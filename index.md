@@ -1,5 +1,1 @@
-Here you can say lots of fun things about your site.
-
-Maybe say a some things about yourself.
-
-Or maybe what you plan to blog about.
+Cheeky lil blog to share different malware analysis techniques on different samples, as well as share some more general DFIR tips & tricks
