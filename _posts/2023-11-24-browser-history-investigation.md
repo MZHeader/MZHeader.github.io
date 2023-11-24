@@ -74,3 +74,17 @@ $_.Value
 } | Sort-Object -Unique
 }
 ```
+
+
+An example use case could be when you are investigating the origin of a file which has the same filename as the URL, in either a time sensitive scenario or in a case where you can not extract the History file from the host to analyse further.
+
+_Example Output:_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e066de39-6e92-4a7f-834d-9f0b7baa0622)
+
+
+
+
+
+
+
