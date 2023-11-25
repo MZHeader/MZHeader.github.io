@@ -71,7 +71,7 @@ if (([System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((i5
 }
 ```
 
-This articale from SANS probably does a better job of explaining the grittier details of this script: https://isc.sans.edu/diary/Fileless+Malicious+PowerShell+Sample/23081
+This [articale](https://isc.sans.edu/diary/Fileless+Malicious+PowerShell+Sample/23081) from SANS probably does a better job of explaining the grittier details of this script.
 
 But what we are interested in is the Base64 string.
 We'll throw it into CyberChef and add a From Base64 and To Hex operator to reveal the shellcode
