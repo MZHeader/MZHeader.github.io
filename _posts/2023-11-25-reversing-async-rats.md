@@ -100,7 +100,36 @@ $Data = '4D5A9@@@@3@@@@@@@4@@@@@@FFFF@@@@B8@@@@@@@@@@@@@@4@@@@@@@@@@@@@@@@@@@@@@
    } catch { }
 ```
 
-2 PEs are present as Hex bytes within the $serv and $Data variables.
+2 PEs are present as Hex bytes within the $serv and $Data variables, these values are loaded directory into memory, so neither of them are written to disk.
+
+By taking these Hex values, replacing @ and with 0, and downloading to a file, we can analyse the 2 PEs further.
+
+The first file is RunPE, it's used to inject the ASync RAT payload (The second PE) into a legitimate process, via process hollowing (https://attack.mitre.org/techniques/T1055/012/)
+
+_Interesting strings which indicate process injection / hollowoing (from PEStudio):_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf627947-2b98-4193-972c-5c07b98a9979)
+
+
+_Interesting functions which indicate process injection / hollowing (From DNSpy):_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b3dec7d5-95da-4dea-afc4-67ab743676b4)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/dbc21c6d-6edc-45cb-addc-e7ac72107c4e)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/33e597d6-8bf9-4667-9fb8-13ac12dcecc7)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/76f93536-3002-4204-ad33-4f5072d781bd)
+
+
+
+
+
+
+
+
+
+
 
 
 
