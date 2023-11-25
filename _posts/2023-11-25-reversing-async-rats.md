@@ -1,5 +1,5 @@
 ---
-tags: RAT-Reversing
+tags: RATs
 ---
 ## Reversing ASync RAT Downloaders / Configs
 
