@@ -1,3 +1,7 @@
+---
+tags: Browser Forensics
+---
+
 ## Browser History Investigation With PowerShell
 
 This is a quick script which displays a given users browser history for Chrome, Edge, Firefox, Brave & Oprea, it's run purely with PowerShell so has it's limitations and is nowhere near as granular as browsing the history file in a sqlite browser, but it has it's uses
