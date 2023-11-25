@@ -87,7 +87,6 @@ _Example Output:_
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e066de39-6e92-4a7f-834d-9f0b7baa0622)
 
 
-
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-48M02RY99Q"></script>
 <script>
