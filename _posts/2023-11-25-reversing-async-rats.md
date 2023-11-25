@@ -104,7 +104,7 @@ $Data = '4D5A9@@@@3@@@@@@@4@@@@@@FFFF@@@@B8@@@@@@@@@@@@@@4@@@@@@@@@@@@@@@@@@@@@@
 
 2 PEs are present as Hex within the $serv and $Data variables, these values are loaded directory into memory, so neither of them are written to disk.
 
-By taking these Hex values, replacing @ and with 0, and downloading to a file, we can analyse the 2 PEs further.
+By taking these Hex values, replacing '@' with '0', and downloading to a file, we can analyse the 2 PEs further.
 
 The first file is RunPE, it's used to inject the ASync RAT payload (The second PE) into a legitimate process, via process hollowing (https://attack.mitre.org/techniques/T1055/012/)
 
