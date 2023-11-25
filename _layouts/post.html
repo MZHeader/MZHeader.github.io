@@ -34,6 +34,10 @@ layout: default
   {% include comments.html %}
 {% endif %}
 
+  {% raw %}{% if jekyll.environment == 'production' and site.google_analytics %}
+  {% include analytics.html %}
+  {% endif %}{% endraw %}
+
 <script type="text/javascript" src="/js/gifffer.min.js"></script>
 <script>window.onload = function() { Gifffer(); }</script>
 <script type="text/javascript" src="/js/copy-code-button.js"></script>
