@@ -48,8 +48,8 @@ This sample has a SystemInfoHelper module, which is used to collect and exfiltra
 
 Further interesting functions include:
 
-**Searching the filesystem for specified directories: Windows, Program Files, Program Files (x86) and Program Data
-**
+**Searching the filesystem for specified directories: Windows, Program Files, Program Files (x86) and Program Data**
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b9e592c-b490-4a0e-b135-8612d26a95fe)
 
 **A list of countries where execution is prevented**
