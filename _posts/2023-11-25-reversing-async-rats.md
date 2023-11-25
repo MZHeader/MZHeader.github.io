@@ -265,18 +265,18 @@ This is taking the 2nd array from GetArr and GetStr, and passing them to the Dec
 
 ```
 for (int i = 0; i < data.Length; i++)
-					{
-						data[i] = (byte)((int)data[i] ^ pass);
-					}
-					byte[] result;
-					using (MemoryStream memoryStream = new MemoryStream(data))
-					{
-						using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
-						{
-							using (MemoryStream memoryStream2 = new MemoryStream())
-							{
-								gzipStream.CopyTo(memoryStream2);
-								result = memoryStream2.ToArray();
+ {
+  data[i] = (byte)((int)data[i] ^ pass);
+ }
+ byte[] result;
+ using (MemoryStream memoryStream = new MemoryStream(data))
+ {
+  using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+  {
+   using (MemoryStream memoryStream2 = new MemoryStream())
+   {
+    gzipStream.CopyTo(memoryStream2);
+    result = memoryStream2.ToArray();
 ```
 The Decrypt fuction is taking the value from GetArr(1) and xoring it (^) with the value from GetStr(1), it is then compressing with GZip.
 
