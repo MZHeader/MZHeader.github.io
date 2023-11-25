@@ -22,12 +22,12 @@ _String Decrypt Function:_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/185621de-4440-4c79-b61e-8b64ad399400)
 
-_Configuration:_
+_Configuration components:_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0312b01c-c8bb-4ccf-8c54-0b3e6d23e37a)
 
 
-Decrypting the configuration items is a simple XOR function and Base64, which we can use CyberChef for.
+Decrypting the configuration components is a simple XOR function and Base64 decode, which we can use CyberChef for.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8804ae0b-d56f-48ca-b1ec-ba70c7c64760)
 
