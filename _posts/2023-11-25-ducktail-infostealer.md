@@ -1,4 +1,4 @@
 ---
-tags: Binary-Analysis
+tags: Infostealers
 ---
 ## Analysing Ducktail Infostealer
