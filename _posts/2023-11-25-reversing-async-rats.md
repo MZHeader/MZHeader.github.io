@@ -3,7 +3,9 @@ tags: RAT-Reversing
 ---
 ## Reversing ASync RART Downloaders / Configs
 
-Going through a few examples / techniques that can be used to find the configuration information for ASync RAT payloads.
+AsyncRAT is a Remote Access Tool (RAT) designed to remotely monitor and control other computers through a secure encrypted connection. It is an open source remote administration tool, however, it could also be used maliciously because it provides functionality such as keylogger, remote desktop control, and many other functions that may cause harm to the victim’s computer. In addition, AsyncRAT can be delivered via various methods such as spear-phishing, malvertising, exploit kit and other techniques.
+
+Here are a few examples / techniques that can be used to reverse and find the configuration information for ASync RAT payloads.
 
 ## Example 1 - Batch Downloader
 
@@ -121,6 +123,127 @@ _Interesting functions which indicate process injection / hollowing (From DNSpy)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/76f93536-3002-4204-ad33-4f5072d781bd)
 
+
+Next, we'll look at the ASync RAT payload, the other PE file we extracted from the PowerShell script.
+
+This example is obfuscated, so the function names are meaningless if you don't know what you're looknig for. In the second example below there will be an unobfuscated ASync RAT payload which will make more sense.
+
+We'll load the PE into DNSpy, follow the entry point, and follow the function which initialises the settings.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d7e5bf8f-8d50-43fc-84ff-d0fa08c2be50)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/59f33465-97b6-4930-a581-3db248273760)
+
+Scroll down and copy this chunk, it is the encrypted configuration information for ASync RAT
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7a19c9a8-e37d-44e7-8641-48187699f08b)
+
+
+```
+		// Token: 0x04000001 RID: 1
+		public static string hWYHKeFtEEW = "o6JfGp15oaNGzR9WARlApVk2JvPGbq9gdGavmsdkX6DuGoM130eIBtGMrUkw7wBpYNYGh8mrukbMc3hkXetHug==";
+
+		// Token: 0x04000002 RID: 2
+		public static string dCJzfOxOjuFS = "qvLrwn18P0R9vmuSTV70SkOzY+xqEgVWfrDGutmRl1OWSFgiPy7MUe1uEO4kE10xOdlgqer815SMOMRnZMdyTrJG4pNkbPgy80Sd4y9TCjg=";
+
+		// Token: 0x04000003 RID: 3
+		public static string WymdhISWjG = "2Znfkq+GplOZtXMaGgU2dBciPR7SvO1+mrvNvI8GN07riHkNbNThHtuDiEJ+zMdKAzxKKIyV57DpJJD8lqYhsOMN1v3K0C22tnkDGXDm9fA=";
+
+		// Token: 0x04000004 RID: 4
+		public static string PXscjOKqSur = "QgOYSnOCrNf0YsP8WOXieraCBjKxM5dBaiqL7vl9jtXEOKOTHLUtUNDeigrngDccwdC/6jXnjKPuijfo5qdlUA==";
+
+		// Token: 0x04000005 RID: 5
+		public static string qYYvBNxxEhZXApwI = "%AppData%";
+
+		// Token: 0x04000006 RID: 6
+		public static string hdQslFbrQYyqStK = "";
+
+		// Token: 0x04000007 RID: 7
+		public static string xdjIwufwCgy = "YUdzT0d5aFJSZmdwdXlqcmhpNVhkU0pnWUc3cmNaRlY=";
+
+		// Token: 0x04000008 RID: 8
+		public static string nZCSwvVQoQAJgs = "jB2zW1XHpaiubHXefFX4EX0OR4bFpNxKYXUtmvDyBF3zuF+jp4n4V2pYQ43X/dN8e3MLkrr6jjZ4R1qeTDL7V46c3BD//TJFgOOCU8sILWI=";
+
+		// Token: 0x04000009 RID: 9
+		public static string RpAikqzoGez = "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";
+
+		// Token: 0x0400000A RID: 10
+		public static string TEiEJhLMvhigXC = "rnaMkpzKjbsuluSpSWKxJorYBpAfvRmNj/+PwWBNeqsKRIMagyqX0j3t+2gadJwNGp3ERejvdIDdplU+ddY+Q0kDTJM2jBw88VK2rnE2/PdxRyxBElmIDiL360Kmhu0ZH5kUvHemMTVa/ExWCldZRUWfH2PzfgjVTWRq8F6adMx/hKxQmnTB9OYevlaIfB4vQEc4oT9ezvunB7eGS63rUWRyz9gSD3HBc8Cy1NwSgZzv1fH7uVN0K7dXWFHsJOzH3BXV/kTZl7aqAPvA5gUB3mh53DvW1yBmvDJ+xQjbwSqP9F5GGTIuhAAMuf5RhPGz7j3H1KLNos+H5Xfkr/9aTkgQr2xR7pyk/x/vbLh9c9kO8sk2GkG3azINeaeYr0k38JPgti9+LvEgG+Cz5O1mKcL7WMn+TNmEr+3gbQH/85cu6HmCpuhFX11mmC1ordPYAgG4X9lmZlq6gWwDu4gVy4eZyTJgE19hzK94Lu9nqJEi9SrchuYlu5/a3bsTdADoIaruPHi1USpm/OE3Cx+XJYpbUl/tmIiM63WwxXm3c/snhWb0RZPs1sAw2mlWClWJtgPxJZofvN5srqzWEqgoE0vLgmjwif/K8pU7VcCW31Q94eXetm0gdFdJqCz9gA6o8T6dxZ0P1Fy7TC0HAdUMgCpyDxRgA1WkTq2CZk4FYFaoDrmGNYe9LxdxBt9fZ5Te9Tfgu5MUjcUD02+2Ywm2h74ILuPuTRrcycEuUXbMHVu2jVURvxb4BrFGTJ4Pugl9vAQaQfmo6Fjd4DmoA2Br+qG/JbVenf6gcGrd1PE150LZwf3DxGR2ZUjo2mus6d4M5Ch95QhvG5LGyS1ESueXGf501/Z08YPafUi4pVN6PLdrTSQgXExwxcTkgqkMfyXt3VSRfdBsnXtOfsLzNZla/1eW0bmRLS/z34NVYMIk4oSDR0wrynYbA/oic8tGwcaIlyxwtBg+nAQQvRmUtpzUcQ==";
+
+		// Token: 0x0400000B RID: 11
+		public static X509Certificate2 pwJVgkQGUTZw;
+
+		// Token: 0x0400000C RID: 12
+		public static string WoTaUDqItzwhd = "cnA5zQ1hVmMUuG9DYNOnuT1pnSh1xNYlT05aZRGcEm9bhzDW7WyqNOxs2Oxy9Nhnl3yBKeCIo9CS+lPQJEQytg==";
+
+		// Token: 0x0400000D RID: 13
+		public static qgxPbMgTneTS kDFoQCQDRJgDby;
+
+		// Token: 0x0400000E RID: 14
+		public static string GNilrjDgbKDnI = "vdpLTQ6GM0xJfEEq9H+qxIc80cSsBbgx7gbd+hYv/dXRBd2TrBHqS7Oc0MRVgcK3Q43TOKvrZ3yXyQr3AFA9uw==";
+
+		// Token: 0x0400000F RID: 15
+		public static string BuKxuxgMrHHY = "7jv0+jCq7CHr8hVCDAj8DTKKcyt/0uhRFyRLqyg81SQbNQSrxLkyb/x6hiD+avA2GHSMqpY/BTSrMMmKj5FmNQ==";
+
+		// Token: 0x04000010 RID: 16
+		public static string gipOvVLCxs = null;
+
+		// Token: 0x04000011 RID: 17
+		public static string RFxLUljBPcgN = "3";
+
+		// Token: 0x04000012 RID: 18
+		public static string aZxzjeJTTVKXrak = "ErjernAre32OfMB6tYkwZpBx0Kodltl41FaA5qBBEcnQGC4XkEZWVt5Ri/ns6c/29UEwiIbeNHc/Rxq5nUdc8g==";
+	}
+}
+```
+
+We're going to throw this into CyberChef, and use the recipie from: https://www.securityinbits.com/tools/cyberchef/asyncrat-config-decryption-using-cyberchef-recipe-2/
+
+The "Key" value which we need is the variable referenced just above the configuration, so we can look for the defined variable in the config.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf2d491f-5e7f-4c7f-be8f-d9afa15c1377)
+
+Variable = xdjIwufwCgy
+
+Key = YUdzT0d5aFJSZmdwdXlqcmhpNVhkU0pnWUc3cmNaRlY=
+
+Next, the Salt, we can find this by following the function before where the Key is referenced, on this line:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2da5c825-e426-446b-bca6-d9560cde84a0)
+
+
+Then scroll to the bottom to find this array:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/90956569-93cf-4ea8-9aff-e8d6796b4b99)
+
+And use CyberChef to convert this array to a hex value.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/890d70e4-cb2b-44d5-9eff-143fb6187c1d)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/229e38f1-3906-49bb-b2dd-90699d118735)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/11d2790f-2248-4e6d-a5ae-dae99d0df8bd)
+
+Salt = bfeb1e56fbcd973bb219022430a57843003d5644d21e62b9d4f180e7e6c33941
+
+Following the guide, we'll add these values to the recipie which will reveal the configuration in (semi) readable format
+
+```
+hWYHKeFtEEW = "3025"
+dCJzfOxOjuFS = "ns1usaupload.myphotos.cc"
+WymdhISWjG = "| Edit 3LOSH RAT"
+PXscjOKqSur = "false"
+nZCSwvVQoQAJgs = "AsyncMutex_6SI8OkPnkA"
+RpAikqzoGez = "MIIE8jCCAtqgAwIBAgIQAPeWQ4YJ3MvReCGwLzn7rTANBgkqhkiG9w0BAQ0FADAaMRgwFgYDVQQDDA9Bc3luY1JBVCBTZXJ2ZXIwIBcNMjIwNDI1MDA0MTA5WhgPOTk5OTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMMD0FzeW5jUkFUIFNlcnZlcjCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAKT9nYYTjYTZhY+g1tekZ8/F29gsEIDgf/8odvCbCmYKGGZZi2yND9NjtBXEMANM9PAXCyMapGvapDPbWgjYkLiMw/Vwa3kZRg7kLpXMpzInLQufe7Q587viilcsGDoVXmnf51/SwsKPjSysZUpyayezUlJ1j6aXkZGnasiqJ7iKANdSneQducOn6IwaEuJBmpXKWxhhq8R9JMfiWeOXL/hXoE/wCzwzvU/CrzPXd3uMsLfFMDHZJ+OQ9OXKU/CHZNCgSPs4VSgCgM4eK0YTbu1mLsWSo5th3/ingNFaTyYmGsmLIE2Jq5AR1A+xA+FEdC8zKL1bAwYQcRgIJs7QdedtAIufepPZ9D5HiOiy3ITYVonqwTiiIm20en7UICt+J8iDb4M2Q2iLWA7Yi9PN2cr0Xrs8A4/RL29Qe5Ly2k35i74RiBTiT7Jbl2r7PcYlUGcjTCbdB9PWt3dYaTysuamoq2Zuo2HVRhhoZpwnajS9vNcjuZCYVoQvUQBUnHTeRZrtHXU5JV59ZBlu7flZneMZnbrWXTxob6Bdt8+hrGoSDMWBFcO4jRzhT3hEFUpu4lSFeb9T3Vx4KWkHJhHtMvHuYgDTXERdEcI00sOUbVxgd/62LhGXNNommQKCyiAGj0V5uLD73Fyw8vJpm3jXf3NgNt/CjnlaMc40DJ+HlXE5AgMBAAGjMjAwMB0GA1UdDgQWBBQsT2WvtxGUK29SWs4sHz1xYye0fzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBDQUAA4ICAQCK5sVfnYyT5MqnCg3uHV2ojf12fIVFCY02Cc7gy3DVoE6/xZCPjr22V/xZunZ7DG1nt0kOJKDwdQYnGoMc5UPh8jbNRoc1ojLOCaluaIYQyl8AGkmUSRA3Ltk0XetDescffrWT/nKuRvIEYU4Ra+B39f8ouGMCa7VXaxnGJ0z0BkUie8KsDLgNmJ7/kVfIYuRxl+YefoCsUTCogqf0fu3DuRHBpUVaSQQOf9YCbvFWH7Nupc3UIwpH5D8kSdpKusEfbRp8nfWN/Fm+lzF3THeHU6vNJ+5UoAWHYFW8wfJCbzQ/0L8QZeOv4uy74oQP2Ed0RdrWCwUL6SSsDPZdDEOy4K4vVYkDTl1nL5tleATguELAEbbT42oLce85z4C7sKvpEfa4DPbU55xBLwvHniILFfjB7VVsrgVckUL/lEf4Y92uJVKvLGruQt/mtKSqIuJjD8T9y7RIsk6g9624egV5UtLtv+36kLKhgIJlqC7Xx/PVwMc2yw8BiQlvxQZgqSd1k7QmV1AhV/3z2wqnYmb09ibTMYaMFjtamFegeFqc4jRLABhVQFEFv8z5E6G9vgKn5mQDWS/JykARBv9o2BjL/PTADfwAtc1b4nWo0l+CI8IjjYXu/mJOuwR+kFJ19INtwbffQvT9U12t4smpcZV+OK0opk4Yr9r1tZYm92ghXA=="
+TEiEJhLMvhigXC = "UAP212eLeEPd/6lKtT3IY+3ZTYfUdaCED64hUyVsT0+jHp9hOeCzLW67poF463ASM3IbDqLK0KtuzbDJfuP3pouwz9CPrpd+0mK7+TbwXPFUoACxxuf9ndhYiqCg+MkYqP6w/wtdLEk92VWKAoXAzoFvHHxtuKvSG+fUvzYc3YXRbDJiNuGkpS9f+J62yj0/j4yF+255rcWgnX/ZSUIg5Fk5JAjgMwaB5wzfxq3euRPcXPCwIuJFIyQulGk2CFRdtqQHLKwfMF6X3MYrBOKgkuy84dEj40H/0/Cit6q2pRv+hCP8o1h2lLaDL6n8CouP3+JULOBOgGx7bVIQ/YG5MqeuDQrLY8q8VX/C194XWIi97iCnTHuOCxbyG61VxeXduIi/QpvJxIAg+q72xAPCNFHS31U/jmzWaYXU/JVQdSHa8ANXhTYhmQ3U1ZBcDGcHLvaG4xoeL5jO6RcolwztgHE48hCaN6eDsaHno/0g1PRcK1I34icPYnWe7FAIVvcpPgUjeQ2bcRMBaHAy5wOonHA/3oda536eRcPLhAtumIXHKsh13HEuhm4FDzCJGMZOiDC+sUjcNX55K69QdmFJLpc7hLid8jCQ+Jek1as33QxulfUBiAVxRd8r5UwYpQ27KwRea2a483SGBG44UkZ2zelX67NOSXL+bJidsA5fuIY="
+WoTaUDqItzwhd = "false"
+GNilrjDgbKDnI = "null"
+BuKxuxgMrHHY = "false"
+aZxzjeJTTVKXrak = "Default"
+AES_KEY = "a6091b5985440524a09832c7f24897ebf8910fedab8f7a844cd3bb54b38f6ae6"
+```
+
+We can now identify the C2 as 'ns1usaupload.myphotos[.]cc:3025'
 
 
 
