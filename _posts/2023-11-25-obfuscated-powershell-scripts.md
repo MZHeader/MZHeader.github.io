@@ -4,6 +4,7 @@ tags: PowerShell-Analysis
 ## Analysing Obfuscated PowerShell Scripts
 
 Some examples of how we can easily and quickly deobfuscate certain PowreShell scripts
+
 The below sample was taken from: https://www.virustotal.com/gui/file/00bceb818c4ca7effb1867160c34265b43ac9bf6a7fdd526e4324f386984e284
 
 
