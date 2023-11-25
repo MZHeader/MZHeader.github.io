@@ -6,7 +6,7 @@ tags: PowerShell-Analysis
 Some examples of how we can easily and quickly deobfuscate certain PowreShell scripts
 
 ## Example 1  -ASync RAT Downloader
-The below sample was taken from: https://www.virustotal.com/gui/file/00bceb818c4ca7effb1867160c34265b43ac9bf6a7fdd526e4324f386984e284
+The below sample was taken from [Virustotal](https://www.virustotal.com/gui/file/00bceb818c4ca7effb1867160c34265b43ac9bf6a7fdd526e4324f386984e284)
 
 
 ```powershell
@@ -87,8 +87,7 @@ We can then use PowerShell again to define and call this variable to get the key
 
 ## Example 2 - Command Execution Through DNS TXT Records
 
-This example was taken from the Huntress CTF, and more context on the command execution method can be found here:
-https://twitter.com/Alh4zr3d/status/1566489367232651264
+This example was taken from the Huntress CTF, and more context on the command execution method can be found on this [tweet](https://twitter.com/Alh4zr3d/status/1566489367232651264)
 
 Layer 1:
 ```powershell
