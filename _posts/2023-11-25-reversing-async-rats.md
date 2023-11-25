@@ -246,6 +246,25 @@ We can now identify the C2 as 'ns1usaupload.myphotos[.]cc:3025'
 
 
 
+## Example 2 - Binary Loader
+
+This second example is taken from the Huntress CTF, but is still a good example of how to extract and decrypt an ASync RAT, the variables for the config on this one are not obfuscated so should make a bit more sense.
+
+Putting the file in DNSpy and following the entry point, we soon notice some interesting functions.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3fd4ae5d-92bc-4e40-9c1c-b11f2d05a860)
+
+**Decrypt:**
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/19cec003-9f76-484a-baed-e253c62837c8)
+
+**GetStr / GetArr**
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5bd703d9-cdaa-4bb0-b074-39769f1d5c64)
+
+
+
+
+
+
 
 
 
