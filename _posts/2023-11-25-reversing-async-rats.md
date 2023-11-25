@@ -226,7 +226,7 @@ And use CyberChef to convert this array to a hex value.
 
 Salt = bfeb1e56fbcd973bb219022430a57843003d5644d21e62b9d4f180e7e6c33941
 
-Following the guide, we'll add these values to the recipie which will reveal the configuration in (semi) readable format
+Following the guide, we'll add these values to the recipie which will decrypt the configuration (bearing in mind the variable names are still obfuscated)
 
 ```
 hWYHKeFtEEW = "3025"
