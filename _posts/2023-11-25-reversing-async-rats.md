@@ -103,16 +103,16 @@ $Data = '4D5A9@@@@3@@@@@@@4@@@@@@FFFF@@@@B8@@@@@@@@@@@@@@4@@@@@@@@@@@@@@@@@@@@@@
 
 2 PEs are present as Hex within the $serv and $Data variables, these values are loaded directory into memory, so neither of them are written to disk.
 
-By taking these Hex values, replacing '@' with '0', and downloading to a file, we can analyse the 2 PEs further.
+By taking these Hex values, replacing '@' with '0', and downloading them to a file, we can analyse the 2 PEs further.
 
 The first file is RunPE, it's used to inject the ASync RAT payload (The second PE) into a legitimate process, via [process hollowing](https://attack.mitre.org/techniques/T1055/012/)
 
-_Interesting strings which indicate process injection / hollowoing (from PEStudio):_
+_Interesting strings which indicate process injection/hollowing (from PEStudio):_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf627947-2b98-4193-972c-5c07b98a9979)
 
 
-_Interesting functions which indicate process injection / hollowing (From DNSpy):_
+_Interesting functions which indicate process injection/hollowing (From DNSpy):_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b3dec7d5-95da-4dea-afc4-67ab743676b4)
 
@@ -125,7 +125,7 @@ _Interesting functions which indicate process injection / hollowing (From DNSpy)
 
 Next, we'll look at the ASync RAT payload, the other PE file we extracted from the PowerShell script.
 
-This example is obfuscated, so the function names are meaningless if you don't know what you're looknig for. In the second example below there will be an unobfuscated ASync RAT payload which will make more sense.
+This example is obfuscated, so the function names are meaningless if you don't know what you're looking for. In the second example below there will be an unobfuscated ASync RAT payload which will make more sense.
 
 We'll load the PE into DNSpy, follow the entry point, and follow the function which initialises the settings.
 
@@ -196,7 +196,7 @@ Scroll down and copy this chunk, it is the encrypted configuration information f
 }
 ```
 
-We're going to throw this into CyberChef, and use the recipie from this [guide](https://www.securityinbits.com/tools/cyberchef/asyncrat-config-decryption-using-cyberchef-recipe-2/)
+We're going to throw this into CyberChef, and use the recipe from this [guide](https://www.securityinbits.com/tools/cyberchef/asyncrat-config-decryption-using-cyberchef-recipe-2/)
 
 The "Key" value which we need is the variable referenced just above the configuration, so we can look for the defined variable in the config.
 
