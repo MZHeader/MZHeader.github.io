@@ -254,15 +254,38 @@ Putting the file in DNSpy and following the entry point, we soon notice some int
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3fd4ae5d-92bc-4e40-9c1c-b11f2d05a860)
 
+```
+return Program.cry.decrypters.decrypt(Program.cry.readers.getArr(1), Convert.ToInt32(Program.cry.readers.getStr(1)));
+```
 **Decrypt:**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/19cec003-9f76-484a-baed-e253c62837c8)
 
+```
+for (int i = 0; i < data.Length; i++)
+					{
+						data[i] = (byte)((int)data[i] ^ pass);
+					}
+					byte[] result;
+					using (MemoryStream memoryStream = new MemoryStream(data))
+					{
+						using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+						{
+							using (MemoryStream memoryStream2 = new MemoryStream())
+							{
+								gzipStream.CopyTo(memoryStream2);
+								result = memoryStream2.ToArray();
+```
 **GetStr / GetArr**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5bd703d9-cdaa-4bb0-b074-39769f1d5c64)
 
-
+```
+return Regex.Match(Encoding.ASCII.GetString(bytes), "<pass1>(.*?)</pass1><pass2>(.*?)</pass2><autorun>(.*?)</autorun>").Groups[massive].Value;
+```
+```
+return Program.cry.decrypters.hextobyte(Regex.Match(Encoding.ASCII.GetString(bytes), "<libArr>(.*?)</libArr><fileArr>(.*?)</fileArr>").Groups[massive].Value);
+```
 
 
 
