@@ -258,6 +258,7 @@ Putting the file in DNSpy and following the entry point, we soon notice some int
 return Program.cry.decrypters.decrypt(Program.cry.readers.getArr(1), Convert.ToInt32(Program.cry.readers.getStr(1)));
 ```
 This is taking the 2nd array from GetArr and GetStr, and passing them to the Decrypt function.
+
 **Decrypt:**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/19cec003-9f76-484a-baed-e253c62837c8)
