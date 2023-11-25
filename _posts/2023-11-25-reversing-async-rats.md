@@ -102,7 +102,7 @@ $Data = '4D5A9@@@@3@@@@@@@4@@@@@@FFFF@@@@B8@@@@@@@@@@@@@@4@@@@@@@@@@@@@@@@@@@@@@
    } catch { }
 ```
 
-2 PEs are present as Hex bytes within the $serv and $Data variables, these values are loaded directory into memory, so neither of them are written to disk.
+2 PEs are present as Hex within the $serv and $Data variables, these values are loaded directory into memory, so neither of them are written to disk.
 
 By taking these Hex values, replacing @ and with 0, and downloading to a file, we can analyse the 2 PEs further.
 
