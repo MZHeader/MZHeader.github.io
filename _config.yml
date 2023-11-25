@@ -21,6 +21,7 @@ github_username: "MZHeader"
 theme: "minima"
 
 #rss: rss
+google_analytics: G-48M02RY99Q
 
 kramdown:
   syntax_highlighter_opts:
