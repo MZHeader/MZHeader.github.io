@@ -1,4 +1,4 @@
-Cheeky lil blog to share different malware analysis techniques on different samples, as well as share some more general DFIR tips & tricks
+Showcasing malware analysis techniques on various samples, as well as sharing some more general DFIR tips & tricks to aid in investigations.
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-48M02RY99Q"></script>
