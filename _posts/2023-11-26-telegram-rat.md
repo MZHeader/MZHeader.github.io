@@ -61,7 +61,7 @@ Back to following the execution chain, we can see that xohfpemfj.pif spawns RegS
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fc9512dd-b7c5-4e23-a331-cf5f32954bd5)
 
-This is the legitimate Windows binary, but it was created by and used as a means of process hollowing into a legitimate process.
+This is the legitimate Windows binary, but it was created by the suspicious xohfpemfj process and is being abused as a means of process hollowing into a legitimate process.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7a30f6b9-fe1d-4584-bdcb-e82302246e61)
 
