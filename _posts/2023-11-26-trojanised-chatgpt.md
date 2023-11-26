@@ -56,3 +56,11 @@ _Further Windows Defender exclusion paths are added_
 ```
 C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe Add-MpPreference -ExclusionPath @($env:UserProfile, $env:ProgramFiles) -Force
 ```
+
+These commands are a strong indication of coin-miner malware, and are similar to samples such as:
+
+[https://any.run/report/2032ba1561fdfa8dce836c35bc1f89aa9a806c021f1ed7f7c32324b54e450290/8fe9499b-3310-40b9-afd0-51eb2a8184de](https://any.run/report/2032ba1561fdfa8dce836c35bc1f89aa9a806c021f1ed7f7c32324b54e450290/8fe9499b-3310-40b9-afd0-51eb2a8184de)
+
+[https://www.joesandbox.com/analysis/1279914/0/lighthtml](https://www.joesandbox.com/analysis/1279914/0/lighthtml)
+
+
