@@ -62,6 +62,11 @@ From Telegram bot [atricle](https://telegrambots.github.io/book/Migration-Guide-
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2ca2c814-fcb2-4f13-a624-2c1404a80226)
 
+_Basic Execution Flow_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1a0d9f71-ea12-4d3e-89ae-6bf784ddee6f)
+
+
 There are also some interesting references to Facebook URLs within the strings:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6728cd25-712c-4b56-a6ff-87993575512c)
