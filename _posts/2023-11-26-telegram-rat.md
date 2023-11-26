@@ -1,4 +1,4 @@
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/12f777cf-893f-4b24-a4f1-fd4353383f59)---
+---
 tags: RATs
 ---
 ## Telegram RAT Analysis
