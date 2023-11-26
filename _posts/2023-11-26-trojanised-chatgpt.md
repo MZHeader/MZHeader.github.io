@@ -1,5 +1,5 @@
 ---
-Tags: Trojans
+tags: Trojans
 ---
 ## Investigating A Fake Trojanised ChatGPT Application
 
