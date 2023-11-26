@@ -1,7 +1,7 @@
 ---
 tags: Infostealers
 ---
-## Analysing Ducktail Infostealer
+## Ducktail Infostealer
 
 Ducktail infostealer targets individuals and employees that may have access to a Facebook Business account.
 The malware is designed to steal browser cookies and take advantage of authenticated Facebook sessions to steal information from the victim's Facebook account and ultimately hijack any Facebook Business account that the victim has sufficient access to.
