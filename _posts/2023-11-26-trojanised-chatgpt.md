@@ -19,7 +19,7 @@ Turning our attention to the Temp directory, we observe the following file creat
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/231c750a-27e8-4481-8cd0-9a40e7edc0dd)
 
-Upon execution of 'Chatgpt Desktop V4.exe' which was installed on the Desktop, the binary 'Free Chatgpt V4.exe' in the Temp directory is executed silently. The same binary also exists as 'C:\Program Files\Google\Chrome\Googleupdater.exe'.
+Upon execution of the main ChatGPT binary,a binary of the same name 'Free Chatgpt V4.exe' in the Temp directory is executed silently. The same binary also exists as 'C:\Program Files\Google\Chrome\Googleupdater.exe'.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c6453e05-2b36-4c3d-b9fe-783443a73bc2)
 
