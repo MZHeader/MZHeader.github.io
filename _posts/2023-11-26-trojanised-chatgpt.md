@@ -63,4 +63,9 @@ These commands are a strong indication of coin-miner malware, and are similar to
 
 [https://www.joesandbox.com/analysis/1279914/0/lighthtml](https://www.joesandbox.com/analysis/1279914/0/lighthtml)
 
+_Basic Execution Flow_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e48d185e-6604-44bd-aafd-ebe3d87e23eb)
+
+
 
