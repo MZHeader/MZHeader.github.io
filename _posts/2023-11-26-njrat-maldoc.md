@@ -82,7 +82,7 @@ The next function involves breaking/disabling AMSI and ETW, likely through the u
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/48e550fc-4b5e-4fcf-9e93-438232dbdc9d)
 
 
-
+Next up is the main function, which essentially decrypts and executes a payload in memory.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/af3e374a-7c42-4e6f-8775-aae8ad36c471)
 
