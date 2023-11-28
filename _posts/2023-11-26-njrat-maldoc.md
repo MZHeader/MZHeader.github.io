@@ -77,6 +77,13 @@ Firstly, the binary does a basic check to decide if the host is in a virtualised
 
 If there is a value for Win32_CacheMemory, the program assumes the host is not a virtual machine and will execute the next function.
 
+The next function involves breaking/disabling AMSI and ETW, likely through the use of SharpUnhooker or a similar tool.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/48e550fc-4b5e-4fcf-9e93-438232dbdc9d)
+
+
+
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/af3e374a-7c42-4e6f-8775-aae8ad36c471)
 
 The first line derives an AES key by getting the SHA 256 value of Settings.aes_key and taking the first 32 bytes.
