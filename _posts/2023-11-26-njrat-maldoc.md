@@ -65,7 +65,7 @@ _Base64 Snippet:_
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/53b37b49-c1de-4051-83c8-fae9faddce0c)
 
 
-Once this code is injected and executed, it drops a PE in the location 'C:\Users\george\AppData\Roaming\netflex\netflex.exe', as well as employing some persistence mechanisms, such as a vbs script in the startup folder and a registry run key.
+Once this code is injected and executed, it drops a PE in the location 'C:\Users\user\AppData\Roaming\netflex\netflex.exe', as well as employing some persistence mechanisms, such as a vbs script in the startup folder and a registry run key.
 
 ## 1st Executable 
 
