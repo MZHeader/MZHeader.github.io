@@ -98,9 +98,13 @@ The Settings class is compromised of 3 key components, baseData, aes_key and aes
 We now have everything needed to decrypt the base64 string.
 
 1) Copy and paste the baseData string, convert it from base64.
+   
 2) Remove the first 4 bytes
+   
 3) Decompress with Gunzip
+   
 4) AES decrypt with base64 key "78e3e7cc513ff8ae00a177366efa4060" _(First 32 bytes of the SHA 256 value of'Q4NP7JPHRA5AJB28')_
+   
 5) Decode from base64
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/aa810be8-fab3-4223-bf4a-7d1de792bfdd)
