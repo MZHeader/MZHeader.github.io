@@ -205,7 +205,7 @@ With this, we know that keystrokes should be recorded under the HLCU\SOFTWARE\Ne
 **Basic Execution Flow**
 
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/99bc950e-277b-44d1-b755-bf6b191d3ebd)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fba213b3-133c-453b-aa70-e2f92e48b105)
 
 
 
