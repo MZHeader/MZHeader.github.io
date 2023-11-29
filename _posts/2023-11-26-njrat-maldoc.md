@@ -189,7 +189,7 @@ The following line defines where the keystrokes are to be recorded.
 
 **STV Function**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a90963bd-f48f-46c5-a8f2-50a7b7eb4f20)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0bee5133-49f0-4b5a-9674-7d18cde86dc5)
 
 With this, we know that keystrokes should be recorded under the SOFTWARE\Netflex [kl] registry key.
 
