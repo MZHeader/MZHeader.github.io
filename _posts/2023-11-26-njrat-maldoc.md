@@ -143,11 +143,15 @@ This leaves us with another .NET executable.
 
 ## 2nd Executable
 
+**Command and Control**
+
 Within this executable, we can see the C2 domain and installation directory being declared. 
 
-**C2: netflex.duckdns[.]org:2255**
+C2: netflex.duckdns[.]org:2255
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6f7fd25f-61d4-4658-bfac-a22c4f894da3)
+
+**Replication**
 
 There is also the capability for replication across removable media drives, creating the same vbs script which was mentioned before.
 
@@ -157,7 +161,9 @@ There is also the capability for replication across removable media drives, crea
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b47f825d-f9e8-4a07-b3be-14859f79be54)
 
-And previously noted registry run key additions.
+**Persistence**
+
+Previously noted registry run key additions.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d6b7e8d2-0be3-448d-9eb2-f1bb0ec4b51c)
 
