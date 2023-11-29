@@ -175,7 +175,21 @@ As well as the binary being copied to the Startup directory.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/27e7f7c9-0c18-4648-9119-7acc0357a85d)
 
+**Keylogging**
 
+The 'kl' class in the binary presents the keylogging functionality.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/baf8b432-0770-42ea-a296-6c91518e97c6)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4795b74c-8d51-4210-94a7-74621f3628e0)
+
+The following line defines where the keystrokes are to be recorded.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e42dd246-0f58-4113-bcfb-f22eb70d79db)
+
+**STV Function**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0973e8e0-a04d-47fe-b97f-dcdd017d1d61)
 
 
 
