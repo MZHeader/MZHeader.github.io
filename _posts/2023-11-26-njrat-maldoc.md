@@ -202,7 +202,8 @@ reg query HKU\S-1-5-21-1066261180-1871016056-3695858278-1000\SOFTWARE\netflex
 
 **Basic Execution Flow**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ccabfad0-751a-4795-b8f6-9f725f24ad70)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/99bc950e-277b-44d1-b755-bf6b191d3ebd)
+
 
 
 
