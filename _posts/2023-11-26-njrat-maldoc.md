@@ -133,7 +133,7 @@ We now have everything needed to decrypt the base64 string.
    
 3) Decompress with Gunzip
    
-4) AES decrypt with base64 key "78e3e7cc513ff8ae00a177366efa4060" _(First 32 bytes of the SHA 256 value of'Q4NP7JPHRA5AJB28')_
+4) AES decrypt with base64 key "78e3e7cc513ff8ae00a177366efa4060" _(First 32 bytes of the SHA 256 value of 'Q4NP7JPHRA5AJB28')_
    
 5) Decode from base64
 
