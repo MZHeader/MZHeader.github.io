@@ -3,7 +3,7 @@ tags: RATs
 ---
 ## NJRat Injection From Malicious Document
 
-Another RAT variant, NJRat is typically attributed to ECRime actors, it is supposedly popular with actors in the Middle East. It's primary infection vectors are phishing attacks and drive-by downloads, and like many other RATs, it has the capability to log keystrokes, access the victim's camera, steal credentials stored in browsers, open a reverse shell, upload/download files, view the victim's desktop, perform process, file, and registry manipulations, etc...
+Another RAT variant, NJRat is typically attributed to ECrime actors, it is supposedly popular with actors in the Middle East. It's primary infection vectors are phishing attacks and drive-by downloads, and like many other RATs, it has the capability to log keystrokes, access the victim's camera, steal credentials stored in browsers, open a reverse shell, upload/download files, view the victim's desktop, perform process, file, and registry manipulations, etc...
 
 This sample was taken from the following [tweet](https://twitter.com/DmitriyMelikov/status/1696050783790207060)
 
