@@ -198,7 +198,7 @@ The following line defines where the keystrokes are to be recorded.
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0bee5133-49f0-4b5a-9674-7d18cde86dc5)
 
 
-With this, we know that keystrokes should be recorded under the HLCU\SOFTWARE\Netflex [kl] registry key.
+With this, we know that keystrokes should be recorded under the HKCU\SOFTWARE\Netflex [kl] registry key.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9c582bd7-186c-400d-983d-ea2deddfd01e)
 
