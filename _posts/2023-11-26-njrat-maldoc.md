@@ -143,7 +143,9 @@ This leaves us with another .NET executable.
 
 ## 2nd Executable
 
-Within this executable, we can see the C2 domain and installation directory being declared: netflex.duckdns[.]org:2255
+Within this executable, we can see the C2 domain and installation directory being declared. 
+
+**C2: netflex.duckdns[.]org:2255**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6f7fd25f-61d4-4658-bfac-a22c4f894da3)
 
