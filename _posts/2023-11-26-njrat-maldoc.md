@@ -127,7 +127,7 @@ The Settings class is compromised of 3 key components, baseData, aes_key and aes
 
 We now have everything needed to decrypt the base64 string.
 
-1) Copy and paste the baseData string, convert it from base64.
+1) Copy and paste the baseData string into CyberChef, convert it from base64.
    
 2) Remove the first 4 bytes
    
