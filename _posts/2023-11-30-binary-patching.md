@@ -33,7 +33,12 @@ The program calls a 'determineWinner__main_58' function, followed by a test oper
 
 Contextually, and through some conveniently named functions, we know that reversing this jump should mean that winning = losing, and losing = winning
 
-We can reverse the jump by right clicking the instruction
+We can reverse the jump by right-clicking the instruction
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4c0d72af-45db-4781-a3ad-95a10d31c446)
+
+Close Cutter and execute the newly modified binary to see if the outputs have swapped.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/67cd1a41-89fc-4b07-bb92-47609bf8b734)
+
 
