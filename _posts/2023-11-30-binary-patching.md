@@ -21,7 +21,7 @@ We'll use Cutter to open the binary in write mode.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c2873273-e3c7-49bb-b0e1-008483858086)
 
-We quickly identify that it is a Nim binary, and so navigate to the NimMainInner function, and follow that to main__main62.
+We identify that it is a Nim binary, and so navigate to the NimMainInner function, and follow that to main__main62.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/177ff89e-d11d-4c6d-a45e-bbad4f30562d)
 
@@ -44,6 +44,8 @@ Close Cutter and execute the newly modified binary to see if the outputs have sw
 ## Example 2 - Targeted Malware
 
 Also taken from the Huntress CTF, crab rave is a challenge where you need to get a DLL to execute to present the flag.
+
+Upon execution, nothing happens.
 
 Just like before, we'll make a copy of the file, and open it in Cutter with write mode enabled.
 
