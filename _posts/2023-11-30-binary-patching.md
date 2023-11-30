@@ -41,4 +41,43 @@ Close Cutter and execute the newly modified binary to see if the outputs have sw
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/67cd1a41-89fc-4b07-bb92-47609bf8b734)
 
+## Example 2 - Targeted Malware
+
+Also taken from the Huntress CTF, crab rave is a challenge where you need to get a DLL to execute to present the flag.
+
+Just like before, we'll make a copy of the file, and open it in Cutter with write mode enabled.
+
+Traversing the program we find the 'NtCheckOSArchitecture' function, which, after a series of other functions and instructions, calls a function which injects the flag.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f7704492-1a10-4202-873e-5eff46590d1a)
+
+_API Calls associated with process injection_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/06931740-f9f5-42f9-9d96-19a8444f1f49)
+
+Without worrying too much about that, we'll go back to the 'NtCheckOSArchitecture' function and review the instructions in-between the calling of this inject flag function, and the start of NtCheckOSArchitecture.
+
+Multiple whoami functions are called, and the result is compared against a value, if the value does not match what the program is expecting, the payload will not execute.
+
+In this context, whoami is a rust crate used to query the username and hostname.
+
+[https://docs.rs/whoami/latest/whoami/](https://docs.rs/whoami/latest/whoami/) 
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3fcc8191-ba3b-44c0-a0a5-a5ba7dd65431)
+
+We'll bypass these checks by making note of the address where the inject function is called, and changing the very jump instruction to jump to this address. 
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/06ed8f8d-762b-4650-8500-b7f709730255)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d8bffbc7-42d5-4db1-a2c7-7c2c2f268c74)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/94a06e9e-d141-4dca-8552-02adf78275ff)
+
+Now when we execute the DLL, the payload executes.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1e0a47ee-c95f-46d7-ab63-7373c250d3c4)
+
+
+
+
 
