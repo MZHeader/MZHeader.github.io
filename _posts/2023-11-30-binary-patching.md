@@ -67,7 +67,7 @@ In this context, whoami is a rust crate used to query the username and hostname.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3fcc8191-ba3b-44c0-a0a5-a5ba7dd65431)
 
-We'll bypass these checks by making note of the address where the inject function is called, and changing the very jump instruction to jump to this address. 
+We'll bypass these checks by making note of the address where the inject function is called and changing the very first jump instruction to jump to this address. 
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/06ed8f8d-762b-4650-8500-b7f709730255)
 
@@ -79,7 +79,36 @@ Now when we execute the DLL, the payload executes.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1e0a47ee-c95f-46d7-ab63-7373c250d3c4)
 
-## Example 3 - .NET Binary
+## Example 3 - .NET Binary - Virtualisation Check
+
+This example is taken from my [NJRat](https://mzheader.github.io/2023/11/29/njrat-maldoc.html) blog post.
+
+The binary does a basic check to decide if the host is in a virtualised environment by querying Win32_CacheMemory
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0310a987-a366-4dde-ae74-d4f754c11fb5)
+
+If there is a value for Win32_CacheMemory, the program assumes the host is not a virtual machine and will execute the next function.
+
+Upon execution in my virtual machine with no changes, nothing happens.
+
+To overcome this, we open the binary in DNSpy, locate the class containing the function, right-click on the class in the assembly explorer and select edit class
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe739797-a947-498c-8c21-bd78e7514ea4)
+
+We can simply change 'if (!Program.VM())' to 'if (Program.VM())', so that the binary will only execute if it's running in a virtualised environment.
+
+Once done, click compile, and save to a new binary
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bb53fd11-93ea-4fe3-a662-be5902ef3ecb)
+
+Now when the binary is executed, the payload executes fully and we see C2 communication and further files being dropped onto the host.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d86c9549-c979-4f15-9a4b-774dc0f879cc)
+
+
+
+
+
 
 
 
