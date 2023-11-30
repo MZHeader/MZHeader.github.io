@@ -8,6 +8,7 @@ This sample is a trojanised ChatGPT installer which can be downloaded as an .msi
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7dd1c425-3a00-49f9-871f-4fa5394e152c)
 
+
 During installation, the directory 'C:\Program Files (x86)\OpenAI' is created, and process 'C:\Program Files (x86)\OpenAI\Chatgpt Desktop V4\Free Chatgpt V4\Free Chatgpt V4.exe' is executed.
 
 This process spawns cmd.exe with the following command line:
