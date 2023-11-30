@@ -3,7 +3,7 @@ tags: Binary-Analysis
 ---
 
 
-## Binary Patching
+## Overcoming Malware Analysis Evasion - Binary Patching
 
 The process of making changes to a binary and modifying its instruction flow, from a malware analysts perspective, this can be utilised to overcome measures the malware author has put in place to evade analysis, such as detecting if the target is a virtual machine.
 
@@ -78,6 +78,8 @@ We'll bypass these checks by making note of the address where the inject functio
 Now when we execute the DLL, the payload executes.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1e0a47ee-c95f-46d7-ab63-7373c250d3c4)
+
+## Example 3 - .NET Binary
 
 
 
