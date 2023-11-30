@@ -11,7 +11,8 @@ The process of making changes to a binary and modifying its instruction flow, fr
 
 Taken from the Huntress CTF, this is a good example of how effective binary patching can be.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6984b703-2d47-4dd2-96a5-ffff3a8f1fe8)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5bf595fa-257a-4da7-ac70-7ccf63e6ca93)
+
 
 The aim is to win a game of rock, paper, scissors against a program which knows your input.
 
@@ -19,7 +20,8 @@ The first step is to copy the binary to have an original and a copy to which we 
 
 We'll use Cutter to open the binary in write mode.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c2873273-e3c7-49bb-b0e1-008483858086)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e0c67d4-5db6-4e45-8256-a858e720c852)
+
 
 We identify that it is a Nim binary, and so navigate to the NimMainInner function, and follow that to main__main62.
 
@@ -39,7 +41,8 @@ We can reverse the jump by right-clicking the instruction
 
 Close Cutter and execute the newly modified binary to see if the outputs have swapped.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/67cd1a41-89fc-4b07-bb92-47609bf8b734)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/79e34d7a-06d4-4fc1-a3fd-2bc11188c796)
+
 
 ## Example 2 - Targeted Malware
 
@@ -99,7 +102,8 @@ We can simply change 'if (!Program.VM())' to 'if (Program.VM())', so that the bi
 
 Once done, click compile, and save to a new binary
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bb53fd11-93ea-4fe3-a662-be5902ef3ecb)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/68e250a7-c613-4b44-ae20-5aec243d68e6)
+
 
 Now when the binary is executed, the payload executes fully and we see C2 communication and further files being dropped onto the host.
 
