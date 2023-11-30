@@ -5,6 +5,7 @@ tags: Trojans
 
 This sample is a trojanised ChatGPT installer which can be downloaded as an .msi file from SourceForge. It masquerades as a Free ChatGPT 4 binary but utilises the R77 rootkit to deploy XMRig coinminer malware.
 
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7dd1c425-3a00-49f9-871f-4fa5394e152c)
 
 During installation, the directory 'C:\Program Files (x86)\OpenAI' is created, and process 'C:\Program Files (x86)\OpenAI\Chatgpt Desktop V4\Free Chatgpt V4\Free Chatgpt V4.exe' is executed.
