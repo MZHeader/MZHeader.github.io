@@ -11,6 +11,6 @@ The process of making changes to a binary and modifying its instruction flow, fr
 
 Taken from the Huntress CTF, this is a good example of how effective binary patching can be.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/759c0a3f-2b8b-4589-954b-12af2e29ad38)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6984b703-2d47-4dd2-96a5-ffff3a8f1fe8)
 
 The aim is to win a game of rock, paper, scissors against a program which knows your input.
