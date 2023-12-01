@@ -67,12 +67,6 @@ This is the legitimate Windows binary, but it was created by the suspicious xohf
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b99e8393-d8c9-4ef7-a4ef-f24f9fdf9218)
 
-
-_Basic Execution Flow_
-
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1e08f3f-07aa-4d82-aeab-650cafc21f6f)
-
-
 Using Process Hacker, we can interrogate the memory of this process and try to find some interesting things. We start by filtering for "HTTP" to search for any network traffic, and we do see results for api.telegram.com, so we'll change our filter to Telegram to identify the following strings:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5825edf8-3f3d-4b15-bb5d-ff50619cf7e7)
