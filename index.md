@@ -1,6 +1,6 @@
 Showcasing malware analysis techniques on various samples, as well as sharing some more general DFIR tips & tricks to aid in investigations.
 
-The tools I use are all freely available, most of which come pre-installed in the FLRAE VM.
+The tools I use are all freely available, most of which come pre-installed in the FLARE VM.
 
 All samples are available on VirusTotal.
 
