@@ -262,6 +262,7 @@ Running the shellcode through Speakeasy, we can gain further context:
 * Finished emulating
 ```
 
+The shellcode is a downloader with C2 address 47.98.51[.]47
 
 
 
