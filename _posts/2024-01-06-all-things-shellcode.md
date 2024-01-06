@@ -237,7 +237,9 @@ We can take this array and clean it up by removing all instances of underscores.
 
 Next, we need to fix the negative values, since these are bytes with a maximum value of 256, we want to replace (-4) with the value of (256 - 4) and so on, which can be achieved by using the following CyberChef recipe:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/aefc6035-f932-4e93-bf49-e4259ee8e0ea)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/75aac014-fa6d-4c72-95e8-b2489f443f77)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e920a79a-3dee-424f-81ac-2e27f2865997)
 
 This shellcode has plaintext references to a UserAgent and the C2 address:
 
