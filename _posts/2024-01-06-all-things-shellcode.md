@@ -153,11 +153,13 @@ The readable elements of the script appear to use Excel add-ins to execute the V
 
 Decimal encoded characters are used as a means of obfuscation, we can overcome this by creating a subsection which will "isolate" that part of the script and only apply operators to that section.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8eea4fdb-05a1-4b1b-9bd6-4b903add5d54)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a70de964-5e5e-4454-8ecb-2534c2639fad)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ebb3e407-63c2-403c-bd97-71e7c25925ea)
 
 We can then clean up the rest of the code by removing new lines, underscores, ampersands
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4aa7a109-54f8-4491-af3e-edfa25fbb8c0)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/489b914d-9e62-4382-84e8-4ddd8fc7e3c2)
 
 Deobfuscated Code:
 
