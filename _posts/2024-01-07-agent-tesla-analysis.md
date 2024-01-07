@@ -45,7 +45,7 @@ When executed, this gives us the following:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f8dbf57c-c55e-449e-8842-cb466a114597)
 
-We're presented with a PowerShell script which downloads and executes the contents of the given domain.
+We're presented with a PowerShell command which downloads and executes the contents of the given domain.
 
 ## PowerShell - Stage 2 
 The domain in question redirects to a bitbucket link and hosts a PowerShell script.
