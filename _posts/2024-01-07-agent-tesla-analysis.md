@@ -319,6 +319,16 @@ Further investigation of network traffic shows that requests are made towards th
 
 **C2: hxxps[://]api.telegram[.]org/bot6796626947:AAGohe-IHhj5LD7VpBLcRBukReMwBcOmiTo**
 
+Looking at file interaction events in ProcMon, it's evident that the malware is reading sensitive information such as history, passwords, cookies etc utilised by common browsers.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b2fd9ede-de95-4634-9392-159d89bf4a40)
+
+Further artefacts include the COM object hijacking mentioned previously:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c87c1668-b8f1-4e04-87cc-303cf815a010)
+
+
+
 
 
 
