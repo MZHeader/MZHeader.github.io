@@ -299,7 +299,7 @@ We'll then upload the result to CyberChef and use a 'From Binary' operator to ex
 
 The binary extracted is a .NET executable, however, it appears have been protected by IntelliLock, making reverse engineering this binary very difficult.
 
-_Referneces to Protection:_
+_References to Protection:_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e2d173aa-e5de-44db-8f95-cc07104df754)
 
