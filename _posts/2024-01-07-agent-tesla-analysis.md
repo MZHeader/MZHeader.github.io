@@ -299,3 +299,5 @@ $ErrorActionPreference = "Continue" # Reset error action preference
 
 ```
 
+This infers that COM object hijacking is being utilised as a means of persistence, under the Class ID 'fdb00e52-a214-4aa1-8fba-4357bb0072ec'
+
