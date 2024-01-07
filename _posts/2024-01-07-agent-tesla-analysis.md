@@ -226,7 +226,7 @@ function kimkarden($binaryData) {
 
 $muthal = -join $muthal[-1..-($muthal.Length)]
 
-$binaryData1 = (Yes another long binary string)
+$binaryData1 = (Yet another long binary string)
 $pinch = $binaryData1.split('O')[1].split('l')[0]
 $rPinchr = -join $pinch[-1..-($pinch.Length)]
 $pinchs = $rPinchr.replace('*', '000000000000000000').replace('-', '111').replace('!', '1000000').replace('^', '100000')
