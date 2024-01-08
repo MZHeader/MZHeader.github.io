@@ -315,7 +315,7 @@ Looking at file interaction events in ProcMon, it's evident that the malware is 
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b2fd9ede-de95-4634-9392-159d89bf4a40)
 
-Further investigation of network traffic shows that POST requests are made towards the Telegram API domain, a strong indication that this sensitive information is being infiltrated via Telegram C2.
+Further investigation of network traffic shows that POST requests are made towards the Telegram API domain, a strong indication that this sensitive information is being exfiltrated via Telegram C2.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1962edb4-4c4f-4dcb-b35a-aa3bbac216ff)
 
