@@ -87,8 +87,9 @@ For the first URL, it reads the bytes between 2 flags present in the strings of 
 
 We can extract the contents of the first by downloading the image, running a strings command, and extracting the code between the <<BASE64_START>> and <<BASE64_END>> flags.
 
-_curl https://uploaddeimagens.com.br/images/004/691/257/original/js.jpg?1702591609 -o test.txt | strings test.txt_
-
+```
+curl https://uploaddeimagens.com.br/images/004/691/257/original/js.jpg?1702591609 -o test.txt | strings test.txt
+```
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7ae91d50-d7f6-42f1-8b17-eaf7dee97fdf)
