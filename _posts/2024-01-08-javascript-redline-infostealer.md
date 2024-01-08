@@ -92,6 +92,11 @@ We can extract this too by downloading the image, running a strings command, and
 
 When decoding this from Base64 we are given an executable file.
 
+The second URL contains a reversed Base64 string which contains another executable.
+
+1st Executable SHA 256: e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54
+
+2nd Executable SHA 256: 8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a
 
 
 
