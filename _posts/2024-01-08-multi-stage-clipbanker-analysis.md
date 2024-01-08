@@ -136,9 +136,14 @@ Following this, we can see that 'LAbWJK' - our 2nd executable - is being injecte
 
 The 2nd executable is our main payload, which is ClipBanker Malware.
 
-Within the binary there are references to the attacker's wallet addresses:
+Within the binary, there are references to the attacker's wallet addresses:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3313d627-d9db-4b98-b3b2-0be9cfac69bf)
+
+It doesn't look like it's been too successful so far!
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8892fc96-43d7-4453-b914-7bd92abc9536)
+
 
 
 
