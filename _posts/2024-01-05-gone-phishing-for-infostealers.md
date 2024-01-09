@@ -179,14 +179,14 @@ Instantly, we can see the two arguments being passed from the previous web reque
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca)
 
-There are some noticeably interesting inoculation definitions:
+There are some interesting conditions that will prevent execution of the malware:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/70993992-814f-4f40-8078-2d618ce5b2aa)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b0e6e74e-cf6f-4a42-a01e-914e9d859dc7)
 
 
-There are lots of interesting functions typical of info-stealing malware, described below:
+There are lots of functions typical of info-stealing malware, described below:
 
 **Finding and stealing sensitive browser information**
 
