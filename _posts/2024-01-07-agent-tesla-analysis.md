@@ -1,4 +1,4 @@
-## Agent Tesla Malware Analysis
+## Agent Tesla Malware Analysis - JavaScript > Telegram C2
 
 A .NET based information stealer readily available to actors due to leaked builders. The malware is able to log keystrokes, can access the host's clipboard and crawls the disk for credentials or other valuable information. It has the capability to send information back to its C&C via HTTP(S), SMTP, FTP, or towards a Telegram channel.
 
