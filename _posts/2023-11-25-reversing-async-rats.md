@@ -7,7 +7,7 @@ AsyncRAT is a Remote Access Tool (RAT) designed to remotely monitor and control 
 
 Here are a few examples / techniques that can be used to reverse and find the configuration information for ASync RAT payloads.
 
-## Example 1 - Batch Downloader
+## First Sample - Batch Downloader
 
 Out initial file is taken from [Virustotal](https://www.virustotal.com/gui/file/16b4a6fec76b452f77a6832871ff2e906d673e557a0e6c2673fc952181d1319b)
 
@@ -246,7 +246,7 @@ We can now identify the C2 as 'ns1usaupload.myphotos[.]cc:3025'
 
 
 
-## Example 2 - Binary Loader
+## Second Sample - Binary Loader
 
 This second example is taken from the Huntress CTF, but is still a good example of how to extract and decrypt an ASync RAT, the variables for the config on this one are not obfuscated so should make a bit more sense.
 
