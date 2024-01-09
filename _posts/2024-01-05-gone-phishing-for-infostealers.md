@@ -157,7 +157,46 @@ The binary can be reviewed in DNSpy as it is a .NET binary, however, it is extre
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c2fa5c5d-54e7-4874-a240-20168cd6fbc8)
 
-Therefore, we will take the dynamic approach.
+We can use a Confuser Unpacker to make this code a lot easier to read, I'll be using this - https://github.com/XenocodeRCE/ConfuserEx-Unpacker/tree/master
+
+Unpack the binary:
+
+```
+C:\Users\mzheader\Desktop\ConfuserEx-Unpacker-master\ConfuserEx Dynamic Unpacker\bin\Debug > & '.\ConfuserEx Dynamic Unpacker.exe' -s C:\Users\mzheader\Desktop\confusing.exe
+```
+
+Instantly, we can see the two arguments being passed from the previous web request
+
+(buildID = 'ezzcAvVW' and URL =  'hxxp[://]45.129.199[.]204/index.php')
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca)
+
+There are lots functions typical of info-stealing malware, described below:
+
+**Finding and stealing sensitive browser information**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/13e30051-0c28-443e-af05-d412cdbea19b)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/68c2bf01-3f44-4c89-ad43-189df3d437fc)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88e34856-1b24-4578-b749-a67c7a5eeee9)
+
+
+**Crypto Wallet Paths being defined:**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/49ad2d13-5946-4182-8ac7-f16d75f77be1)
+
+**Screenshot functionality:**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9dc09b92-a8f7-435f-a888-37dcc6ed3a9a)
+
+
+
+
+
+
+
+Dynamic Analysis:
 
 To be able to execute this binary without an internet connection, I've hardcoded the config and changed the C2 address to localhost.
 
