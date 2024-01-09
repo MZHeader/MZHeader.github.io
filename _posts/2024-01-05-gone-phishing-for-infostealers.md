@@ -190,34 +190,13 @@ There are lots functions typical of info-stealing malware, described below:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9dc09b92-a8f7-435f-a888-37dcc6ed3a9a)
 
+**Collecting System information**
 
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c5304ba0-b812-480e-a604-10e13d5f125f)
 
+**Full List of interesting function names:**
 
-
-
-
-Dynamic Analysis:
-
-To be able to execute this binary without an internet connection, I've hardcoded the config and changed the C2 address to localhost.
-
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/98544282-3be6-407d-a28b-183801d7e5e8)
-
-Upon execution, we can see POST requests are sent to the hardcoded C2 address
-```
-POST /index.php HTTP/1.1
-Host: 127.0.0.1
-Content-Length: 86407
-Expect: 100-continue
-Connection: Keep-Alive
-```
-
-Investigating with ProcMon we see the file events we would expect from an infostealer, touching files which contain sensitive information such as credentials, and extensions associated with 2FA, password management and crypto wallets.
-
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5844ee7d-47ec-405d-a61a-e0f26c1de989)
-
-
-
-
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b7588e0-e338-4895-8ad3-b2dac3ddbd2e)
 
 
 
