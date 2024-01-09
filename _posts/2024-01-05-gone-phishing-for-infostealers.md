@@ -179,7 +179,7 @@ Instantly, we can see the two arguments being passed from the previous web reque
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca)
 
-There are lots functions typical of info-stealing malware, described below:
+There are lots of interesting functions typical of info-stealing malware, described below:
 
 **Finding and stealing sensitive browser information**
 
@@ -190,11 +190,11 @@ There are lots functions typical of info-stealing malware, described below:
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88e34856-1b24-4578-b749-a67c7a5eeee9)
 
 
-**Crypto Wallet Paths being defined:**
+**Crypto Wallet Paths being defined**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/49ad2d13-5946-4182-8ac7-f16d75f77be1)
 
-**Screenshot functionality:**
+**Screenshot functionality**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9dc09b92-a8f7-435f-a888-37dcc6ed3a9a)
 
@@ -202,7 +202,12 @@ There are lots functions typical of info-stealing malware, described below:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c5304ba0-b812-480e-a604-10e13d5f125f)
 
-**Full List of interesting function names:**
+**Function detailing how the information is exfiltrated**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/dae44a37-1622-4016-aa7d-69039d2dae1d)
+
+
+**Full List of interesting function names**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b7588e0-e338-4895-8ad3-b2dac3ddbd2e)
 
