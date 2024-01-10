@@ -359,7 +359,11 @@ Immediately noticeable are the APIs associated with injection - VirtualAlloc, Wr
 
 We can take this array and clean it up by removing all instances of underscores.
 
-Next, we need to fix the negative values, since these are bytes with a maximum value of 256, we want to replace (-4) with the value of (256 - 4) and so on, which can be achieved by using the following CyberChef recipe:
+Next, we need to fix the negative values, since these are bytes with a maximum value of 256, we want to replace (-4) with the value of (256 - 4) and so on, which can be achieved by using the following CyberChef recipe.
+
+We create a subsection to match all of the negative values (-\d+). We then find and replace these negative values with "256 + original value", for example, "-4" = "256 - 4".
+
+We then add a Subtract operator with a space delimiter, subtracting the original value from 256, we'll then use a Merge operator, ending the subsection, and do a From Decimal operator to extract the shellcode.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/75aac014-fa6d-4c72-95e8-b2489f443f77)
 
