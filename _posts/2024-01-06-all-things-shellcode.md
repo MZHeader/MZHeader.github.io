@@ -275,6 +275,8 @@ The readable elements of the script appear to use Excel add-ins to execute the V
 
 Decimal encoded characters are used as a means of obfuscation, we can overcome this by creating a subsection which will "isolate" that part of the script and only apply operators to that section.
 
+We'll create a subsection with regex "Chr\(\d+\)", we will then use the regex "\d+" and list the output, this will output all of the decimal values, ready for our From Decimal operator.
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a70de964-5e5e-4454-8ecb-2534c2639fad)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ebb3e407-63c2-403c-bd97-71e7c25925ea)
