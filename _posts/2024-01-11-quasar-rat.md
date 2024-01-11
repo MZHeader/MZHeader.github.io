@@ -1,3 +1,7 @@
+---
+tags: RATs
+---
+
 ## Quasar RAT - PowerShell Deobfuscation - .Net Debugging
 
 Quasar RAT is a malware family written in .NET which is used by a variety of attackers, as it's fully functional and open source.
