@@ -307,7 +307,9 @@ We can use a tool such as DetectItEasy or PE Detective to learn it is a .NET exe
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31baf012-8484-40ec-8768-8f2f10f2ece8)
 
-Knowing this, we can use DNSpy to interrogate the binary further, however, after following the entry point, we quickly realise that the binary is heavily obfuscated, which will make analysis pretty difficult.
+Knowing this - we can use DNSpy to interrogate the binary further, however, after following the entry point we quickly realise that the binary is heavily obfuscated.
+
+This will make our analysis a lot more difficult.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
 
