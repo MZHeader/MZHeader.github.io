@@ -8,6 +8,8 @@ Quasar RAT is a malware family written in .NET which is used by a variety of att
 
 The sample we're looking at today is taken from: https://bazaar.abuse.ch/download/98844e610a8d1e4800f8aee8d8464acc12d50f19c4025ffbf1759a899b5d66c4
 
+It involves decoding and extracting byte arrays from a PowerShell script. The executable is then debugged with DNSpy to reveal the C2 address.
+
 ## Initial PowerShell
 ``` powershell
 Add-Type -AssemblyName System.Windows.Forms
@@ -72,13 +74,13 @@ INSTALL
 CodeDom $RUNPE "Netflix.Movie" "Run"
 ```
 
-The first interesting string appears to be byte code for a portable executable.
+The first interesting string appears to be byte code for a portable executable. _([Byte[]] $RUNPE =)_
 
-The second appears to create a VBS script.
+The second appears to create a VBS script. _([String] $VBSRun =)_
 
-There's then a function referencing decompression, which appears to be Gzip.
+There's then a function referencing decompression, which appears to be Gzip. _(Function Decompress {)_
 
-The next interesting string is a very long URL-encoded byte array.
+The next interesting string is a very long URL-encoded byte array. _([Byte[]] $Bytes = [System.Web.HttpUtility]::UrlDecodeToBytes)_
 
 We're going to start by taking the last, longest, URL-encoded string, and decode it to reveal an executable using the following CyberChef recipe:
 
