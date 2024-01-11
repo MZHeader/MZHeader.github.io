@@ -71,3 +71,18 @@ INSTALL
 [System.Threading.Thread]::Sleep(1000)
 CodeDom $RUNPE "Netflix.Movie" "Run"
 ```
+
+The first interesting string appears to be byte code for a portable executable.
+
+The second appears to create a VBS script.
+
+There's then a function referencing decompression, which appears to be Gzip.
+
+The next interesting string is a very long URL-encoded byte array.
+
+We're going to start by taking the last, longest, URL-encoded string, and decode it to reveal an executable using the following CyberChef recipe:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e1c81006-928f-4863-956b-1ff2a84187a2)
+
+
+
