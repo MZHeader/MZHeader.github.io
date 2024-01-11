@@ -86,5 +86,21 @@ We're going to start by taking the last, longest, URL-encoded string, and decodi
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e1c81006-928f-4863-956b-1ff2a84187a2)
 
+We can then download the output to get our executable.
+
+## Analysing the Executable
+
+We can use a tool such as DetectItEasy or PE Detective to learn that it is a .NET executable.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31baf012-8484-40ec-8768-8f2f10f2ece8)
+
+Knowing this, we can use DNSpy to interrogate the binary further, however, after following the entry point, we quickly realise that the binary is heavily obfuscated, which is going to make analysis pretty difficult.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
+
+To overcome this, we can use a tool like De4Dot, which identifies and "cleans" obfuscated .NET binaries. This tool can be downloaded from [here](https://github.com/de4dot/de4dot)
+
+
+
 
 
