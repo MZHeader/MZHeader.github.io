@@ -6,7 +6,7 @@ tags: RATs
 
 Quasar RAT is a malware family written in .NET which is used by a variety of attackers, as it's fully functional and open source.
 
-The sample we're looking at today is taken from: https://bazaar.abuse.ch/download/98844e610a8d1e4800f8aee8d8464acc12d50f19c4025ffbf1759a899b5d66c4
+The sample we're looking at today is taken from [MalwareBazaar](https://bazaar.abuse.ch/download/98844e610a8d1e4800f8aee8d8464acc12d50f19c4025ffbf1759a899b5d66c4)
 
 It involves decoding and extracting byte arrays from a PowerShell script. The executable is then debugged with DNSpy to reveal the C2 address.
 
@@ -90,15 +90,50 @@ We can then download the output to get our executable.
 
 ## Analysing the Executable
 
-We can use a tool such as DetectItEasy or PE Detective to learn that it is a .NET executable.
+We can use a tool such as DetectItEasy or PE Detective to learn it is a .NET executable.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31baf012-8484-40ec-8768-8f2f10f2ece8)
 
-Knowing this, we can use DNSpy to interrogate the binary further, however, after following the entry point, we quickly realise that the binary is heavily obfuscated, which is going to make analysis pretty difficult.
+Knowing this, we can use DNSpy to interrogate the binary further, however, after following the entry point, we quickly realise that the binary is heavily obfuscated, which will make analysis pretty difficult.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
 
 To overcome this, we can use a tool like De4Dot, which identifies and "cleans" obfuscated .NET binaries. This tool can be downloaded from [here](https://github.com/de4dot/de4dot)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/40b9706a-1afc-4417-bcfe-c2089f0bfd04)
+
+De4Dot detects that the executable has been obfuscated, cleans it up, and outputs the cleaned version under a new file. We'll load this file back into DNSpy to see the results.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50dbb051-72e2-4c79-950b-356d578f07e8)
+
+Thankfully, it worked pretty well, the module and method names don't hold much meaning, but interrogating this binary will be a lot easier with this newer, cleaned version.
+
+Malware typically loads configuration information shortly after the entry point, meaning we're probably not too far away from what we're interested in.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fff0c0c-0ee9-4298-9089-3e544ff872ef)
+
+We're going to dig deeper into smethod_0, as it's one of the first executed objects.
+
+We can see that there are strings being defined with Base64 encoded text, which is a good indication that we are looking at configuration-related information. 
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d9b4ff72-d9ea-482a-bea3-507cf4720124)
+
+As well as the method which is used to decrypt and obtain the data.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ed76a929-6459-44db-a94f-e0ca0703f45d)
+
+Rather than wasting time reversing this process, we can set a breakpoint and step over the functions to try and reveal important information.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1d40550-d478-4dc8-b9b7-6f62624a322c)
+
+Stepping over these functions we reveal the C2 address as: nathwood23[.]mysynology[.]net:6750
+
+Stepping further, we get strong indications that this is related to the Quasar RAT.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3223cda0-3619-4bc6-8da6-0d43f1d66b6b)
+
+
+
 
 
 
