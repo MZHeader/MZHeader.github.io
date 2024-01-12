@@ -1,5 +1,5 @@
 ---
-tags: RATs
+tags: InfoStealer
 ---
 
 ## Agent Tesla Malware Analysis - JavaScript to Telegram C2
