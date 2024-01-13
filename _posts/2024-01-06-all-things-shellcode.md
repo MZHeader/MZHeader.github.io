@@ -4,7 +4,11 @@ tags: Shellcode
 
 ## All Things Shellcode - Meterpreter, Cobalt Strike
 
-A couple of examples of deobfuscating scripts to reveal shellcode, and then analysing the shellcode to find the underlying commands.
+Shellcode is a small piece of executable code used as a payload and is usually written in assembly language.
+
+The primary goal of shellcode is to perform a specific action on the target system, such as spawning a command shell or establishing a network connection. 
+
+Below are a couple of examples of deobfuscating scripts to reveal shellcode, and then analysing the shellcode to find the underlying commands.
 
 ## Meterpreter Shellcode Obfuscated in PowerShell
 Taking apart a Meterpreter Payload encoded within an obfuscated PowerShell script.
