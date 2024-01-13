@@ -400,6 +400,55 @@ Running the shellcode through Speakeasy, we can gain further context:
 
 The shellcode is a downloader with C2 address 47.98.51[.]47
 
+## Cobalt Strike Binary Loader
+
+When analysing Cobalt Strike binaries, we can typically load the executable into x32/64dbg and set our first breakpoint at the VirtualAlloc function.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5382ce8c-1ca9-4110-b89d-8b325626d6df)
+
+We'll then run through execution until we meet that breakpoint.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b235aeac-1813-478a-bd6c-359b9ad9c9e2)
+
+We can then use the "execute til return" option, which will step over the instructions until the current instruction pointed to by EIP or RIP is ret instruction.
+
+Under our FPUs we want to take note of the first address and follow it in dump by right-clicking and selecting that option.
+
+This will give us an empty memory buffer at the bottom of the screen, we're going to set a breakpoint on the first byte of this buffer by doing the following:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/35f061b8-2d8c-4dd7-a300-c006626c1654)
+
+We'll hit that breakpoint by running the executable and we can see that the first byte has been written with "FC", which is very common for shellcode and has been evident in the previous examples.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/27a2501a-2023-41bf-8890-4cc77d528270)
+
+We'll execute until return again and can see the buffer fill up with seemingly meaningless characters, however, this is our shellcode.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/12348d10-9b8a-47ad-802f-f258f4761b7d)
+
+We can choose to dump this shellcode and run it through an emulator like Speakeasy to get the out. We can do this by right-clicking, following in memory map, right-clicking the address and dumping to a file.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1ca4ccdb-1158-4d01-b703-92d67b3d83df)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a813755c-9368-4210-9256-e0ed32ab70fc)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/83f1c73e-8ce7-4722-bd07-de7fb55a34f2)
+
+Alternatively, we can continue with using x64dbg to gather this information.
+
+Following the shellcode in the disassembler and switching to a graph view, we can see where API calls are likely mdae at the bottom of the graph
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0bb3fd2e-b208-4291-95f1-9773de505868)
+
+We'll set a breakpoint here and see what values are being resolved.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/75e42ba4-0122-4f7e-bbb4-76966476b270)
+
+This will end up showing our C2 domain being passed to the wininet.InternetConnectA function.
+
+
+
+
 
 
 
