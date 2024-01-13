@@ -462,7 +462,24 @@ Running the shellcode through Speakeasy, we can gain further context:
 * Finished emulating
 ```
 
-The shellcode is a downloader with C2 address 47.98.51[.]47
+The shellcode is a downloader with C2 address 47.98.51[.]47.
+
+Rather than using an emulator, we can debug the shellcode by loading it with blobrunner and attaching x32dbg to the process.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/62efd60a-1ac5-4a01-aaeb-684e06f99547)
+
+We'll use the address that blobrunner has given us and set a breakpoint there, we'll then run the shellcode and switch to a graph view which will look like the following:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a27923f5-642c-4f39-ad01-9c7c7a20c37d)
+
+We'll navigate to the bottom of the graph and set a breakpoint at the JMP function, this is where the API calls will occur.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/26204898-a5e9-4d18-9792-bce775bb4bc9)
+
+The values will be present on the right-hand side of the screen where we can again see the C2 address.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8ab68a61-7a16-4a10-9c97-47b9b09fa7a0)
+
 
 ## Cobalt Strike Binary Loader
 
