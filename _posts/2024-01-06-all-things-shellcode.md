@@ -170,10 +170,6 @@ $aN.Length};$mM=$gL::VirtualAlloc(0,0x1000,$Ud,0x40);for ($Bw=0;$Bw -le ($aN.Len
 
 There are references to injection APIs such as VirtualAlloc, Memset and CreateThread, which could be an indication that the following hex blob is shellcode.
 
-We can validate this by using the disassemble x86 operator in CyberChef.
-
-<img width="1386" alt="image" src="https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6279660b-dcb3-4cac-945e-98395f92b469">
-
 We can emulate this shellcode by using Speakeasy, we'll save the shellcode from CyberChef and run it against Speakeasy to reveal the following code:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/038af658-e528-4fc0-a982-88c87b10dc21)
