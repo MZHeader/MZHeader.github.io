@@ -489,7 +489,7 @@ We'll then run through execution until we meet that breakpoint.
 
 We can then use the "execute til return" option, which will step over the instructions until the current instruction pointed to by EIP or RIP is ret instruction.
 
-Under our FPUs we want to take note of the first address and follow it in dump by right-clicking and selecting that option.
+WWe'll make note of the first register's address and follow it in dump by right-clicking and selecting that option.
 
 This will give us an empty memory buffer at the bottom of the screen, we're going to set a breakpoint on the first byte of this buffer by doing the following:
 
