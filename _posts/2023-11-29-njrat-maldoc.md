@@ -84,7 +84,7 @@ We also see indications that a registry run key is going to be a form of persist
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8be53c65-f5cc-41aa-824c-8963e1810e88)
 
-Most interestingly, we can see a NtWrite API call occurring, however, it only seems to show the first 1024 bytes of what it is writing, but from this content also, we can see that it is writing an executable, which we should investigate further.
+Most interestingly, we can see a NtWriteFile API call occurring. It only seems to show the first 1024 bytes of what it is writing but from this content alone we can see that it is writing an executable, which we should investigate further.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/db05a2ba-1cb1-4cbc-821e-be7dbfa3e387)
 
