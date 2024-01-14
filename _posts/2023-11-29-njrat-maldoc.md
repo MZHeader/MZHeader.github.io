@@ -66,6 +66,8 @@ _Base64 Snippet:_
 
 This is donut Shellcode - https://github.com/TheWover/donut
 
+## Shellcode Analysis
+
 A simple From Base64 operation will reveal the raw shellcode. To investigate this further, I ran the shellcode as an argument with Blobrunner and attached x32dbg to the process.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0734d4a3-15b5-4077-8998-04858c32b2cf)
