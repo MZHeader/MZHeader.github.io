@@ -186,7 +186,7 @@ We now have everything needed to decrypt the base64 string.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/aa810be8-fab3-4223-bf4a-7d1de792bfdd)
 
-This leaves us with another .NET executable.
+This leaves us with another .NET executable, which, upon execution, netflex.exe would load in memory.
 
 ## 3rd Executable - NJRat Payload
 
