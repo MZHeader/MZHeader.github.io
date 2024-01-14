@@ -108,18 +108,36 @@ As this was extracted from memory, we need to clean some bits up before we get o
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3595c7dc-21f8-4909-9b56-f90d86b74120)
 
+## 1st Executable - The Loader
+
 This is a .NET binary so we will run it through DNSpy to figure out what it's doing.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/28ef07f4-5a8a-421d-8b18-d8acbca8338c)
 
+This appears to be a loader with the injection target of svchost.exe
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/63e29b47-8ecd-4118-851d-2af3fdde3d59)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d7f5cee7-f6c5-4a30-9ee1-6772dec017dc)
+
+We see more references to the registry run key previously mentioned.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe9edb4b-affa-4298-8438-e382afd5baf7)
+
+And, what we're interested in - a baes64 encoded chunk and target file path.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1cdab8a4-e617-4b50-b587-f7fb14bf0fb3)
+
+A From Base64 operation will reveal our next binary, dropped from this loader.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a75e9850-0fe6-4b3b-8ab9-ee938484a6d4)
 
 
 
 
 
 
-
-## 1st Executable 
+## 2nd Executable - Netflex
 
 Taking a look at the dropped 'netflex.exe' in DNSpy, there are a few things to note.
 
@@ -170,7 +188,7 @@ We now have everything needed to decrypt the base64 string.
 
 This leaves us with another .NET executable.
 
-## 2nd Executable
+## 3rd Executable - NJRat Payload
 
 **Command and Control**
 
