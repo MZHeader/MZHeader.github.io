@@ -66,6 +66,32 @@ _Base64 Snippet:_
 
 This is donut Shellcode - https://github.com/TheWover/donut
 
+A simple From Base64 operation will reveal the raw shellcode. To investigate this further, I ran the shellcode as an argument with Blobrunner and attached x32dbg to the process.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0734d4a3-15b5-4077-8998-04858c32b2cf)
+
+We'll set a breakpoint in x32dbg for the base address 0x012d0000 and run the shellcode.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7bc92678-f8d7-4d58-94ec-47861d5d2bbd)
+
+I decided to leave this here for now, and instead switched to API monitor to see if i could see some interesting function calls.
+
+Within some of the API calls, there are references to netflex.exe in the AppData directory, which is one of our final payloads.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fcb9df18-624f-4385-9615-51c036dd2b14)
+
+We also see indications that a registry run key is going to be a form of persistence for this malware.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8be53c65-f5cc-41aa-824c-8963e1810e88)
+
+Most interestingly, we can see a NtWrite API call occurring, however, it only seems to show the first 1024 bytes of what it is writing, but from this content also, we can see that it is writing an executable, which we should investigate further.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/db05a2ba-1cb1-4cbc-821e-be7dbfa3e387)
+
+
+
+
+
 Once this code is injected and executed, it drops a PE in the location 'C:\Users\user\AppData\Roaming\netflex\netflex.exe', as well as employing some persistence mechanisms, such as a vbs script in the startup folder and a registry run key.
 
 **VBS Script**
