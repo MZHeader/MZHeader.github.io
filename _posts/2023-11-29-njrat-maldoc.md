@@ -289,4 +289,3 @@ With this, we know that keystrokes should be recorded under the HKCU\SOFTWARE\Ne
 
 
 
-
