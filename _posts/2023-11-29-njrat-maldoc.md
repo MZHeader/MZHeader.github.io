@@ -186,7 +186,7 @@ We now have everything needed to decrypt the base64 string.
    
 5) Decode from base64
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/aa810be8-fab3-4223-bf4a-7d1de792bfdd)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7e120cd3-88a3-4b70-a9ee-f61e6bba9413)
 
 This leaves us with another .NET executable, which, upon execution, netflex.exe would load in memory.
 
