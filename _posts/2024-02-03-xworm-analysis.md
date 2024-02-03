@@ -159,7 +159,7 @@ This module doesn't appear to be obfuscated and we can instantly see where the S
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9b67b4f1-e3a9-4684-9cc1-009723118aff)
 
 
-IOCs:
+**IOCs:**
 
 IPv4: 65.1.224[.]214
 
