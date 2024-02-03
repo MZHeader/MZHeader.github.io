@@ -105,3 +105,70 @@ $_CASH_DLltN = New-Object System.IO.MemoryStream
 $_CASH_VzeZp = New-Object System.IO.Compression.GZipStream($_CASH_SjOoQ, [IO.Compression.CompressionMode]::Decompress)
 ```
 The decrypted text is being decompressed with gunzip.
+```powershell
+$_CASH_JzGOp = [System.Reflection.Assembly]::('daoL'[-1..-4] -join '')($_CASH_epUJg)
+$_CASH_PUHAS = $_CASH_JzGOp.EntryPoint
+$_CASH_PUHAS.Invoke($null, (, [string[]] ('')))
+```
+The contents of which are being loaded/executed in memory.
+
+Now that we know what the script is doing, we'll search for instances of "::@" in the initial script, perform the operations and we should be left with some form of executable code.
+
+We see our string starting with "::@", which is a huge blob of text.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d8d60598-7491-4893-8892-2d4d563c8206)
+
+We'll take this blob and throw it in CyberChef with the following operators to decode and decrypt the content as the script does.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d45309f5-a055-4251-b051-96766c3050b3)
+
+We are left with an executable file.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b251516-6528-43ff-b54a-ced8d90e169f)
+
+## .NET Analysis
+
+Detect It Easy tells us that this is a .NET binary, and it has a fairly interesting entropy level, around mid-way but it remains consistent.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c6ef6c1c-b1dd-4fdc-85d8-f9a6ed669266)
+
+Loading the executable into DnSpy we can see it is heavily obfuscated, but there are references to LoadPE. This, and the level of entropy suggests it's likely a loader and not our final payload.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/23ac0071-6c6b-4f02-b400-45a40b3ab74e)
+
+Knowing this, we can set a module breakpoint and try to extract anything interesting that is being loaded in memory.
+
+Head to Module Breakpoints and set a breakpoint for * (anything)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31865716-bb47-45d9-aabb-332c2cc0f323)
+
+Now we begin to debug the executable, taking note of all loaded modules.
+
+As we step through, there is a very interesting module being loaded which we should interrogate further.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b8deef38-4b11-4323-9018-613beeb23bab)
+
+We can right-click "Load Module" to decompile it in our current DnSpy session.
+
+This module doesn't appear to be obfuscated and we can instantly see where the Settings are stored.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e5f87ea-7e84-4d94-8ad4-16fef0a92b75)
+
+**Settings:**
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9b67b4f1-e3a9-4684-9cc1-009723118aff)
+
+
+IOCs:
+IPv4: 65.1.224[.]214
+SHA 256: E5DAC6F6D2AB4C479C5C3E91064F335DE141C8399BD93F8267E13F134C578C0F
+SHA 256: EC7890D7D688DAC4EF8EF6B6E2A832280EA47BF404B851B97CDF7C709C389E65
+SHA 256: CBB7FC940A1E9B3DADB1EC625554325B5DD9A95E34A05A0EC6F7206D2128DAB9
+
+
+
+
+
+
+
+
