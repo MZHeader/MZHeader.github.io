@@ -146,7 +146,7 @@ Now we begin to debug the executable, taking note of all loaded modules.
 
 As we step through, there is a very interesting module being loaded which we should interrogate further.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b8deef38-4b11-4323-9018-613beeb23bab)
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b4c94a3e-5255-4d35-b37c-b36ba64ba74e)
 
 We can right-click "Load Module" to decompile it in our current DnSpy session.
 
