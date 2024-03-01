@@ -53,6 +53,7 @@ The script initially declares some 2 character variable names, which are likely 
 We can save these variables locally by appending a $ before them, echo all of the variable names, and save the output to a file locally.
 
 Multiple ways to go about this, I added all of the variables in PowerShell:
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e799fe6a-a876-46ff-9f68-fa09b25dd67f)
 
 And then created and ran a script that would echo all of the variables to a file:
