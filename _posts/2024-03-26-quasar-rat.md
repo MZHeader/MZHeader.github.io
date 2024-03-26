@@ -409,9 +409,12 @@ The remaining bytes after the first 48 are our input which we are trying to decr
 From the encrypted segment we took, we have managed to get the C2 for this RAT: **nathwood23.mysynology[.]net:6750**
 
 **Decrypting by Debugging**
+
+Set a breakpoint at where the settings are being decrypted:
+
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1d40550-d478-4dc8-b9b7-6f62624a322c)
 
-Stepping over these functions we reveal the C2 address as: nathwood23[.]mysynology[.]net:6750
+Stepping over these functions we reveal the plaintext values - like the C2 address we previously found.
 
 Stepping further, we get strong indications that this is related to the Quasar RAT.
 
