@@ -327,9 +327,7 @@ Malware typically loads configuration information shortly after the entry point,
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fff0c0c-0ee9-4298-9089-3e544ff872ef)
 
-We're going to dig deeper into smethod_0, as it's one of the first executed objects.
-
-We can see that there are strings being defined with Base64 encoded text, which is a good indication that we are looking at configuration-related information. 
+When we follow this method and scroll down, we can see that there are strings being defined with Base64 encoded text, which is a good indication that we are looking at configuration-related information. 
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d9b4ff72-d9ea-482a-bea3-507cf4720124)
 
@@ -337,8 +335,80 @@ As well as the method which is used to decrypt and obtain the data.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ed76a929-6459-44db-a94f-e0ca0703f45d)
 
-Rather than wasting time reversing this process, we can set a breakpoint and step over the functions to try and reveal important information.
+**Static Decrypting**
 
+GClass0.smethod_0 is composed of the following:
+```
+	public static bool smethod_0()
+	{
+		if (string.IsNullOrEmpty(GClass0.string_0))
+		{
+			return false;
+		}
+		GClass30.smethod_0(GClass0.string_9);
+		GClass0.string_10 = GClass30.smethod_6(GClass0.string_10);
+		GClass0.string_0 = GClass30.smethod_6(GClass0.string_0);
+		GClass0.string_1 = GClass30.smethod_6(GClass0.string_1);
+		GClass0.string_5 = GClass30.smethod_6(GClass0.string_5);
+		GClass0.string_6 = GClass30.smethod_6(GClass0.string_6);
+		GClass0.string_7 = GClass30.smethod_6(GClass0.string_7);
+		GClass0.string_8 = GClass30.smethod_6(GClass0.string_8);
+		GClass0.string_11 = GClass30.smethod_6(GClass0.string_11);
+		GClass0.smethod_1();
+		return true;
+```
+Firstly, the value of string_9 is being passed to GClass30.smethod_0.
+
+We can see the contents of string_9 among the other configuration information:
+
+```
+string_9 = "QzXTNaNU0qNKGByM57rH";
+```
+
+Following GClass.smethod_0, we can see that the value QzXTNaNU0qNKGByM57rH is being passed as a key, and has some operations applied to it.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/852a3607-8303-42c9-a7dd-a6ec2af05546)
+
+Following Rfc2898DeriveBytes, we can see that the strings are named password, salt, and iterations, as well as the SHA1 hashing algorithm.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fe61ec3-64a2-4c6e-ab56-1d2a5e1d85fb)
+
+A SHA1 sum is being calculated from the value of key/password (QzXTNaNU0qNKGByM57rH), plus a salt, with 50000 iterations.
+
+We can find the salt by following GClass30.byte2
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/22eb8275-ac85-4e0a-8a1a-d146acacc313)
+
+The result of this is the key to be used for AES decryption, evident from the use of GClass.byte0:
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b86c5b66-d8ba-452a-81e6-84a0ced14659)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88ccb100-4570-4eb7-9eab-6459d53aa486)
+
+We can create a SHA1 sum using these values by using a Derive PBKDF2 Key operator in CyberChef
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a5728e68-aaac-4db2-8ade-f865a46c1df9)
+
+Output:
+```
+479a82d2b43754381da67194314e8f25
+```
+
+It should be possible to decrypt the settings with this key. The IV is the first 16 bytes of the input, noting that the first actual 32 bytes are the hash, so we should take bytes 33-48.
+
+I find that the easiest way to do this is to do a From Base64 operation on a given encrypted segment, and copy the bytes, it's visible within CyberChef what specific bytes are being highlighted.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6519cdb8-6b92-4086-8650-2d1859aef658)
+
+The remaining bytes after the first 48 are our input which we are trying to decrypt.
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf2fd424-c995-468b-b1be-0de76e4abb34)
+
+![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fd07aebb-f26e-4c55-be11-0ed23c0d9be9)
+
+From the encrypted segment we took, we have managed to get the C2 for this RAT: **nathwood23.mysynology[.]net:6750**
+
+**Decrypting by Debugging**
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1d40550-d478-4dc8-b9b7-6f62624a322c)
 
 Stepping over these functions we reveal the C2 address as: nathwood23[.]mysynology[.]net:6750
