@@ -5,9 +5,9 @@ description: "Collection of malware analysis and DFIR techniques" # This will sh
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
 #email: "example@mail.com"
-#twitter_username: "Chuggx00"
+#twitter_username:
 github_username: "MZHeader"
-#linkedin_username: "Liam-Chugg"
+#linkedin_username:
 #facebook_username: username
 #flickr_username: username
 #instagram_username: username
