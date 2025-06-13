@@ -3,6 +3,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <style>
+    /* Prevent white flash by setting dark bg and text immediately */
+    body {
+      background-color: #1e1e1e !important;
+      color: #d4d4d4 !important;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+  </style>
+
   {%- seo -%}
   {%- feed_meta -%}
 
