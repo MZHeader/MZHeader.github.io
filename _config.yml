@@ -1,40 +1,46 @@
 title: "Analysing Malware One Sample At A Time"
 author: Liam Chugg
-description: "Collection of malware analysis and DFIR techniques" # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+description: "A collection of practical malware analysis and DFIR techniques, tools, and write-ups."
 
-# Email / Social media user names used by the minima theme:
-# All of these are optional and can be removed or commented out
-#email: "example@mail.com"
-#twitter_username:
+# Email / Social media usernames for Minima theme:
+# All of these are optional — add or remove as needed.
+# email: "example@mail.com"
+# twitter_username: ""
 github_username: "MZHeader"
 linkedin_username: "liam-chugg"
-#facebook_username: username
-#flickr_username: username
-#instagram_username: username
-#pinterest_username: username
-#youtube_username: username
-#googleplus_username: +username
+# facebook_username: ""
+# flickr_username: ""
+# instagram_username: ""
+# pinterest_username: ""
+# youtube_username: ""
+# googleplus_username: ""
 
 #########################################################################################
 ######### Nothing below needs to be changed (unless you know what you're doing) #########
 #########################################################################################
+
 theme: "minima"
 
-#rss: rss
+# RSS feed and analytics
+# rss: rss
 google_analytics: G-48M02RY99Q
 
+# Kramdown markdown engine settings
 kramdown:
   syntax_highlighter_opts:
     disable: true
-    
+
+# Plugins for feed and sitemap generation
 plugins:
   - jekyll-feed
   - jekyll-sitemap
 
+# Use first heading as page title for posts & collections
 titles_from_headings:
   strip_title: true
   collections: true
 
+# Default front matter for posts
 defaults:
   - scope:
       path: ""
