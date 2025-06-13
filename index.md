@@ -7,76 +7,49 @@
   <!-- Dracula syntax highlighting -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
 
-  <!-- highlight.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-48M02RY99Q"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-48M02RY99Q');
-  </script>
-
   <style>
     body {
-      margin: 0;
-      padding: 2rem;
       background: #1e1e1e;
       color: #dcdcdc;
       font-family: 'Segoe UI', 'Roboto', sans-serif;
+      padding: 2rem;
       line-height: 1.6;
     }
-
     h1, h2 {
       color: #ff79c6;
     }
-
     header {
       border-bottom: 1px solid #333;
       margin-bottom: 2rem;
       padding-bottom: 1rem;
     }
-
     header p {
       color: #bbbbbb;
       max-width: 70ch;
     }
-
     a {
+      color: #ff79c6;
       text-decoration: none;
     }
-
     a:hover {
       text-decoration: underline;
       color: #50fa7b;
     }
-
-    .normal-link {
-      color: #8be9fd;
-    }
-
     .post-list {
       list-style: none;
       padding: 0;
     }
-
     .post-list li {
       margin-bottom: 1rem;
     }
-
-    .post-list a {
-      color: #ff79c6;
-    }
-
     .post-list .post-date {
       color: #888;
       margin-right: 0.5rem;
       font-size: 0.9rem;
     }
-
     pre code {
       display: block;
       padding: 1em;
@@ -89,13 +62,11 @@
       box-shadow: 0 0 8px #00000080;
       border: 1px solid #444;
     }
-
     section {
       margin-bottom: 2rem;
     }
   </style>
 </head>
-
 <body>
 
   <header>
@@ -108,8 +79,8 @@
     </p>
     <p>
       All samples are available on 
-      <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
-      <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
+      <a href="https://www.virustotal.com/" target="_blank" style="color:#8be9fd;">VirusTotal</a> /
+      <a href="https://bazaar.abuse.ch/" target="_blank" style="color:#8be9fd;">MalwareBazaar</a>.
     </p>
   </header>
 
@@ -126,10 +97,10 @@ print(ascii_chars_from_octal)
     <h2>Posts</h2>
     <ul class="post-list">
       {% for post in site.posts %}
-        <li>
-          <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        </li>
+      <li>
+        <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </li>
       {% endfor %}
     </ul>
   </section>
