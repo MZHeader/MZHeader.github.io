@@ -1,51 +1,62 @@
-/* hljs-custom.css */
 .hljs {
   background: #1e1e1e;
   color: #d4d4d4;
-  padding: 1em;
-  overflow-x: auto;
+  padding: 1rem;
   border-radius: 8px;
+  overflow-x: auto;
   font-size: 0.95rem;
   line-height: 1.5;
+  box-shadow: 0 0 0 1px #333;
 }
 
-/* Code element colors */
+/* Comments */
 .hljs-comment,
 .hljs-quote {
   color: #6a9955;
   font-style: italic;
 }
 
+/* Keywords */
 .hljs-keyword,
 .hljs-selector-tag,
-.hljs-subst {
+.hljs-literal {
   color: #569cd6;
 }
 
-.hljs-literal,
-.hljs-number,
+/* Strings and numbers */
 .hljs-string,
-.hljs-doctag {
+.hljs-number,
+.hljs-meta .hljs-string {
   color: #ce9178;
 }
 
+/* Function names, variables */
 .hljs-title,
-.hljs-section {
+.hljs-name {
   color: #4ec9b0;
 }
 
-.hljs-type,
-.hljs-tag,
-.hljs-name,
+/* Attribute names */
+.hljs-attr,
 .hljs-attribute {
   color: #9cdcfe;
 }
 
+/* Built-in and types */
 .hljs-built_in,
-.hljs-builtin-name {
+.hljs-type {
   color: #c586c0;
 }
 
-.hljs-params {
+/* Special */
+.hljs-symbol,
+.hljs-bullet {
   color: #dcdcaa;
+}
+
+/* Fix font rendering and spacing */
+pre code {
+  font-family: 'Fira Code', Consolas, Menlo, Monaco, monospace;
+  white-space: pre;
+  display: block;
 }
