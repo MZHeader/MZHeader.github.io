@@ -19,7 +19,7 @@
 }
 
 .post-list li .post-date {
-  color: #888;
+  color: #ff79c6;  /* PINK! */
   margin-left: 0.5rem;
   font-size: 0.9rem;
 }
