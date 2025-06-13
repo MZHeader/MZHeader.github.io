@@ -1,62 +1,58 @@
 .hljs {
   background: #1e1e1e;
-  color: #d4d4d4;
+  color: #dcdcdc;
   padding: 1rem;
   border-radius: 8px;
-  overflow-x: auto;
   font-size: 0.95rem;
+  overflow-x: auto;
+  font-family: 'Fira Code', Consolas, Monaco, monospace;
   line-height: 1.5;
   box-shadow: 0 0 0 1px #333;
 }
 
-/* Comments */
 .hljs-comment,
 .hljs-quote {
   color: #6a9955;
   font-style: italic;
 }
 
-/* Keywords */
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-literal {
   color: #569cd6;
 }
 
-/* Strings and numbers */
 .hljs-string,
-.hljs-number,
-.hljs-meta .hljs-string {
+.hljs-number {
   color: #ce9178;
 }
 
-/* Function names, variables */
 .hljs-title,
 .hljs-name {
   color: #4ec9b0;
 }
 
-/* Attribute names */
 .hljs-attr,
 .hljs-attribute {
   color: #9cdcfe;
 }
 
-/* Built-in and types */
 .hljs-built_in,
 .hljs-type {
   color: #c586c0;
 }
 
-/* Special */
 .hljs-symbol,
 .hljs-bullet {
   color: #dcdcaa;
 }
 
-/* Fix font rendering and spacing */
 pre code {
-  font-family: 'Fira Code', Consolas, Menlo, Monaco, monospace;
   white-space: pre;
   display: block;
+  background: inherit;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  border: none;
 }
