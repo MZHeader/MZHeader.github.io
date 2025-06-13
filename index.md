@@ -40,18 +40,5 @@
     </p>
   </header>
 
-  <section>
-    <h2>Posts</h2>
-    <ul class="post-list">
-      <li><a href="#">Huntress CTF 2024 Writeups</a> <small>Nov 7, 2024</small></li>
-      <li><a href="#">Quasar RAT - PowerShell Deobfuscation - Config Reversing</a> <small>Mar 26, 2024</small></li>
-      <li><a href="#">Deobfuscating A RedLine Stealer Downloader</a> <small>Mar 1, 2024</small></li>
-      <li><a href="#">XWorm - Batch Deobfuscation - .NET Loader</a> <small>Feb 3, 2024</small></li>
-      <li><a href="#">MultiStage ClipBanker - JavaScript to Injection</a> <small>Jan 8, 2024</small></li>
-      <li><a href="#">Agent Tesla Malware Analysis - JavaScript to Telegram C2</a> <small>Jan 7, 2024</small></li>
-      <li><a href="#">All Things Shellcode - Meterpreter, Cobalt Strike</a> <small>Jan 6, 2024</small></li>
-    </ul>
-  </section>
-
 </body>
 </html>
