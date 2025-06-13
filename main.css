@@ -1,4 +1,4 @@
-/* Global dark styling */
+/* GLOBAL DARK THEME */
 body {
   margin: 0;
   padding: 2rem;
@@ -8,6 +8,25 @@ body {
   line-height: 1.6;
 }
 
+/* HEADER */
+header h1 {
+  font-size: 2rem;
+  color: #ff79c6;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  color: #bbbbbb;
+  max-width: 70ch;
+}
+
+header {
+  border-bottom: 1px solid #333;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+/* LINKS */
 a {
   color: #8be9fd;
   text-decoration: none;
@@ -15,14 +34,10 @@ a {
 
 a:hover {
   text-decoration: underline;
+  color: #50fa7b;
 }
 
-/* Headers */
-h1, h2 {
-  color: #ff79c6;
-}
-
-/* Code blocks */
+/* CODE BLOCKS */
 pre code {
   display: block;
   padding: 1em;
@@ -32,13 +47,11 @@ pre code {
   overflow-x: auto;
   font-size: 0.95rem;
   font-family: 'Fira Code', 'Consolas', monospace;
-  box-shadow: 0 0 10px #00000080;
+  box-shadow: 0 0 8px #00000080;
+  border: 1px solid #444;
 }
 
-h1, h2 {
-  margin-bottom: 0.5rem;
-}
-
+/* POST LIST */
 .post-list {
   list-style: none;
   padding: 0;
@@ -46,4 +59,14 @@ h1, h2 {
 
 .post-list li {
   margin-bottom: 1rem;
+}
+
+/* HEADINGS */
+h1, h2 {
+  color: #ff79c6;
+}
+
+/* SECTION */
+section {
+  margin-bottom: 2rem;
 }
