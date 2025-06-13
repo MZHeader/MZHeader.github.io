@@ -63,10 +63,10 @@
 <header>
   <h1>Reverse Engineering Malware</h1>
   <p>
-    Demonstrating malware analysis techniques on a variety of samples, along with practical DFIR tips and tricks to support investigations.
+    Showcasing practical malware analysis techniques, tips, and tricks across diverse samples — covering topics like deobfuscation, debugging, disassembly, and more
   </p>
   <p>
-    The tools I rely on are all freely available — with most included out-of-the-box in <strong>FLARE VM</strong>.
+    The tools I rely on are all freely available — with most included out-of-the-box in <strong>FLARE VM</strong>
   </p>
   <p>
     All malware samples can be found on 
