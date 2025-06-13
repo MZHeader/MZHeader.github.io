@@ -38,17 +38,8 @@
       text-decoration: underline;
       color: #50fa7b;
     }
-    .post-list {
-      list-style: none;
-      padding: 0;
-    }
-    .post-list li {
-      margin-bottom: 1rem;
-    }
-    .post-list .post-date {
-      color: #888;
-      margin-right: 0.5rem;
-      font-size: 0.9rem;
+    .normal-link {
+      color: #8be9fd !important;
     }
     pre code {
       display: block;
@@ -79,8 +70,8 @@
     </p>
     <p>
       All samples are available on 
-      <a href="https://www.virustotal.com/" target="_blank" style="color:#8be9fd;">VirusTotal</a> /
-      <a href="https://bazaar.abuse.ch/" target="_blank" style="color:#8be9fd;">MalwareBazaar</a>.
+      <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
+      <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
     </p>
   </header>
 
@@ -92,7 +83,6 @@ ascii_chars_from_octal = ''.join([chr(int(str(num), 8)) for num in octal_values]
 print(ascii_chars_from_octal)
     </code></pre>
   </section>
-
 
 </body>
 </html>
