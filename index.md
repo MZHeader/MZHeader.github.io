@@ -122,14 +122,14 @@ print(ascii_chars_from_octal)
     }
 
     .post-title a {
-      color: #5625be; /* Your deep blue-purple */
+      color: #ffffff; /* WHITE instead of purple-blue */
       font-weight: 500;
       text-decoration: none;
     }
 
     .post-title a:hover {
       text-decoration: underline;
-      color: #50fa7b;
+      color: #50fa7b; /* green hover still works */
     }
   </style>
 
@@ -144,6 +144,7 @@ print(ascii_chars_from_octal)
     {% endfor %}
   </div>
 </section>
+
 
 
 </body>
