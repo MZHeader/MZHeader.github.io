@@ -62,6 +62,14 @@
 
 <header>
   <h1>Reverse Engineering Malware</h1>
+    <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
+ __  __ ______ 
+|  \/  |___  /
+| |\/| |  / / 
+| |  | | / /__
+|_|  |_|/____|
+ MZ HEADER
+</pre>
   <p>
     Showcasing practical malware analysis techniques, tips, and tricks across diverse samples — covering topics like deobfuscation, debugging, disassembly, and more
   </p>
@@ -73,14 +81,6 @@
     <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
     <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
   </p>
-  <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
- __  __ ______ 
-|  \/  |___  /
-| |\/| |  / / 
-| |  | | / /__
-|_|  |_|/____|
- MZ HEADER
-</pre>
 </header>
 
 
