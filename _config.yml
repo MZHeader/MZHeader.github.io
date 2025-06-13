@@ -18,7 +18,6 @@ linkedin_username: "liam-chugg"
 #########################################################################################
 ######### Nothing below needs to be changed (unless you know what you're doing) #########
 #########################################################################################
-
 theme: "minima"
 
 # RSS feed and analytics
