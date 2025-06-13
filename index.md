@@ -76,15 +76,5 @@
 </header>
 
 
-  <section>
-    <h2>Example Python Snippet</h2>
-    <pre><code class="language-python">
-octal_values = [70, 62, 64, 60, 61]
-ascii_chars_from_octal = ''.join([chr(int(str(num), 8)) for num in octal_values])
-print(ascii_chars_from_octal)
-    </code></pre>
-  </section>
-
-
 </body>
 </html>
