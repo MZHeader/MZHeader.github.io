@@ -1,0 +1,26 @@
+body {
+  background: #1e1e1e;
+  color: #dcdcdc;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+header h1 {
+  color: #ffffff;
+}
+
+a {
+  color: #50fa7b;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #7fffb7;
+}
+
+pre, code {
+  background: #2d2d2d;
+  color: #f8f8f2;
+  border-radius: 4px;
+  padding: 0.5em;
+}
