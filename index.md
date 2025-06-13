@@ -61,7 +61,7 @@
 <body>
 
 <header>
-  <h1>Malware Analysis & DFIR Tips</h1>
+  <h1>Reverse Engineering Malware</h1>
   <p>
     Demonstrating malware analysis techniques on a variety of samples, along with practical DFIR tips and tricks to support investigations.
   </p>
