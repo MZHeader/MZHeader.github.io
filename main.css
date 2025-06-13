@@ -34,3 +34,16 @@ pre code {
   font-family: 'Fira Code', 'Consolas', monospace;
   box-shadow: 0 0 10px #00000080;
 }
+
+h1, h2 {
+  margin-bottom: 0.5rem;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.post-list li {
+  margin-bottom: 1rem;
+}
