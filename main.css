@@ -1,29 +1,24 @@
 body {
-  margin: 0;
-  padding: 2rem;
   background: #1e1e1e;
   color: #dcdcdc;
-  font-family: 'Segoe UI', 'Roboto', sans-serif;
-  line-height: 1.6;
+  font-family: sans-serif;
+  padding: 2rem;
 }
 
 h1, h2 {
-  color: #ff79c6; /* Pink/purple accent */
+  color: #ff79c6;
 }
 
 header p {
   color: #bbbbbb;
-  max-width: 70ch;
 }
 
 a {
-  color: #ff79c6; /* Pink titles */
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
-  color: #50fa7b;
 }
 
 .post-list {
@@ -35,18 +30,7 @@ a:hover {
   margin-bottom: 1rem;
 }
 
-.post-list li a {
-  font-size: 1.05rem;
-  color: #ff79c6; /* Make links pink! */
-}
-
-.post-list li a:hover {
-  text-decoration: underline;
-  color: #50fa7b;
-}
-
 .post-list li .post-date {
   color: #888;
-  margin-left: 0.5rem;
-  font-size: 0.9rem;
+  margin-right: 0.5rem;
 }
