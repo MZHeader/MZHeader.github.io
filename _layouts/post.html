@@ -1,52 +1,18 @@
 ---
 layout: default
 ---
-<link rel="stylesheet" href="{{ '/assets/css/dark.css' | relative_url }}">
-
-<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
-
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="headline">{{ page.title | escape }}</h1>
-    <p class="post-meta">
-      {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
-      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-        {{ page.date | date: date_format }}
-      </time>
-
-      {% assign author = page.author | default: site.author %}
-      {% if author %}
-        • <span class="p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <span itemprop="name">{{ author }}</span>
-        </span>
-      {% endif %}
-    </p>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/dark.css' | relative_url }}">
+</head>
+<body>
+  <header>
+    <h1>{{ site.title }}</h1>
   </header>
-
-  {% if site.share_links %}
-    <div class="share-links no-print">
-      {% include sharelinks.html %}
-    </div>
-  {% endif %}
-
-  <div class="post-content e-content" itemprop="articleBody">
+  <main>
     {{ content }}
-
-    {% include navlinks.html %}
-  </div>
-
-  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
-</article>
-
-{% if site.comments_repo %}
-  {% include comments.html %}
-{% endif %}
-
-{% include analytics.html %}
-
-<script src="/js/gifffer.min.js" defer></script>
-<script src="/js/copy-code-button.js" defer></script>
-<script>
-  window.addEventListener("load", () => {
-    if (typeof Gifffer === "function") Gifffer();
-  });
-</script>
+  </main>
+</body>
+</html>
