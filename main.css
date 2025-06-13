@@ -26,7 +26,7 @@ header {
   padding-bottom: 1rem;
 }
 
-/* LINKS */
+/* NORMAL LINKS = CYAN */
 a {
   color: #8be9fd;
   text-decoration: none;
@@ -35,6 +35,21 @@ a {
 a:hover {
   text-decoration: underline;
   color: #50fa7b;
+}
+
+/* POST LIST LINKS = PINK */
+.post-list a {
+  color: #ff79c6;
+}
+
+.post-list a:hover {
+  color: #50fa7b;
+}
+
+.post-list .post-date {
+  color: #888;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
 }
 
 /* CODE BLOCKS */
@@ -51,7 +66,7 @@ pre code {
   border: 1px solid #444;
 }
 
-/* POST LIST */
+/* POST LIST SPACING */
 .post-list {
   list-style: none;
   padding: 0;
@@ -66,7 +81,7 @@ h1, h2 {
   color: #ff79c6;
 }
 
-/* SECTION */
+/* SECTION SPACING */
 section {
   margin-bottom: 2rem;
 }
