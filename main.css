@@ -1,32 +1,4 @@
-/* GLOBAL DARK THEME */
-body {
-  margin: 0;
-  padding: 2rem;
-  background-color: #1e1e1e;
-  color: #dcdcdc;
-  font-family: 'Segoe UI', 'Roboto', sans-serif;
-  line-height: 1.6;
-}
-
-/* HEADER */
-header h1 {
-  font-size: 2rem;
-  color: #ff79c6;
-  margin-bottom: 0.5rem;
-}
-
-header p {
-  color: #bbbbbb;
-  max-width: 70ch;
-}
-
-header {
-  border-bottom: 1px solid #333;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-}
-
-/* NORMAL LINKS = CYAN */
+/* Global links = cyan */
 a {
   color: #8be9fd;
   text-decoration: none;
@@ -37,51 +9,17 @@ a:hover {
   color: #50fa7b;
 }
 
-/* POST LIST LINKS = PINK */
+/* Only post list links = pink */
 .post-list a {
-  color: #ff79c6;
+  color: #ff79c6 !important;  /* force it to override the global a */
 }
 
 .post-list a:hover {
-  color: #50fa7b;
+  color: #50fa7b;  /* optional hover color */
 }
 
 .post-list .post-date {
   color: #888;
   margin-right: 0.5rem;
   font-size: 0.9rem;
-}
-
-/* CODE BLOCKS */
-pre code {
-  display: block;
-  padding: 1em;
-  background: #2d2d2d;
-  color: #f8f8f2;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-size: 0.95rem;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  box-shadow: 0 0 8px #00000080;
-  border: 1px solid #444;
-}
-
-/* POST LIST SPACING */
-.post-list {
-  list-style: none;
-  padding: 0;
-}
-
-.post-list li {
-  margin-bottom: 1rem;
-}
-
-/* HEADINGS */
-h1, h2 {
-  color: #ff79c6;
-}
-
-/* SECTION SPACING */
-section {
-  margin-bottom: 2rem;
 }
