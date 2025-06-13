@@ -60,20 +60,21 @@
 </head>
 <body>
 
-  <header>
-    <h1>Malware Analysis & DFIR Tips</h1>
-    <p>
-      Showcasing malware analysis techniques on various samples, plus general DFIR tips & tricks to aid investigations.
-    </p>
-    <p>
-      The tools I use are freely available — most come pre-installed with <strong>FLARE VM</strong>.
-    </p>
-    <p>
-      All samples are available on 
-      <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
-      <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
-    </p>
-  </header>
+<header>
+  <h1>Malware Analysis & DFIR Tips</h1>
+  <p>
+    Demonstrating malware analysis techniques on a variety of samples, along with practical DFIR tips and tricks to support investigations.
+  </p>
+  <p>
+    The tools I rely on are all freely available — with most included out-of-the-box in <strong>FLARE VM</strong>.
+  </p>
+  <p>
+    All malware samples can be found on 
+    <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
+    <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
+  </p>
+</header>
+
 
   <section>
     <h2>Example Python Snippet</h2>
