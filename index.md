@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -25,25 +26,14 @@
   <header>
     <h1>Malware Analysis & DFIR Tips</h1>
     <p>
-      Showcasing malware analysis techniques on various samples, as well as sharing some more general DFIR tips & tricks to aid in investigations.
+      Showcasing malware analysis techniques on various samples, plus general DFIR tips & tricks to aid investigations.
     </p>
     <p>
-      The tools I use are all freely available, most of which come pre-installed in the FLARE VM.
+      The tools I use are freely available — most come pre-installed with <strong>FLARE VM</strong>.
     </p>
     <p>
-      All samples are available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
+      All samples are available on 
+      <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
       <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
     </p>
   </header>
-
-  <section>
-    <h2>Example Python Snippet</h2>
-    <pre><code class="language-python">
-octal_values = [70, 62, 64, 60, 61]
-ascii_chars_from_octal = ''.join([chr(int(str(num), 8)) for num in octal_values])
-print(ascii_chars_from_octal)
-    </code></pre>
-  </section>
-
-</body>
-</html>
