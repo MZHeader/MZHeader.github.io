@@ -3,29 +3,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    /* Prevent white flash by setting dark bg and text immediately */
-    body {
-      background-color: #1e1e1e !important;
-      color: #d4d4d4 !important;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-  </style>
-
   {%- seo -%}
   {%- feed_meta -%}
 
+  <!-- Main site stylesheet -->
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
 
-  <!-- Custom Highlight.js theme -->
+  <!-- Only use custom highlight.js theme -->
   <link rel="stylesheet" href="{{ "/css/hljs-custom.css" | relative_url }}">
 
-  <!-- Google Analytics (if enabled) -->
-  {% if jekyll.environment == 'production' and site.google_analytics %}
-    {% include google-analytics.html %}
-  {% endif %}
-
-  <!-- highlight.js support -->
+  <!-- highlight.js scripts -->
   <script src="/js/highlightjs/highlight.min.js" defer></script>
   <script src="/js/highlightjs/languages/plaintext.min.js" defer></script>
   <script src="/js/highlightjs/languages/powershell.min.js" defer></script>
@@ -34,12 +21,17 @@
     window.addEventListener("DOMContentLoaded", () => hljs.highlightAll());
   </script>
 
-  <!-- Dark mode with DarkReader -->
-  <script src="https://unpkg.com/darkreader@4.9.40/darkreader.js" defer></script>
+  <!-- OPTIONAL: Disable DarkReader if using your own dark theme -->
+  <!-- <script src="https://unpkg.com/darkreader@4.9.40/darkreader.js" defer></script>
   <script defer>
     window.addEventListener("DOMContentLoaded", () => {
       DarkReader.setFetchMethod(window.fetch);
-      DarkReader.auto({ brightness: 100, contrast: 90, sepia: 10 });
+      DarkReader.disable();
     });
-  </script>
+  </script> -->
+
+  <!-- Google Analytics -->
+  {% if jekyll.environment == 'production' and site.google_analytics %}
+    {% include google-analytics.html %}
+  {% endif %}
 </head>
