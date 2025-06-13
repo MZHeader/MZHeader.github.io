@@ -1,60 +1,51 @@
-/* Custom highlight.js theme (dark) */
+/* hljs-custom.css */
 .hljs {
   background: #1e1e1e;
   color: #d4d4d4;
   padding: 1em;
-  border-radius: 8px;
-  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
   overflow-x: auto;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* Keywords */
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-literal,
-.hljs-section,
-.hljs-link {
-  color: #569CD6;
-}
-
-/* Strings */
-.hljs-string,
-.hljs-meta .hljs-string {
-  color: #CE9178;
-}
-
-/* Numbers */
-.hljs-number {
-  color: #B5CEA8;
-}
-
-/* Functions */
-.hljs-title,
-.hljs-title.class_,
-.hljs-function .hljs-title {
-  color: #DCDCAA;
-}
-
-/* Types and classes */
-.hljs-type,
-.hljs-class .hljs-title {
-  color: #4EC9B0;
-}
-
-/* Comments */
+/* Code element colors */
 .hljs-comment,
 .hljs-quote {
-  color: #6A9955;
+  color: #6a9955;
   font-style: italic;
 }
 
-/* Attribute names */
-.hljs-attr {
-  color: #9CDCFE;
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #569cd6;
 }
 
-/* Built-ins and special */
+.hljs-literal,
+.hljs-number,
+.hljs-string,
+.hljs-doctag {
+  color: #ce9178;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #4ec9b0;
+}
+
+.hljs-type,
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: #9cdcfe;
+}
+
 .hljs-built_in,
-.hljs-symbol {
-  color: #C586C0;
+.hljs-builtin-name {
+  color: #c586c0;
+}
+
+.hljs-params {
+  color: #dcdcaa;
 }
