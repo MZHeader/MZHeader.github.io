@@ -70,3 +70,68 @@ h1, h2 {
 section {
   margin-bottom: 2rem;
 }
+
+/* --- GLOBAL COLORS --- */
+body {
+  background: #1e1e1e;
+  color: #dcdcdc;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem;
+}
+
+/* --- HEADINGS --- */
+h1, h2 {
+  color: #ff79c6; /* Pink accent */
+}
+
+/* --- LINKS --- */
+a {
+  color: #8be9fd; /* Cyan links */
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #50fa7b; /* Green on hover */
+}
+
+/* --- POST LIST --- */
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.post-list li {
+  margin-bottom: 1rem;
+}
+
+.post-list li a {
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.post-list li small {
+  color: #888;  /* subtle gray date */
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* --- HEADER / INTRO --- */
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  color: #bbbbbb;
+  max-width: 70ch;
+}
+
+header {
+  border-bottom: 1px solid #333;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
