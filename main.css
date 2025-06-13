@@ -1,4 +1,7 @@
-/* GLOBAL DARK THEME */
+/* -----------------------------
+   GLOBAL DARK THEME BASE
+----------------------------- */
+
 body {
   margin: 0;
   padding: 2rem;
@@ -8,10 +11,16 @@ body {
   line-height: 1.6;
 }
 
-/* HEADER */
+/* -----------------------------
+   HEADINGS
+----------------------------- */
+
+h1, h2 {
+  color: #ff79c6; /* Pink accent */
+}
+
 header h1 {
   font-size: 2rem;
-  color: #ff79c6;
   margin-bottom: 0.5rem;
 }
 
@@ -26,67 +35,10 @@ header {
   padding-bottom: 1rem;
 }
 
-/* LINKS */
-a {
-  color: #8be9fd;
-  text-decoration: none;
-}
+/* -----------------------------
+   LINKS
+----------------------------- */
 
-a:hover {
-  text-decoration: underline;
-  color: #50fa7b;
-}
-
-/* CODE BLOCKS */
-pre code {
-  display: block;
-  padding: 1em;
-  background: #2d2d2d;
-  color: #f8f8f2;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-size: 0.95rem;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  box-shadow: 0 0 8px #00000080;
-  border: 1px solid #444;
-}
-
-/* POST LIST */
-.post-list {
-  list-style: none;
-  padding: 0;
-}
-
-.post-list li {
-  margin-bottom: 1rem;
-}
-
-/* HEADINGS */
-h1, h2 {
-  color: #ff79c6;
-}
-
-/* SECTION */
-section {
-  margin-bottom: 2rem;
-}
-
-/* --- GLOBAL COLORS --- */
-body {
-  background: #1e1e1e;
-  color: #dcdcdc;
-  font-family: 'Segoe UI', 'Roboto', sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 2rem;
-}
-
-/* --- HEADINGS --- */
-h1, h2 {
-  color: #ff79c6; /* Pink accent */
-}
-
-/* --- LINKS --- */
 a {
   color: #8be9fd; /* Cyan links */
   text-decoration: none;
@@ -94,10 +46,13 @@ a {
 
 a:hover {
   text-decoration: underline;
-  color: #50fa7b; /* Green on hover */
+  color: #50fa7b; /* Green hover */
 }
 
-/* --- POST LIST --- */
+/* -----------------------------
+   AUTO-GENERATED POSTS LIST
+----------------------------- */
+
 .post-list {
   list-style: none;
   padding: 0;
@@ -112,26 +67,33 @@ a:hover {
   font-size: 1.05rem;
 }
 
-.post-list li small {
-  color: #888;  /* subtle gray date */
+.post-list li .post-date {
+  color: #888;  /* subtle grey for dates */
   margin-left: 0.5rem;
   font-size: 0.9rem;
 }
 
-/* --- HEADER / INTRO --- */
-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+/* -----------------------------
+   CODE BLOCKS (Highlight.js)
+----------------------------- */
+
+pre code {
+  display: block;
+  padding: 1em;
+  background: #2d2d2d;
+  color: #f8f8f2;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.95rem;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  box-shadow: 0 0 8px #00000080;
+  border: 1px solid #444;
 }
 
-header p {
-  color: #bbbbbb;
-  max-width: 70ch;
-}
+/* -----------------------------
+   SECTION SPACING
+----------------------------- */
 
-header {
-  border-bottom: 1px solid #333;
+section {
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
 }
-
