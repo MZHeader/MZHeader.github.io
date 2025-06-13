@@ -90,7 +90,7 @@ print(ascii_chars_from_octal)
 
   <style>
     .posts h2 {
-      color: #50fa7b;
+      color: #50fa7b; /* Posts section header: green */
       margin-bottom: 1rem;
     }
 
@@ -122,14 +122,19 @@ print(ascii_chars_from_octal)
     }
 
     .post-title a {
-      color: #ffffff; /* WHITE instead of purple-blue */
+      color: #50fa7b; /* Post titles: green */
       font-weight: 500;
       text-decoration: none;
     }
 
     .post-title a:hover {
       text-decoration: underline;
-      color: #50fa7b; /* green hover still works */
+      color: #7fffb7; /* Slightly brighter green on hover */
+    }
+
+    /* Site main title in header remains white: optional override for clarity */
+    header h1 {
+      color: #ffffff;
     }
   </style>
 
@@ -144,6 +149,7 @@ print(ascii_chars_from_octal)
     {% endfor %}
   </div>
 </section>
+
 
 
 
