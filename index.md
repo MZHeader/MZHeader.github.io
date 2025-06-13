@@ -19,7 +19,7 @@
       line-height: 1.6;
     }
     h1, h2 {
-      color: #4a90e2;
+      color: #5625be;
     }
     header {
       border-bottom: 1px solid #333;
@@ -31,7 +31,7 @@
       max-width: 70ch;
     }
     a {
-      color: #4a90e2;
+      color: #5625be;
       text-decoration: none;
     }
     a:hover {
