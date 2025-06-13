@@ -1,0 +1,60 @@
+/* Custom highlight.js theme (dark) */
+.hljs {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 1em;
+  border-radius: 8px;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  overflow-x: auto;
+}
+
+/* Keywords */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+  color: #569CD6;
+}
+
+/* Strings */
+.hljs-string,
+.hljs-meta .hljs-string {
+  color: #CE9178;
+}
+
+/* Numbers */
+.hljs-number {
+  color: #B5CEA8;
+}
+
+/* Functions */
+.hljs-title,
+.hljs-title.class_,
+.hljs-function .hljs-title {
+  color: #DCDCAA;
+}
+
+/* Types and classes */
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #4EC9B0;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote {
+  color: #6A9955;
+  font-style: italic;
+}
+
+/* Attribute names */
+.hljs-attr {
+  color: #9CDCFE;
+}
+
+/* Built-ins and special */
+.hljs-built_in,
+.hljs-symbol {
+  color: #C586C0;
+}
