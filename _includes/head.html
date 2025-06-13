@@ -32,5 +32,18 @@
   DarkReader.setFetchMethod(window.fetch); // Fix to remedy CORS errors in chrome console
   //DarkReader.enable();
   DarkReader.auto( {brightness: 100, contrast: 90, sepia: 10} );
+  
+<!-- Dracula highlight theme -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
+
+<!-- Highlight.js core + needed languages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/batch.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbscript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
+
+<script>hljs.highlightAll();</script>
+
 </script>
 </head>
