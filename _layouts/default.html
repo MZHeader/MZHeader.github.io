@@ -1,71 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ page.title }} | {{ site.title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Syntax highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+---
+layout: null
+---
 
-  <!-- Google Analytics (optional) -->
-  {% if site.google_analytics %}
-  <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{{ site.google_analytics }}');
-  </script>
-  {% endif %}
+{% include head-custom.html %}
 
-  <!-- Dark theme styling -->
-  <style>
-    body {
-      margin: 0;
-      padding: 2rem;
-      background: #1e1e1e;
-      color: #dcdcdc;
-      font-family: 'Segoe UI', 'Roboto', sans-serif;
-      line-height: 1.6;
-    }
+<style>
+  body {
+    background: #1e1e1e;
+    color: #dcdcdc;
+  }
 
-    header h1 {
-      color: #ffffff;
-    }
+  header h1 {
+    color: #ffffff;
+  }
 
-    a {
-      color: #50fa7b;
-      text-decoration: none;
-    }
+  a {
+    color: #50fa7b;
+  }
 
-    a:hover {
-      text-decoration: underline;
-      color: #7fffb7;
-    }
+  a:hover {
+    color: #7fffb7;
+  }
 
-    pre, code {
-      background: #2d2d2d;
-      color: #f8f8f2;
-      border-radius: 4px;
-      padding: 0.5em;
-    }
+  pre, code {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    border-radius: 4px;
+    padding: 0.5em;
+  }
+</style>
 
-    main {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>{{ site.title }}</h1>
-  </header>
-
-  <main>
-    {{ content }}
-  </main>
-</body>
-</html>
+{{ content }}
