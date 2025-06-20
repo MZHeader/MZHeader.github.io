@@ -131,7 +131,7 @@ Due to ASLR, we need to re-allign our debugger and our disassembler to the same 
 
 My base address is 00990000, which i need to tell IDA, this is done by going to Edit > Segments > Rebase Program
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/d25e6f52-ab03-44e5-81ed-32b81fbdecca" />
+![image](https://github.com/user-attachments/assets/a02cfd71-7adc-4e80-b607-ace59b032579)
 
 With our addresses re-aligned, I want to set a breakpoint to the Parallels virtualisation check, which is going to be at around 0x00998A7D 
 
