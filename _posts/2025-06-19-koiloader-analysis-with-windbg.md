@@ -6,6 +6,7 @@ tags: CTF
 The main focus of this post is to use WinDbg for binary analysis. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the following binary:
 
 File Name: ciconinejvR.exe
+
 SHA 256: 74b85c502651bae1734849f3ac49d8152a6c0fbb9234083b1384d8cbe3640068
 
 ## Initial static analysis with Ghidra
