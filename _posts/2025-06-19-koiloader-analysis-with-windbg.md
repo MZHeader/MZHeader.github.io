@@ -3,7 +3,7 @@ tags: CTF
 ---
 ## Analysing a KoiLoader / KoiStealer sample with WinDbg
 
-The main focus of this post is to use WinDbg for binary analysis. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the following binary:
+The main focus of this post is to use WinDbg for binary analysis rather than focusing too much on the specific functionality of this malware. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the following binary:
 
 File Name: ciconinejvR.exe
 
