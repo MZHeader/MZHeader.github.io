@@ -264,6 +264,21 @@ We now have the XOR key "LenKQVy4Bh10vp2vt9AE" and can decrypt the assmebly.
 
 <img width="1213" alt="image" src="https://github.com/user-attachments/assets/80a090b0-0a0d-4ec7-8983-d51cfebbb967" />
 
+We can see that the other 2 arguments are passed to the main function:
+
+```
+private static void Main(string[] args)
+{
+	if (args.Length < 2)
+	{
+		return;
+	}
+	string text = args[0];
+	string text2 = args[1];
+```
+The first arguments is used as a GUID / victim ID, it’s appended to some collected info and used in logging / exfil.
+The seconf argument is Used as an encryption key / C2 token, it’s passed to multiple methods that handle encryption and communication.
+
 The assembly is pretty obfuscated but the following methods contain information stealing capabilities:
 
 This method copies files from specific locations to a temporary location, reads their content, and stores them in an internal memory stream. It is used repeatedly across the malware to steal files.
