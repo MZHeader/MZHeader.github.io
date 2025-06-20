@@ -63,7 +63,7 @@ We can dump this memory by using the .writemem command, which requires the argum
 Moving on to the binary we've just unpacked (HASH: d950f0e4a597416aa8f4cb0682d29707cc8958b2972ab307b9f34316e806ec4d)
 As this binary was pulled from memory, we need to use a tool like pe_unmapper to realign the PE from virtual to raw addresses.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/7562d70e-5977-43ed-8408-ff50e28930da" />
+![image](https://github.com/user-attachments/assets/5e84130b-8f43-40c0-b0ac-ae2f887cb73b)
 
 Now I'll load the binary into IDA, look at some interesting strings and take it from there.
 Strings can be viewed in IDA by navigating to View > Open subviews > Strings
