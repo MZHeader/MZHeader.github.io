@@ -215,7 +215,9 @@ This returns the address 0723e398, navigating to this address in memory gives us
 
 <img width="900" alt="image" src="https://github.com/user-attachments/assets/0e7362d3-7258-4595-a09d-060f025a6041" />
 
-This is the WinDbg element of this post covered, but the main payload to KoiStealer is the followig assmelby which gets downloaded and execution from this function:
+## KoiStealer Assembly
+
+That was the WinDbg element of this post covered, but the main payload to KoiStealer is the followig assmelby which gets downloaded and execution from this function:
 
 <img width="1300" alt="image" src="https://github.com/user-attachments/assets/dcb97fd7-c99c-40e7-ae97-2632a13caa6d" />
 
@@ -251,6 +253,17 @@ $ep = $sm.EntryPoint
 $ep.Invoke($null, (, [string[]] ($cfb[1], $cfb[2], $cfb[3])))
 
 ```
+
+The script retrieves the victim machine’s unique GUID from the Windows registry, contacts the C2 and sends the GUID along with a SubID, The server responds with data split by | — the first element is an XOR key, and the next elements are additional strings.
+
+The C2 server is no longer alive but the contents can be retrieved from VirusTotal:
+
+<img width="694" alt="image" src="https://github.com/user-attachments/assets/30f3209c-e827-4159-83bf-8b5317329c17" />
+
+We now have the XOR key "LenKQVy4Bh10vp2vt9AE" and can decrypt the assmebly.
+
+<img width="1213" alt="image" src="https://github.com/user-attachments/assets/80a090b0-0a0d-4ec7-8983-d51cfebbb967" />
+
 
 
 
