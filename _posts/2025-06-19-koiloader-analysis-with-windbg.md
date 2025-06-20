@@ -13,6 +13,9 @@ Imports from KERNEL32.dll are noted such as VirtualAlloc and VirtualProtect, whi
 
 <img width="350" alt="image" src="https://github.com/user-attachments/assets/c8ae14b9-9581-4e99-9c26-c83e821c9699" />
 
+These imports can be found in Ghidra by viewing the Symbol Tree, an option for which is present on the toolbar at the top of the program. We can then highlight and double click an import to see where it is referenced in the executable.
+
+<img width="708" alt="image" src="https://github.com/user-attachments/assets/19de60ff-7680-4317-bd0d-fde71fd68654" />
 
 
 
