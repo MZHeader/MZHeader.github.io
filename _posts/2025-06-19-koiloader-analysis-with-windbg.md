@@ -15,7 +15,32 @@ Imports from KERNEL32.dll are noted such as VirtualAlloc and VirtualProtect, whi
 
 These imports can be found in Ghidra by viewing the Symbol Tree, an option for which is present on the toolbar at the top of the program. We can then highlight and double click an import to see where it is referenced in the executable.
 
-<img width="1400" alt="image" src="https://github.com/user-attachments/assets/19de60ff-7680-4317-bd0d-fde71fd68654" />
+<img width="1600" alt="image" src="https://github.com/user-attachments/assets/19de60ff-7680-4317-bd0d-fde71fd68654" />
+
+When we navigate to our import of interest, in this case VirtualAlloc, we can review the cross references (XREF) to see how many times VirtualAlloc is called, and in what functions.
+
+<img width="1250" alt="image" src="https://github.com/user-attachments/assets/ddac117e-4ba5-4b0a-a2e2-2056cf298c3b" />
+
+It appears that VirtualAlloc is only present in one function - FUN_00401300. We can click this value to navigate to this function and review it in the decompile window on the left.
+We can see on line 37 that VirtualAlloc is called with multiple arguments, and the result of which is stored as _Dst.
+
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/ea55e824-6d2c-4864-98f9-9a53254b6f92" />
+
+We can gather context on what these arguments may be by reviewing Microsoft Documentation for VirtualAlloc
+
+On line 78 we can see that VirtualProtect is being called with _Dst being passed to it as the first argument.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/d2c5c39a-57f0-46b8-b689-2e6fb9d4e341" />
+
+VirtualProtect changes the protection on a region of committed pages in the virtual address space. The first argument that gets passed to it is the address of the starting page of the region of pages whose access protection attributes are to be changed.
+_Dst is our area of interest, as it appears very likely that some form of executable code has been written to this address space.
+We'll now move over to a debugger to attempt to locate and interrogate this area of memory.
+
+
+
+
+
+
 
 
 
