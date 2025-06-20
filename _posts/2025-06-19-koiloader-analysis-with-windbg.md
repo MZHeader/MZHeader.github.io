@@ -120,6 +120,118 @@ Next, the zero flag is checked. If ZF=0 (Hyper-V was found) then the program wil
 jnz     loc_408B55
 ```
 
+## Debugging our new unpacked binary with WinDbg
+
+Now that I know this executable performs various anti-analysis checks, I want to investigate this further and think about how to overcome this.
+Loading the binary into WinDbg I want to set a breakpoint at where the program checks for the "Parallels Display Adapter" string, as this is what my VM is running on and this is likely to result in the application exiting.
+Due to ASLR, we need to re-allign our debugger and our disassembler to the same base address. We can review our entry point address in WinDbg by reviewing this address when we load the executable:
+
+<img width="1250" alt="image" src="https://github.com/user-attachments/assets/317e2a0c-0cb1-48cf-9a79-16f895c1ac4a" />
+
+My base address is 00990000, which i need to tell IDA, this is done by going to Edit > Segments > Rebase Program
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/d25e6f52-ab03-44e5-81ed-32b81fbdecca" />
+
+With our addresses re-aligned, I want to set a breakpoint to the Parallels virtualisation check, which is going to be at around 0x00998A7D 
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/bcd94521-096b-474e-9023-efc930ea9ffd" />
+
+Stepping through the program, I can see that the following instruction pushes my Display Adapter to the EAX register, which is visible by reviewing the address at the EAX register
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/2f19d943-0259-4465-8711-634944494fff" />
+
+<img width="350" alt="image" src="https://github.com/user-attachments/assets/dae58b60-5421-4848-bc9b-12d8cf681667" />
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/a23bba20-e433-45f4-8d85-a0ceab657dbb" />
+
+After passing the "test    eax, eax" instruction, my Zero Flag is changed to 0 (Visible in the Registers View)
+
+<img width="550" alt="image" src="https://github.com/user-attachments/assets/2dec2267-1dbb-4192-8e2a-e00c4cf202c0" />
+
+This means I'm going to qualify for the jnz instruction and jump to address 0x00998b55:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/08a3ef98-88c7-4f97-83ec-9626f495d929" />
+
+This jumps me to the end of the function and returns me to the previous function.
+
+<img width="650" alt="image" src="https://github.com/user-attachments/assets/7cdefd5f-bb67-4fd2-bdac-78f767e9271b" />
+
+When I'm returned, a test al, al instruction is performed. 'al' refers to the lower 8 bits of the EAX register. This is likely another anti-analysis check which is going to fail because I did not complete the previous function, and the process will terminate.
+I can confirm this by jumping to that address in IDA and reviewing the execution flow. This is done by pressing "g" to go to a specific address, in my case it's 0x009992ea.
+
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/76482023-d733-4707-b813-f19b9c1ddb87" />
+
+If the test al,al instruction "fails" (ZF=0), it will call ExitProcess.
+Otherwise, if it's happy (ZF=1) it looks like we proceed to the main functions of the program.
+This means that we only need to satisfy this one check to be able to execute the program.
+
+## Overcoming anti-VM checks
+
+We can manually change the zero-flag prior to a jnz instruction.
+By using the command "r@zf=1", I change my zero flag from 0 to 1. Now when I step over the jnz instruction, it does not jump me.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/357b6d6d-b7a8-4423-8d46-ede979555665" />
+
+I can now continue execution of this program and review the further function calls
+
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/53d99242-a9d9-4182-8c79-577ed02d70f1" />
+
+## Identifying C2 Address
+
+Now that we've overcome the anti-VM checks we can continue to investigate this binary. My goal is to identify a C2 address that the malware calls out to.
+Reviewing Imports, there are some loaded from the WININET library of interest:
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/f00e3ad9-e581-4e84-b4e6-8e3af502b9da" />
+
+Again ,we double click on the API of interest and follow the XREF to see the references in a function.
+
+<img width="750" alt="image" src="https://github.com/user-attachments/assets/67e0c546-850c-468d-a9b4-db1cb7a1d2ad" />
+
+Reviewing the documentation for InternetConnectW and reviewing the code above, we know that the second argument being passed to the API is our remote address. The value of which appears to be pushed to the EBP register.
+We'll set our breakpoint at the API in a debugger to review this further.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/6dd2df7a-db57-4dc4-83c9-355b7a7bf82e" />
+
+I'm now at the API call, reviewing the disassembly, I can see that the address for our remote address used for the InternetConnectW API call has been pushed to ebp-2C.
+To calculate this value, I need to subtract 2C from our current EBP register address.
+
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/520af37b-e6a7-415a-ad9b-c024ba475857" />
+
+026FFA90 - 2C = 26FFA64.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/8907f70c-25d0-4945-b07e-41744618e4ba" />
+
+Reviewing that address in the memory view doesn't reveal anything that resembles a C2 address, so it's instead likely that a pointer has been used.
+
+## Dereferencing a pointer
+
+We need to "dereference" this pointer to ascertain the memory address from which is being supplied to the API call.
+This is simply done by using the following command: "dd 26FFA64 L1"
+
+<img width="450" alt="image" src="https://github.com/user-attachments/assets/eb8ebc0c-43ba-4718-8488-23a398ff5764" />
+
+This returns the address 0723e398, navigating to this address in memory gives us the C2 IP: 87.121.61[.]55
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/0e7362d3-7258-4595-a09d-060f025a6041" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
