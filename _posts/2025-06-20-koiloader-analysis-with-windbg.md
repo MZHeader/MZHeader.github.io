@@ -68,7 +68,7 @@ As this binary was pulled from memory, we need to use a tool like pe_unmapper to
 Now I'll load the binary into IDA, look at some interesting strings and take it from there.
 Strings can be viewed in IDA by navigating to View > Open subviews > Strings
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/ebe3460f-c607-4082-925a-d8f654a48c94" />
+![image](https://github.com/user-attachments/assets/37cf39d2-4d4c-41a1-98a5-b3b8f8795c98)
 
 The string that caught my eye here was "Jennifer Lopez & Pitbull - On The Floor\r\nBeyonce - Halo"
 
