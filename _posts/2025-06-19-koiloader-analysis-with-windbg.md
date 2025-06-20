@@ -38,6 +38,26 @@ VirtualProtect changes the protection on a region of committed pages in the virt
 _Dst is our area of interest, as it appears very likely that some form of executable code has been written to this address space.
 We'll now move over to a debugger to attempt to locate and interrogate this area of memory.
 
+## Debugging ciconinejvR.exe with WinDbg
+
+After loading the executable with WinDbg we use the command "bp $exentry" to set a breakpoint at the entrypoint and "g" to go there.
+Now we're going to set a breakpoint at VirtualProtect by using the command "bp VirtualProtect" and "g" to go there.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/61bf8bbc-7ba9-4d41-a678-c68aaddc7c0b" />
+
+We're now at the VirtualProtect API call.
+We can review the first argument being passed to VirtualProtect (lpAddress) by querying the EAX register.
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/c06de256-60e7-48f9-9f69-0ea70a70f6a2" />
+
+In my case, EAX is pointing to 03030000. We navigate to this address in memory by using the Memory view. 
+
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/1abed962-4baa-4e1e-a732-2073e5aab48c" />
+
+The screenshot above shows the portable executable (PE) file format present at that address in memory. This indicates that a second-stage binary has been unpacked and is going to be executed by our initial binary.
+We can dump this memory by using the .writemem command, which requires the arguments FilePath, Base Address, End Address. In my case this is going to be ".writemem C:\Users\User\Desktop\dump.dmp 03030000 0303D000".
+
+
 
 
 
