@@ -254,7 +254,7 @@ $ep.Invoke($null, (, [string[]] ($cfb[1], $cfb[2], $cfb[3])))
 
 ```
 
-The script retrieves the victim machine’s unique GUID from the Windows registry, contacts the C2 and sends the GUID along with a SubID, The server responds with data split by | — the first element is an XOR key, and the next elements are additional strings.
+The script retrieves the victim machine’s unique GUID from the Windows registry, contacts the C2 and sends the GUID along with a SubID, The server responds with data split by '|' — the first element is an XOR key, and the next elements are additional strings.
 
 The C2 server is no longer alive but the contents can be retrieved from VirusTotal:
 
