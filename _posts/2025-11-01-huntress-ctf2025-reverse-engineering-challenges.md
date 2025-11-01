@@ -72,6 +72,102 @@ Replicating this will result in the flag
 
 ## Rust Tickler 2
 
+SHA 256: 47d7fa30cfeeba6cc42e75e97382ab05002a6cd0ebb4d622156a6af84fda7d5e
+
+Main > 0x140001350
+
+<img width="625" height="101" alt="image" src="https://github.com/user-attachments/assets/b3cb12e3-cc22-4809-8c5b-c7adaac5d5cf" />
+
+Set a breakpoint for this address in x64dbg:
+
+<img width="625" height="250" alt="image" src="https://github.com/user-attachments/assets/bf807eb2-f6fd-44ab-89b7-05158e255089" />
+
+A few instructions into this function, data gets moved to RDX, and the length of data is moved into RAX
+
+<img width="626" height="94" alt="image" src="https://github.com/user-attachments/assets/12c78e24-d558-4171-86fa-1fdb090db1fe" />
+
+Jump over this instruction in a debugger and  right click the RDX register > Follow in dump to see the data
+
+<img width="622" height="62" alt="image" src="https://github.com/user-attachments/assets/5dd9c3e4-81e6-4f69-bdda-4a9641f908dd" />
+
+<img width="624" height="251" alt="image" src="https://github.com/user-attachments/assets/b4b8b094-a41a-417c-8fe7-ca32caf5291c" />
+
+At 1400013ae, an XOR key is moved into XMM0
+
+<img width="626" height="25" alt="image" src="https://github.com/user-attachments/assets/71f97bda-9f11-4018-9ec1-c8d6dd5379d7" />
+
+An XOR operation then occurs using this key towards i_3 (The data in RDX)
+
+<img width="623" height="178" alt="image" src="https://github.com/user-attachments/assets/3d9bdce2-3447-45fd-b967-8944cb287600" />
+
+This XOR operation is performed in the following loop:
+
+<img width="626" height="106" alt="image" src="https://github.com/user-attachments/assets/25d9b3e7-f014-45d5-aeeb-b72fd3c974b6" />
+
+Partial decrypted data in RDX after the first iteration shows a HNTS header:
+
+<img width="625" height="249" alt="image" src="https://github.com/user-attachments/assets/7f9b3fd4-bb4b-4479-b74e-86abdd41d8f5" />
+
+Set a breakpoint at 1400013E5 and hit it to complete the decryption loop, revealing the decrypted data structure in RDX
+
+<img width="627" height="255" alt="image" src="https://github.com/user-attachments/assets/8f83541e-24b7-463c-b7d8-1e085714f748" />
+
+This decrypted data structure gets passed to function 140003ea0
+
+<img width="618" height="33" alt="image" src="https://github.com/user-attachments/assets/475b90a0-8153-4eee-a505-6e82bfb21018" />
+
+This function is essentially the HNTS data parser, it checks that the data is as expected by checking the magic bytes and creates an indexed array for later lookup
+
+The parsed data structure is moved into the RDX prior to the call to function 140003de0
+
+<img width="628" height="33" alt="image" src="https://github.com/user-attachments/assets/908b952c-3087-48c5-ac99-ec62f0ebe38b" />
+
+<img width="630" height="274" alt="image" src="https://github.com/user-attachments/assets/91d84671-eacd-4b30-8339-84011bc1e143" />
+
+0xAAAAAAAA is then moved into the R8 register
+
+<img width="623" height="34" alt="image" src="https://github.com/user-attachments/assets/85cb975e-4630-4eff-9960-2470ff526a20" />
+
+These values are used as arguments for the call to function 140003de0
+
+<img width="623" height="37" alt="image" src="https://github.com/user-attachments/assets/8327678b-e395-481b-8bf6-0d14924c3d58" />
+
+After passing this function in a debugger, a string is returned:
+
+<img width="606" height="32" alt="image" src="https://github.com/user-attachments/assets/df56de85-0779-4712-b568-fad3cff3f487" />
+
+A similar set up occurs later, where 0xAAAA is moved into R8 and returns another string after a call to 140003de0
+
+<img width="426" height="56" alt="image" src="https://github.com/user-attachments/assets/e03ef126-f4f7-4b75-946e-e67628dff0a0" />
+
+Which returns the string Bingus
+
+<img width="379" height="32" alt="image" src="https://github.com/user-attachments/assets/b8709b72-3f49-4a0f-86d2-91797e59a169" />
+
+So the values being moved to R8 prior to the function call return different strings. They are acting as IDs within the HNTS data structure and return different output depending on the ID provided.
+
+Looking at the HNTS data structure, the IDs are formatted in a pretty recognisable way:
+
+<img width="622" height="252" alt="image" src="https://github.com/user-attachments/assets/4e10e0fe-9d67-42f6-bedb-25c46502a038" />
+
+We already know that AAAAAAAA and AAAA are valid IDs, AAAAA is also later called in the code. The rest of the IDs highlighted in this “zone” are also valid due to their offsets within the structure.
+
+Modifying the R8 register to one of these IDs prior to the function call changes the result
+
+<img width="288" height="224" alt="image" src="https://github.com/user-attachments/assets/87aa9746-1886-43fe-8999-2d9b1bebe761" />
+
+The 7F structure ID will return the flag:
+
+<img width="627" height="36" alt="image" src="https://github.com/user-attachments/assets/1faf784e-ca1e-4b5c-94a3-ca7394f7b7bc" />
+
+## Rust Tickler 3
+
+
+
+
+
+
+
 
 
 
