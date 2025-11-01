@@ -1,5 +1,7 @@
 ## Huntress CTF 2025 - Reverse Engineering Challenge Writeups
 
+<img width="1100" height="850" alt="image" src="https://github.com/user-attachments/assets/16b9d875-682a-43bc-bd3b-99f7ee3bd1e0" />
+
 I try my best to explain how I solve the 4 RE challenges from this years CTF, some of it relied on trial and error / recognising patterns and therefore may not be as technically accurate as i'd like
 
 ## NimCrackMe1
@@ -44,6 +46,37 @@ var_a0_1 = &TM__cGo7QGde1ZstH4i7xlaOag_4
 TM__cGo7QGde1ZstH4i7xlaOag_4 is a global variable for “Nim is not for malware!”
 
 <img width="685" height="285" alt="image" src="https://github.com/user-attachments/assets/d7fd8a50-6b66-427f-a263-ab96acee1430" />
+
+## Rust Tickler
+
+SHA 256: df95140548732f34d8cf11b6b9dd7addb31480fab871b7004c7c1e09acfd920b
+
+**Finding main:**
+Entry point > FUN_140005424 > FUN_140001790 > FUN_1400011f0
+
+Towards the end of this large function is an undefined function (sub_140001740).
+
+<img width="624" height="76" alt="image" src="https://github.com/user-attachments/assets/ea5575f0-6577-4f33-87d1-422c2ab94231" />
+
+<img width="627" height="42" alt="image" src="https://github.com/user-attachments/assets/fb00a4e7-f5e3-41c9-9c45-5f77f4552e34" />
+
+<img width="626" height="161" alt="image" src="https://github.com/user-attachments/assets/3e0d4b6e-9f65-46b0-b2ce-c9e9b6dd314d" />
+
+We can see a string being XOR’d with 0x51
+
+Replicating this will result in the flag
+
+<img width="613" height="301" alt="image" src="https://github.com/user-attachments/assets/efd75e81-8362-413f-b6bb-82b9ac3b7cad" />
+
+<img width="701" height="112" alt="image" src="https://github.com/user-attachments/assets/d0feea29-44f1-47db-b34b-e38bb79fc07a" />
+
+## Rust Tickler 2
+
+
+
+
+
+
 
 
 
