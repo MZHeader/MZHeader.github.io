@@ -162,6 +162,79 @@ The 7F structure ID will return the flag:
 
 ## Rust Tickler 3
 
+SHA 256: a4a5b64d72540552c691293f9e988e189674275f6e4743b8d61f299bd6f31fc7
+
+Main function of interest: **1400011f0**
+
+This challenge initially follows a similar format to Rust Tickler 2 where an ID is moved into R8 prior to a function call which results in a different string being returned, for example:
+
+<img width="623" height="61" alt="image" src="https://github.com/user-attachments/assets/2cbedc0c-7d7b-444a-92d8-ed3bf05d049e" />
+
+This results in:
+
+<img width="499" height="34" alt="image" src="https://github.com/user-attachments/assets/41f005f0-dcb0-40b6-8774-01a4aad9defe" />
+
+When we get to ​​1400013C2, there is a conditional jump, where either ID 1338 or 1339 is used
+
+<img width="620" height="33" alt="image" src="https://github.com/user-attachments/assets/830b2a25-2497-4198-801d-291f6ae1d027" />
+
+<img width="551" height="31" alt="image" src="https://github.com/user-attachments/assets/821033c8-d577-4ffe-b253-31bda54f77d5" />
+
+Trial and error tells us that 1338 is the failure, and 1339 is the success, so we’ll set our RIP / patch the ZF / binary to follow that execution path.
+
+Failure / success is determined based on if the provided input is equal to the result of ID 133A
+
+<img width="463" height="221" alt="image" src="https://github.com/user-attachments/assets/f779a206-45da-43cb-b9f1-62cc7d552a20" />
+
+Modifying one of the IDs in R8 prior to the 1423ED7D0 function call will reveal the “answer”:
+
+<img width="622" height="111" alt="image" src="https://github.com/user-attachments/assets/de609d1c-831c-42e8-b0ce-7c9801389e17" />
+
+Continuing to follow execution, we see a path being built: (ID 1348 = Exodus)
+
+<img width="577" height="481" alt="image" src="https://github.com/user-attachments/assets/4bd8f38c-27db-40f1-add7-316182ff82a7" />
+
+<img width="607" height="33" alt="image" src="https://github.com/user-attachments/assets/9c8c0a8e-d8c3-4b87-af72-9ade57d13a73" />
+
+The binary will terminate shortly after this is seen if this directory doesn’t exist.
+
+If the correct “answer” is provided and the above path exists, a file (filename created from ID 1369)
+
+So all we need to do is create this directory and supply the hash when prompted by the executable.
+
+<img width="616" height="185" alt="image" src="https://github.com/user-attachments/assets/5755b794-85c3-4560-8074-33f3510cf21a" />
+
+Stage 2 performs a memcmp to compare supplied input to a known value and if that value matches, the success path is executed.
+
+However, patching the binary to get a success just reveals the message:
+
+<img width="623" height="50" alt="image" src="https://github.com/user-attachments/assets/abb16692-fccb-491c-9673-361453342dbe" />
+
+And there is not much change in execution flow as seen:
+
+<img width="622" height="252" alt="image" src="https://github.com/user-attachments/assets/f2f239fc-0b3b-4055-b0b3-b63661ef4929" />
+
+The answer lies between 140001354 and 1400013c3. This AES ciphertext, AES key, and AES IV. 
+
+I believe this data is then passed through further cryptographic functions prior to being used by the memcmp function.
+
+Data_14037d0f8 = cb584b62035d138f77bc9810f00f1a2020700f8fbf0d75dca3fd71085f1467cde9d05f1f83bbc76b7d9beb42f7510095
+
+Data_14037d128 = d4c39486fdf04283f5d96436ba68ea1c4f4194796af82d0f8eed7c12f53fa07c
+
+Data_14037d148 = 539fb31e1cc13442420d039397e91777
+
+These data variables follow that of AES 256, where the cipher is 48 bytes, followed by a 32 byte key and 16 byte IV.
+
+<img width="697" height="254" alt="image" src="https://github.com/user-attachments/assets/48ffca8f-3c18-4829-9c5f-a49937537370" />
+
+
+
+
+
+
+
+
 
 
 
