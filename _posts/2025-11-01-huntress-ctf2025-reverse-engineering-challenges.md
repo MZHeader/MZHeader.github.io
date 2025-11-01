@@ -214,7 +214,11 @@ And there is not much change in execution flow as seen:
 
 <img width="622" height="252" alt="image" src="https://github.com/user-attachments/assets/f2f239fc-0b3b-4055-b0b3-b63661ef4929" />
 
-The answer lies between 140001354 and 1400013c3. This AES ciphertext, AES key, and AES IV. 
+The answer lies between 140001354 and 1400013c3. This is AES ciphertext, AES key, and AES IV. 
+
+<img width="760" height="282" alt="image" src="https://github.com/user-attachments/assets/d123333d-0f59-480a-adf6-35601d2050b7" />
+
+<img width="595" height="198" alt="image" src="https://github.com/user-attachments/assets/e8735424-2987-4ddc-90c0-bcdca8b90035" />
 
 I believe this data is then passed through further cryptographic functions prior to being used by the memcmp function.
 
