@@ -1,6 +1,6 @@
 ## Huntress CTF 2025 - Reverse Engineering Challenge Writeups
 
-<img width="1100" height="850" alt="image" src="https://github.com/user-attachments/assets/16b9d875-682a-43bc-bd3b-99f7ee3bd1e0" />
+<img width="793" height="609" alt="image" src="https://github.com/user-attachments/assets/489faf9b-6966-4b09-9f74-5cfe4478b390" />
 
 I try my best to explain how I solve the 4 RE challenges from this years CTF, some of it relied on trial and error / recognising patterns and therefore may not be as technically accurate as i'd like
 
