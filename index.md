@@ -80,6 +80,10 @@
     All malware samples can be found on 
     <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
     <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
+  <p>
+    Samples can also be downloaded from my Samples repo 
+    <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">here</a>.
+  </p>
   </p>
 </header>
 
