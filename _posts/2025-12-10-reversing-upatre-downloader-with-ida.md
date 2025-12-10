@@ -1,4 +1,4 @@
-## Reversing an UPATRE Downloader Sample With IDA - WIP
+## Reversing an UPATRE Downloader Sample With IDA
 
 Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
 
@@ -149,13 +149,12 @@ There is then an if statement as follows:
 ```
 if ( !v17 || v14[1] != 90 || v14[2] != 80 || v14[3] )
 ```
-Which will decide where we the following "File Writing & Execution" code executes, or, if it jumps to the "Decompression & Decryption" routine.
 
 <img width="472" height="141" alt="image" src="https://github.com/user-attachments/assets/a0171419-6409-461e-9c3c-366278f31157" />
 
-The code is checking the header of the downloaded payload for the presence of 3 bytes "ZZP"
+The code is checking the header of the downloaded payload for the presence of 3 bytes "ZZP" (90h = Z, 80h = P)
 
-If those bytes exist, the code continues execution into the decompression & decryption routine. If those bytes do not exist, the binary will jump to a location where the payload is written to disk and executed.
+If those bytes exist, the code continues execution into the decompression & decryption routine. If those bytes do not exist, the binary will skip those code and jump to a location where the payload is written to disk and executed.
 
  **Payload Decompression & Decryption**
 ```C
@@ -196,7 +195,7 @@ If those bytes exist, the code continues execution into the decompression & decr
           &v31);
         FreeLibrary((HMODULE)hFile);
         dwBytes = v19;
-        goto LABEL_53;
+        goto LABEL_53; // Jump to the 'File Writing & Execution' code
       }
     }
   }
@@ -206,7 +205,8 @@ If those bytes exist, the code continues execution into the decompression & decr
 
 **File Writing & Execution**
 
-Once the payload is downloaded, the malware writes it to disk and attempts to execute it
+If the ZZP magic bytes were not found, or, if the code jumped to LABEL_53, we found ourselves at this code block, which simply writes the payload to a file on disk, and executes it.
+
 ```C
     hFile = CreateFileW(L"kilf.exe", 0x40000000u, 2u, 0, 2u, 0x80u, 0); // Creates a writable handle to kilf.exe in the current directory
       WriteFile(hFile, v14, dwBytes, &NumberOfBytesWritten, 0); // Writes the downloaded payload (v14) to kilf.exe
@@ -219,10 +219,17 @@ Once the payload is downloaded, the malware writes it to disk and attempts to ex
       goto LABEL_8; // Terminate current process
 ```
 
- decompress and decrypt the payload prior to execution:
-
-
 
 So from this function we can infer that the payload is XOR'd with hex key 78 56 34 12, decompressed with RtlDecompressBuffer, and executed.
 
-## First Payload 
+One payload being served by this URL has the SHA 256 hash: 84864d1758432f365aec494cb963158b77c77014db19e5f3990966e147a85235
+
+It has the ZZP magic bytes and can be decrypted with the following CyberChef recipe:
+
+```
+Drop_bytes(0,4,false)
+XOR({'option':'Hex','string':'78 56 34 12'},'Standard',false)
+LZNT1_Decompress()
+```
+
+<img width="1214" height="723" alt="image" src="https://github.com/user-attachments/assets/16fe5c1d-48e5-4150-bf4f-df7065d7c3e8" />
