@@ -173,7 +173,7 @@ If any previous condition fails, the malware will instead decompress and decrypt
       if ( (dwBytes & 0xFFFFFFFC) > 4 )
       {
         do
-          *(_DWORD *)&v14[4 * v20++] ^= v18; //  XOR the data [v14][+4 / Drop the first 4 bytes] with the XOR key [v18]
+          *(_DWORD *)&v14[4 * v20++] ^= v18; //  XOR the data [v14] with the XOR key [v18]
         while ( v20 < dwBytes >> 2 );
       }
       LibraryW = LoadLibraryW(L"ntdll.dll"); // Dynamically load ntdll.dll
@@ -187,10 +187,10 @@ If any previous condition fails, the malware will instead decompress and decrypt
           FreeLibrary((HMODULE)hFile);
           return 1;
         }
-        dwBytes -= 4;
-        v23 = v14 + 4;
+        dwBytes -= 4; // Drop the first 4 bytes
+        v23 = v14 + 4; // v23 now points to data AFTER the first 4 bytes
         v14 = (char *)nNumberOfBytesToRead;
-        ((void (__stdcall *)(int, DWORD, SIZE_T, _BYTE *, SIZE_T, LPCVOID *))RtlDecompressBuffer)(
+        ((void (__stdcall *)(int, DWORD, SIZE_T, _BYTE *, SIZE_T, LPCVOID *))RtlDecompressBuffer)( //Decompress the payload with following arguments:
           258,
           nNumberOfBytesToRead,
           v19,
