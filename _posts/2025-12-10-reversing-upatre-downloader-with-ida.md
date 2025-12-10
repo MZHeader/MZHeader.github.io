@@ -45,15 +45,15 @@ LABEL_8:
 ```
 **Self-Deletion**
 
-Next, when the binary is executing from %TEMP%, it will attempt to delete itself from it's "original" location
+Next, when the binary is executing from %TEMP%, it will attempt to delete itself from its "original" location by querying the metadata that was added in the replication stage, which contains the processes original execution path.
 ```C
   }
-  v7 = (char *)v31 + 40 * *(unsigned __int16 *)((char *)v31 + *((_DWORD *)v31 + 15) + 6) + *((_DWORD *)v31 + 15) + 208;
-  v8 = (const WCHAR *)((char *)v31 + *((_DWORD *)v7 + 4) + *((_DWORD *)v7 + 5));
+  v7 = (char *)v31 + 40 * *(unsigned __int16 *)((char *)v31 + *((_DWORD *)v31 + 15) + 6) + *((_DWORD *)v31 + 15) + 208; // Calculates the offset to the start of the last PE section
+  v8 = (const WCHAR *)((char *)v31 + *((_DWORD *)v7 + 4) + *((_DWORD *)v7 + 5)); // Calculates where the appended metadata is [Original execution path]
   CloseHandle(hFile);
   for ( nNumberOfBytesToRead = 0; (int)nNumberOfBytesToRead <= 20000; ++nNumberOfBytesToRead )
   {
-    if ( DeleteFileW(v8) )
+    if ( DeleteFileW(v8) ) // Repeatadly attempts to delete the original file
       break;
   }
 ```
