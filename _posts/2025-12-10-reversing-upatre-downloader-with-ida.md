@@ -20,9 +20,9 @@ All of the interesting functionality occurs within the entry point, starting wit
   if ( FileW == (HANDLE)-1 ) // If the handle creation failed..
     return 1; // Return 1 to the calling process 'failed'
   nNumberOfBytesToRead = GetFileSize(FileW, 0); // Sets the nNumberOfBytesToRead to the file size of the file handle
-  v3 = lstrlenW(v0);
-  v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4);
-  v31 = v4;
+  v3 = lstrlenW(v0); // v3 = length of current executing path
+  v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4); // v4 = Memory allocation of current process file size + length of current executing path
+  v31 = v4; // v4 is now v31
   if ( !v4 )
     ExitProcess(1u); // If memory allocation fails, exit process
   ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0); // Read the current executing process
