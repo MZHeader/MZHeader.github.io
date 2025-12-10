@@ -34,7 +34,7 @@ All of the interesting functionality occurs within the entry point, starting wit
     if ( hHeap == (HANDLE)-1 ) // If the handle creation failed...
       return 1; // Return to the calling process
     v6 = lstrlenW(v0);
-    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0); // Write the current executing process to %TEMP%\budha.exe + append metadata of original execution path [v0 [Path] + 2 * v6 + 4 [Length]
+    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0); // Write the current executing process + appended original filepath metadata to %TEMP%\budha.exe
     CloseHandle(hFile);
     CloseHandle(hHeap); // Close both handles to the current process
     GetTempPathW(0x1000u, v0);
