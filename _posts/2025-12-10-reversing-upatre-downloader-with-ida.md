@@ -60,7 +60,7 @@ Next, when the binary is executing from %TEMP%, it will attempt to delete itself
 
 **Payload Downloading**
 
-Next up is a payload being downloaded over HTTP
+Next up is a payload being downloaded over HTTP using Windows API calls
 ```C
 v31 = InternetOpenW(L"Updates downloader", 0, 0, 0, 0); // InternetOpenW API with "Updates downloader" user-agent is held in variable v31
   if ( v31 ) // If this was successful, build an lpszAcceptTypes string of "text/application/*"
