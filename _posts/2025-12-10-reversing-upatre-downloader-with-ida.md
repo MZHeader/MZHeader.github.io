@@ -166,20 +166,21 @@ If any previous condition fails, the malware will instead decompress and decrypt
     if ( nNumberOfBytesToRead )
     {
       v18 = dword_403010[(_DWORD)lpBuffer];
+// dword_403010 contains a hex XOR key [78 56 34 12]
       v19 = 4 * dwBytes;
       v20 = 1;
       v31 = 0;
       if ( (dwBytes & 0xFFFFFFFC) > 4 )
       {
         do
-          *(_DWORD *)&v14[4 * v20++] ^= v18;
+          *(_DWORD *)&v14[4 * v20++] ^= v18; //  XOR the data [v14][+4 / Drop the first 4 bytes] with the XOR key [v18]
         while ( v20 < dwBytes >> 2 );
       }
-      LibraryW = LoadLibraryW(L"ntdll.dll");
+      LibraryW = LoadLibraryW(L"ntdll.dll"); // Dynamically load ntdll.dll
       hFile = LibraryW;
       if ( LibraryW )
       {
-        RtlDecompressBuffer = GetProcAddress(LibraryW, "RtlDecompressBuffer");
+        RtlDecompressBuffer = GetProcAddress(LibraryW, "RtlDecompressBuffer"); // Dynamically resolve RtlDecompressBuffer function
         dword_403018 = (int)RtlDecompressBuffer;
         if ( !RtlDecompressBuffer )
         {
@@ -205,10 +206,7 @@ If any previous condition fails, the malware will instead decompress and decrypt
   return 1;
 }
 ```
-.data:00403010 dword_403010    dd 12345678h            ; DATA XREF: start+395↑r
-.data:00403014                 db  78h ; x
-.data:00403015                 db  56h ; V
-.data:00403016                 db  34h ; 4
-.data:00403017                 db  12h
+
+So from this function we can infer that the payload is XOR'd with hex key 78 56 34 12, decompressed with RtlDecompressBuffer, and executed.
 
 ## First Payload 
