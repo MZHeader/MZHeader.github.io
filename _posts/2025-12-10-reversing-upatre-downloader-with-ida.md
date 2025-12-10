@@ -44,6 +44,7 @@ LABEL_8:
   }
 ```
 **Self-Deletion**
+
 Next, when the binary is executing from %TEMP%, it will attempt to delete itself from it's "original" location
 ```C
   }
