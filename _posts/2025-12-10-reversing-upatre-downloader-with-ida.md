@@ -21,11 +21,11 @@ All of the interesting functionality occurs within the entry point, starting wit
     return 1; // Return 1 to the calling process 'failed'
   nNumberOfBytesToRead = GetFileSize(FileW, 0); // Sets the nNumberOfBytesToRead to the file size of the file handle
   v3 = lstrlenW(v0); // v3 = length of current executing path
-  v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4); // v4 = Memory allocation of current process file size + length of current executing path
+  v4 = HeapAlloc(hHeap, 8u, nNumberOfBytesToRead + 2 * v3 + 4); // v4 = Memory allocation of current executing process file + length of current executing path [EXE Bytes + File Path]
   v31 = v4;
   if ( !v4 )
     ExitProcess(1u); // If memory allocation fails, exit process
-  ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0); // Read the current executing process
+  ReadFile(hFile, v4, nNumberOfBytesToRead, &NumberOfBytesRead, 0); // Read the current executing process into memory
   if ( lstrcmpW(v0, lpBuffer) ) // Execute if statement only if the current executing process is not %TEMP%\budha.exe
   {
     v5 = lstrlenW(v0); // v5 = Length of current executing process
