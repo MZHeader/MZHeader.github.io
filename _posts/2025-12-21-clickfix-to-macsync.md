@@ -721,7 +721,7 @@ writeText(password_entered, writemind & "Password")
 ```
 
 The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration.
-The following extension IDs are checked:
+The following extension IDs are checked in relation to MFA / password vaults:
 ```nosyntax
 eiaeiblijfjekdanodkjadfinkhbfgcd - NordPass® Password Manager & Digital Vault
 aeblfdkhhhdcdjpifhhbdiojplfjncoa - 1Password – Password Manager
@@ -762,6 +762,8 @@ lgndjfkadlbpaifdpbbobdodbaiaiakb - Authenticator App
 bbphmbmmpomfelajledgdkgclfekilei - Authenticator app
 bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
 ```
+
+Additionally, a large number of extesnions are checked related to crypto-currency wallets.
 
 The malware will copy the data from these extensions, including IndexedDB, Local Extension Settings, cookies, and saved passwords.
 
