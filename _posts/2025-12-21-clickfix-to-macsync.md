@@ -794,7 +794,7 @@ Upon entering recovery details, they are sent via a POST request to the '/module
 
 ```
 POST /modules/wallets HTTP/1.1
-Host: ballfrank.today
+Host: ballfrank[.]today
 Accept: */*
 Sec-Fetch-Site: same-origin
 Accept-Language: en-GB,en;q=0.9
