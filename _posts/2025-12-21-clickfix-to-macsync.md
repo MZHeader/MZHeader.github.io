@@ -2,6 +2,8 @@
 
 ClickFix is a social-engineering technique that relies on convincing users to perform a manual action, typically pasting and executing a command under the guise of fixing a problem. It first gained wider attention in the wild through fake CAPTCHA and “verify you are human” pages, where users were instructed to copy and run commands to proceed. Since then, ClickFix has been reused across multiple campaigns as a lightweight initial access method.
 
+## ClickFix Lure
+
 This execution chain starts with the following domain, which is often the target from various malvertising domains:
 
 Domain: hxxps[://]macfilearchive[.]com/s3/
@@ -78,6 +80,8 @@ else
     exit 1
 fi
 ```
+
+## MacSync Infostealer Payload
 
 Execution results in the following MacSync information stealer payload:
 
@@ -741,6 +745,9 @@ curl -k -X POST \
 ```
 
 The script then has the functionality to check for two installed applications and replace them with backdoored compotents if they exist. Ledger & Trezor . We'll first take a look at Trezor. 
+
+## Trezor Suite Backdoor
+
 The script checks for the presence of '/Applications/Ledger Wallet.app'
 
 If this application exists on the host, it is replaced with a backdoored version downloaded from the malicious domain:
@@ -809,3 +816,9 @@ Server returns:
 ```
 {"status":"success","message":"Success"}
 ```
+
+A likely fake error message is then returned, despite the recovery seeds being successfully exfiltrated.
+
+<img width="1257" height="803" alt="image" src="https://github.com/user-attachments/assets/9bd5f957-0816-4ed3-a813-20d4f4517983" />
+
+## Ledger Backdoor
