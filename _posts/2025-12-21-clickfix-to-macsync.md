@@ -83,8 +83,9 @@ fi
 
 ## MacSync Infostealer Payload
 
-Execution results in the following MacSync information stealer payload:
-
+<details>
+  <summary>MacSync Infostealing script (click to expand)</summary>
+	
 ```applescript
 on filesizer(paths)
 	set fsz to 0
@@ -705,6 +706,7 @@ if trezor_installed then
     end try
 end if
 ```
+</details>
 
 Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered.
 
