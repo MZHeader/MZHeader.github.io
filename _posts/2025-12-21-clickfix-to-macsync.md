@@ -802,4 +802,10 @@ Connection: keep-alive
 Sec-Fetch-Dest: empty
 Cookie: PHPSESSID=9vh6eufvm1g1e4ogo8bproigjh
 
-{"seedwords":["123","123","123","123","123","123","123","123","123","123","123","123"],"token":"270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514","app":"trezor"}```
+{"seedwords":["123","123","123","123","123","123","123","123","123","123","123","123"],"token":"270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514","app":"trezor"}
+```
+
+Server returns:
+```
+{"status":"success","message":"Success"}
+```
