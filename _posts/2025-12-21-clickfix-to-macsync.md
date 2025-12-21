@@ -716,7 +716,9 @@ Upon execution, the script prompts the user the enter their password, and will r
 set password_entered to getpwd(username, writemind, "")
 ```
 
-The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration. System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
+The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration.
+
+System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
 
 The information is initially collected and stored in the direct /tmp/[RANDOM-NUMBER]
 
