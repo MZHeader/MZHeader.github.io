@@ -708,6 +708,7 @@ end if
 ```
 </details>
 
+
 Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered.
 
 <img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
