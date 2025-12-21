@@ -1,2 +1,2 @@
-## From ClickFix to MacSync: An Execution Chain Analysis on macOS
+## From ClickFix to MacSync: Execution Chain Analysis on macOS
 
