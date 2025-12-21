@@ -931,3 +931,14 @@ A likely fake error message is then returned, despite the recovery seeds being s
 <img width="1257" height="803" alt="image" src="https://github.com/user-attachments/assets/9bd5f957-0816-4ed3-a813-20d4f4517983" />
 
 ## Ledger Backdoor
+
+The zip archive can be downloaded by maintaining the same headerrs as the malware.
+It contains an Info.plist and App.asar (Electron App) which will replace the legitimate Ledger Application if it's installed.
+
+App.asar can be unpacked with 'asar extract'
+
+
+
+## IOCs
+ballfrank[.]today
+macfilearchive[.]com
