@@ -759,3 +759,15 @@ set TREZORPATH to TREZORMOUNT & "/" & TREZORNAME
 set TREZORAPPFOLDER to "/Applications"
 set TREZORDEST to TREZORAPPFOLDER & "/" & TREZORNAME
 ```
+
+App.asar and Info.plist are replaced.
+
+The most interesting element of the replaced Info,plist file are that the malicious domain is explicitly allowed under an ATS exception:
+
+```
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <key>ballfrank[.]today</key>
+```
