@@ -993,6 +993,8 @@ continueBtn.addEventListener('click', function () {
 ```
 
 ## IOCs
-ballfrank[.]today
-macfilearchive[.]com
-ledger-gate[.]coupons
+- ballfrank[.]today
+
+- macfilearchive[.]com
+
+- ledger-gate[.]coupons
