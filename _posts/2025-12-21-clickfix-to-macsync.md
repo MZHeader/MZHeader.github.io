@@ -85,7 +85,7 @@ fi
 
 <details>
   <summary>MacSync Infostealing script (click to expand)</summary>
-  <pre><code class="language-applescript">
+  <pre><code>
 on filesizer(paths)
 	set fsz to 0
 	try
