@@ -8,6 +8,8 @@ This execution chain starts with the following domain, which is often the target
 
 Domain: hxxps[://]macfilearchive[.]com/s3/
 
+There's is also a recent Reddit post on r/MacOS where a user has fallen victim to this specific campaign: https://www.reddit.com/r/MacOS/comments/1pramrh/did_i_mess_upcompromise_my_mac_security_any/
+
 <img width="1007" height="1069" alt="image" src="https://github.com/user-attachments/assets/dab21879-3c91-4020-9ba8-34872b43d6a5" />
 
 This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it is referencing Apple's legitimate domain, but the full command is as follows:
