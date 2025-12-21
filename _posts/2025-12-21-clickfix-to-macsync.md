@@ -762,7 +762,7 @@ set TREZORAPPFOLDER to "/Applications"
 set TREZORDEST to TREZORAPPFOLDER & "/" & TREZORNAME
 ```
 
-The most interesting element of the replaced Info,plist file are that the malicious domain is explicitly allowed under an ATS exception:
+The most interesting element of the replaced Info.plist file are that the malicious domain is explicitly allowed under an ATS exception:
 
 ```
 <key>NSAppTransportSecurity</key>
