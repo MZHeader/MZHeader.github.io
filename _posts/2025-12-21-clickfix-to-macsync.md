@@ -733,4 +733,24 @@ if trezor_installed then
 end if
 ```
 
+Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered.
+
+<img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
+
+```
+set password_entered to getpwd(username, writemind, "")
+```
+
+The malware the proceeds to create lists for Chronium based browsers and common crypto-currency wallet related applications / extensions. System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
+
+The information is initially collected and stored in the direct /tmp/[RANDOM-NUMBER]
+
+```
+set randomNumber to do shell script "echo $((RANDOM % 9000000 + 1000000))"
+set writemind to "/tmp/sync" & randomNumber & "/"
+```
+
+The collected information is then compressed into a zip archive located at '/tmp/osalogging.zip', expanded this looks like:
+
+<img width="783" height="277" alt="image" src="https://github.com/user-attachments/assets/5ca34cc9-b285-4755-bbe1-a0589422cbb7" />
 
