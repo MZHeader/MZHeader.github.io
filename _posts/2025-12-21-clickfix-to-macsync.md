@@ -718,7 +718,7 @@ set password_entered to getpwd(username, writemind, "")
 
 The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration.
 The following extension IDs are checked:
-
+```
 eiaeiblijfjekdanodkjadfinkhbfgcd - NordPass® Password Manager & Digital Vault
 aeblfdkhhhdcdjpifhhbdiojplfjncoa - 1Password – Password Manager
 bfogiafebfohielmmehodmfbbebbbpei - Keeper® Password Manager & Digital Vault
@@ -757,7 +757,7 @@ ppkkcfblhfgmdmefkmkoomenhgecbemi - Authenticator for PC
 lgndjfkadlbpaifdpbbobdodbaiaiakb - Authenticator App
 bbphmbmmpomfelajledgdkgclfekilei - Authenticator app
 bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
-
+```
 
 System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
 
