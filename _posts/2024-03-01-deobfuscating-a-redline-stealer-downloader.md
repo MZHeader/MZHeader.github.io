@@ -1,5 +1,6 @@
 ---
 tags: InfoStealer
+description: This multi-stage sample begins as a malicious LNK file that downloads and executes a RedLine Stealer HTA payload via mshta.
 ---
 ## Pulling the Thread: How a Simple LNK Unravels into RedLine
 
