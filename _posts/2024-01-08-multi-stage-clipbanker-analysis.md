@@ -9,7 +9,7 @@ RedLine Clipper (aka ClipBanker) is specifically designed to steal cryptocurrenc
 
 ## Initial JavaScript
 
-``` powershell
+```javascript
 function TwtgaWCivnsxiQCbwJSLTCoEJMdptJClJHpZjAWDdZiSqltCvhdULoxXBHwyHFsZGOAumfobRmSZYGcnTOqlQIORHhyqfcitfVIVoRXnknNbOnVerxNCyeaBAnMEDuvyWPYATkqBNDZeMFnDOCskmTaUSfpbVTXPKKBNtUyFSBdQbdByWNvZaxWgdUegnKYPirtLGYpA(str) {
     return str.split('').reverse().join('');
 }
@@ -34,7 +34,7 @@ Now we know where the second stage is hosted, we'll head over and download the c
 
 ## 2nd Stage - Further JavaScript
 
-``` powershell
+```javascript
     var gQBnV = false;
 
     function PPGnIJfdSdJwnbhDmJOmPsHixFAUqYszDllXfNfgjBvoLlUjSGGClBwLWEMMGNpFQYhoJOugHPuOyfuGziEuOWLmcMWmyWNfYqfdoCgGMvwCJltPxiflBrKgywudmPLWXTYXcoJboaQdSKXTzmBswwBNcVdmARyaXbfmbDtfxzfTCFeQWgAnOQtnHPWVxrQnvVspDhKI(LpxIb) {
@@ -123,7 +123,7 @@ Next, we can see more Base64 content being extracted from an image, reversed, an
 After reversing the string, downloading the image, reversing the base64 and decoding to an executable, we are presented with a binary whose sole purpose is to inject code.
 
 **References to Injection:**
-``` powershell
+```csharp
 private static readonly Class1.Delegate9 delegate9_0 = Class1.smethod_0<Class1.Delegate9>("kern!".Replace("!", "el32"), "Create&".Replace("&", "ProcessA"));
 private static readonly Class1.Delegate8 delegate8_0 = Class1.smethod_0<Class1.Delegate8>("%ll".Replace("%", "ntd"), "#ewOfSection".Replace("#", "ZwUnmapVi"));
 private static readonly Class1.Delegate7 delegate7_0 = Class1.smethod_0<Class1.Delegate7>("kern!".Replace("!", "el32"), "!ssMemory".Replace("!", "ReadProce"));
