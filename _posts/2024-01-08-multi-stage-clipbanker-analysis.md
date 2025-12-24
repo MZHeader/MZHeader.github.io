@@ -2,7 +2,7 @@
 tags: InfoStealer
 ---
 
-## MultiStage ClipBanker - JavaScript to Injection
+## Dissecting ClipBanker: From JavaScript Loader to Process Injection
 
 RedLine Clipper (aka ClipBanker) is specifically designed to steal cryptocurrencies by replacing the user’s system clipboard activities with the wallet address under the control of attackers. 
 
