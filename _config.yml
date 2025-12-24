@@ -18,7 +18,7 @@ linkedin_username: "liam-chugg"
 #########################################################################################
 ######### Nothing below needs to be changed (unless you know what you're doing) #########
 #########################################################################################
-remote_theme: pages-themes/minimal@v0.2.0
+remote_theme: daattali/beautiful-jekyll@6.0.1
 plugins:
 - jekyll-remote-theme
 # RSS feed and analytics
