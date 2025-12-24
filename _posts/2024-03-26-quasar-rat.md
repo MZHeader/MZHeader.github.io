@@ -5,6 +5,13 @@ description: This post dissects a PowerShell loader used by Quasar RAT. It cover
 
 ## Inside Quasar RAT: Unpacking a Multi-Stage PowerShell Loader
 
+### 🧪 **Samples**  
+Password-protected malware samples used in this write-up are available for hands-on follow-along.  
+
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/Quasar_RAT)  
+🔑 **Password:** 'mzheader'
+
+## 🔍 **Analysis**
 Quasar RAT is a malware family written in .NET which is used by a variety of attackers, as it's fully functional and open source.
 
 This specific sample is taken from [MalwareBazaar](https://bazaar.abuse.ch/download/98844e610a8d1e4800f8aee8d8464acc12d50f19c4025ffbf1759a899b5d66c4)
