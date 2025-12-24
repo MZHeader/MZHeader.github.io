@@ -8,3 +8,9 @@ a {
   text-shadow: none !important;
   opacity: 1 !important;
 }
+
+/* Bigger post titles */
+.post-title {
+  font-size: 2.2rem;   /* try 2.5rem if you want it bigger */
+  line-height: 1.2;
+}
