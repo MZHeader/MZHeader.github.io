@@ -61,7 +61,7 @@
 <body>
 
 <header>
-  <h1>Reverse Engineering Malware</h1>
+  <h1>Malware Under the Microscope</h1>
     <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
  __  __ ______ 
 |  \/  |___  /
