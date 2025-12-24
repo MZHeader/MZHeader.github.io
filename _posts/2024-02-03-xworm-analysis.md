@@ -4,6 +4,13 @@ description: XWorm RAT often relies on obfuscated loaders to evade detection. Th
 ---
 ## Following the Execution Trail: An XWorm Loader Autopsy
 
+### 🧪 **Samples**  
+Password-protected malware samples used in this write-up are available for hands-on follow-along.  
+
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/XWorm)  
+🔑 **Password:** 'mzheader'
+
+## 🔍 **Analysis**
 This sample starts off with some batch & PowerShell deobfuscation, revealing a .NET loader which we can debug using DnSpy and module breakpoints to reveal the payload.
 
 SHA 256: e5dac6f6d2ab4c479c5c3e91064f335de141c8399bd93f8267e13f134c578c0f
