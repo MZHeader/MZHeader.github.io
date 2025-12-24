@@ -1,4 +1,4 @@
-## Reversing an UPATRE Downloader Sample With IDA
+## UPATRE Downloader: Replication, Decryption, and Execution
 
 Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
 
