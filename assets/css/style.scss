@@ -1,0 +1,10 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Fix blurry text */
+a {
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
