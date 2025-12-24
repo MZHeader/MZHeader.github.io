@@ -1,6 +1,6 @@
 ---
 tags: InfoStealer
-description: Tracing ClipBanker from a JavaScript loader to executable payloads and the malwares clipboard-stealing functionality.
+description: ClipBanker is focused on clipboard hijacking and cryptocurrency theft. We followed its journey from a JavaScript loader to in‑memory executable payloads, showing how it monitors clipboard activity to detect and replace cryptocurrency wallet addresses during transactions.
 ---
 
 ## Dissecting ClipBanker: From JavaScript Loader to Process Injection
