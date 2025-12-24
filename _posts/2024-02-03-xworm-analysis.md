@@ -1,7 +1,7 @@
 ---
 tags: RATs
 ---
-## XWorm - Batch Deobfuscation - .NET Loader
+## Following the Execution Trail: An XWorm Loader Autopsy
 
 This sample starts off with some batch & PowerShell deobfuscation, revealing a .NET loader which we can debug using DnSpy and module breakpoints to reveal the payload.
 
