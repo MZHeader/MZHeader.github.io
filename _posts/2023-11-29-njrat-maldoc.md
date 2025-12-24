@@ -2,13 +2,14 @@
 tags: RATs
 description: NJRat is a long-standing RAT with versatile capabilities. Our investigation reconstructed the full infection chain, from malicious document to loaders and dropped binaries, highlighting the RAT’s persistence strategies and its approach to gaining control over compromised systems.
 ---
-📦 **Samples**  
+
+## Breaking Down NJRat: A Full Kill Chain Analysis
+
+### 📦 **Samples**  
 Password-protected malware samples used in this analysis are available for hands-on follow-along.  
 
 🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/NjRAT)  
 🔑 **Password:** 'mzheader'
-
-## Breaking Down NJRat: A Full Kill Chain Analysis
 
 Another RAT variant, NJRat is typically attributed to ECrime actors, it is supposedly popular with actors in the Middle East. It's primary infection vectors are phishing attacks and drive-by downloads, and like many other RATs, it has the capability to log keystrokes, access the victim's camera, steal credentials stored in browsers, open a reverse shell, upload/download files, view the victim's desktop, perform process, file, and registry manipulations, etc...
 
