@@ -4,9 +4,14 @@ description: UPATRE is a lightweight downloader that spreads across systems by r
 
 ## UPATRE Downloader: Replication, Decryption, and Execution
 
-Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
+### 🧪 **Samples**  
+Password-protected malware samples used in this write-up are available for hands-on follow-along.  
 
-Sample SHA 256: 0000b060341630c2385b5cea8ce2e866671519b31641f5a0c525b880fc655d9e
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/UPATRE_Downloader)  
+🔑 **Password:** 'mzheader'
+
+## 🔍 **Analysis**
+Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
 
 All of the interesting functionality occurs within the entry point, starting with code that rewrites and executes the file under %TEMP%
 ## Downloader
