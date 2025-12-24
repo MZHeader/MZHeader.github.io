@@ -1,3 +1,7 @@
+---
+description: UPATRE is a lightweight downloader that replicates itself, removes its original dropper, and retrieves encrypted payloads over HTTP for execution. It relies on simple obfuscation, XOR‑based decryption, and decompression to deliver second‑stage malware.
+---
+
 ## UPATRE Downloader: Replication, Decryption, and Execution
 
 Simply put, UPATRE is a downloader written in C/C++ that retrieves payloads via HTTP. Downloaded payloads are typically written to disk and then executed.
