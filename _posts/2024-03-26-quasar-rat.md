@@ -1,5 +1,6 @@
 ---
 tags: RATs
+description: This post dissects a PowerShell loader used by Quasar RAT. It covers its multi-stage execution, including payload decoding, process injection, and persistence mechanisms. The loader uses AES encryption for securing its configuration and employs process hollowing to evade detection.
 ---
 
 ## Inside Quasar RAT: Unpacking a Multi-Stage PowerShell Loader
