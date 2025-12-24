@@ -1,6 +1,6 @@
 ---
 tags: RATs
-description: This post walks through an NJRat infection chain, starting from a malicious document and following the execution flow through in-memory loaders, dropped binaries, and persistence mechanisms.
+description: NJRat is a long-standing RAT with versatile capabilities. Our investigation reconstructed the full infection chain, from malicious document to loaders and dropped binaries, highlighting the RAT’s persistence strategies and its approach to gaining control over compromised systems.
 ---
 ## Breaking Down NJRat: A Full Kill Chain Analysis
 
