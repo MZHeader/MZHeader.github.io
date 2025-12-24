@@ -26,9 +26,13 @@ plugins:
 google_analytics: G-48M02RY99Q
 
 # Kramdown markdown engine settings
+markdown: kramdown
+highlighter: rouge
 kramdown:
+  syntax_highlighter: rouge
   syntax_highlighter_opts:
-    disable: true
+    line_numbers: false   # optional, if you want line numbers
+
 
 # Plugins for feed and sitemap generation
 plugins:
