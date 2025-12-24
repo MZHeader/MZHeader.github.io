@@ -1,5 +1,6 @@
 ---
 tags: RATs
+description: This post walks through an NJRat infection chain, starting from a malicious document and following the execution flow through in-memory loaders, dropped binaries, and persistence mechanisms.
 ---
 ## Breaking Down NJRat: A Full Kill Chain Analysis
 
