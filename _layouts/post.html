@@ -17,3 +17,14 @@ layout: default
     {{ content }}
   </div>
 </article>
+
+{% if page.tools %}
+<section class="post-tools">
+  <h3>Tools Used</h3>
+  <ul>
+    {% for tool in page.tools %}
+      <li>{{ tool }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
