@@ -155,7 +155,7 @@ LABEL_14:
 ```
 
 There is then an if statement as follows:
-```
+```c
 if ( !v17 || v14[1] != 90 || v14[2] != 80 || v14[3] )
 ```
 
