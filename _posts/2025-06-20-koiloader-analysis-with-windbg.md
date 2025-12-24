@@ -4,11 +4,14 @@ description: KoiLoader and its companion KoiStealer are known for complex memory
 
 ## Analyzing KoiLoader: WinDbg‑Driven Reverse Engineering of a Multi‑Stage Malware Loader
 
-The main focus of this post is to use WinDbg for binary analysis rather than focusing too much on the specific functionality of this malware. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the following binary:
+### 🧪 **Samples**  
+Password-protected malware samples used in this write-up are available for hands-on follow-along.  
 
-File Name: ciconinejvR.exe
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/KoiStealer)  
+🔑 **Password:** 'mzheader'
 
-SHA 256: 74b85c502651bae1734849f3ac49d8152a6c0fbb9234083b1384d8cbe3640068
+## 🔍 **Analysis**
+The main focus of this post is to use WinDbg for binary analysis rather than focusing too much on the specific functionality of this malware. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the payload.
 
 ## Initial static analysis with Ghidra
 
