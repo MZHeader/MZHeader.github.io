@@ -6,7 +6,7 @@ description: NJRat is a long-standing RAT with versatile capabilities. Our inves
 ## Breaking Down NJRat: A Full Kill Chain Analysis
 
 ### 🧪 **Samples**  
-Password-protected malware samples used in this analysis are available for hands-on follow-along.  
+Password-protected malware samples used in this write-up are available for hands-on follow-along.  
 
 🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/NjRAT)  
 🔑 **Password:** 'mzheader'
