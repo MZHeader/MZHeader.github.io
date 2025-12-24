@@ -1,3 +1,7 @@
+---
+tags: CTF
+---
+
 ## Huntress CTF 2025 - Reverse Engineering Challenge Writeups
 
 <img width="793" height="609" alt="image" src="https://github.com/user-attachments/assets/489faf9b-6966-4b09-9f74-5cfe4478b390" />
