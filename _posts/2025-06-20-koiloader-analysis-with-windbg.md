@@ -1,3 +1,7 @@
+---
+description: Exploring KoiLoader and KoiStealer, a multi-stage malware family known for memory unpacking, anti-VM checks, and data exfiltration. Using WinDbg and static analysis, we dissect its loader, bypass protections, and trace how it retrieves and executes the main payload
+---
+
 ## Analyzing KoiLoader: WinDbg‑Driven Reverse Engineering of a Multi‑Stage Malware Loader
 
 The main focus of this post is to use WinDbg for binary analysis rather than focusing too much on the specific functionality of this malware. I have skipped over the first few steps of the execution chain which are JavaScript, PowerShell & Shellcode loaders, which result in the execution of the following binary:
