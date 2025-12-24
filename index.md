@@ -71,19 +71,15 @@
  MZ HEADER
 </pre>
   <p>
-    Showcasing practical malware analysis techniques, tips, and tricks across diverse samples — covering topics like deobfuscation, debugging, disassembly, and more
+    A deep dive into the world of malware analysis. Here, I break down real-world samples with practical techniques - from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
   </p>
   <p>
-    The tools I rely on are all freely available — with most included out-of-the-box in <strong>FLARE VM</strong>
+    I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.
   </p>
   <p>
-    All malware samples can be found on 
-    <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> /
-    <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>.
-  <p>
-    Samples can also be downloaded from my Samples repo 
-    <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">here</a>.
-  </p>
+    All samples referenced are publically available on  
+    <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and 
+    <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.
   </p>
 </header>
 
