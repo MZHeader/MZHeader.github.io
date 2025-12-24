@@ -19,7 +19,7 @@ This specific sample is taken from [MalwareBazaar](https://bazaar.abuse.ch/downl
 It involves decoding and extracting byte arrays from a PowerShell script. The executable is then debugged with DNSpy to reveal the C2 address.
 
 ## Initial PowerShell
-``` powershell
+```powershell
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName Microsoft.VisualBasic
 Add-Type -AssemblyName Microsoft.CSharp
@@ -94,7 +94,7 @@ I'm going to start with the first byte array, which can be decoded and extracted
 
 This will reveal the following:
 
-``` powershell
+```powershell
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -346,7 +346,7 @@ As well as the method which is used to decrypt and obtain the data.
 **Static Decrypting**
 
 GClass0.smethod_0 is composed of the following:
-```
+```csharp
 	public static bool smethod_0()
 	{
 		if (string.IsNullOrEmpty(GClass0.string_0))
@@ -369,7 +369,7 @@ Firstly, the value of string_9 is being passed to GClass30.smethod_0.
 
 We can see the contents of string_9 among the other configuration information:
 
-```
+```chsarp
 string_9 = "QzXTNaNU0qNKGByM57rH";
 ```
 
