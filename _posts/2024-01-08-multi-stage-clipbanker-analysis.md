@@ -1,5 +1,5 @@
 ---
-tags: ClipBanker
+tags: InfoStealer
 ---
 
 ## MultiStage ClipBanker - JavaScript to Injection
