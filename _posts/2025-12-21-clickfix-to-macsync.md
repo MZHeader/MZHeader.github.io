@@ -1,3 +1,7 @@
+---
+tags: ClipBanker
+---
+
 ## From ClickFix to MacSync: Execution Chain Analysis on macOS
 
 ClickFix is a social-engineering technique that relies on convincing users to perform a manual action, typically pasting and executing a command under the guise of fixing a problem. It first gained wider attention in the wild through fake CAPTCHA and “verify you are human” pages, where users were instructed to copy and run commands to proceed. Since then, ClickFix has been reused across multiple campaigns as a lightweight initial access method.
