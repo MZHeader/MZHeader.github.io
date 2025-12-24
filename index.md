@@ -98,10 +98,16 @@ title: Home
 <ul>
   {% for post in site.posts %}
     <li>
-      <a href="{{ post.url | relative_url }}">
+      <a href="{{ post.url | relative_url }}" class="post-title">
         {{ post.title }}
       </a>
-      <span> — {{ post.date | date: "%b %-d, %Y" }}</span>
+
+      {% if post.description %}
+        <p class="post-description">{{ post.description }}</p>
+      {% endif %}
+
+      <span class="post-date"> — {{ post.date | date: "%b %-d, %Y" }}</span>
     </li>
   {% endfor %}
 </ul>
+
