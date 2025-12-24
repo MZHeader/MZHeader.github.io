@@ -1,6 +1,6 @@
 ---
 tags: InfoStealer
-description: Testing 123
+description: MacSync is a macOS infostealer that harvests passwords, browser and crypto wallet data, Keychain items, and sensitive files. Investigation revealed its manipulation of legitimate crypto apps like Ledger and Trezor to capture additional user information.
 ---
 
 ## From ClickFix to MacSync: Execution Chain Analysis on macOS
