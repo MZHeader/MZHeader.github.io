@@ -1,3 +1,22 @@
+---
+layout: default
+title: Home
+---
+
+<h1>Posts</h1>
+
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url | relative_url }}">
+        {{ post.title }}
+      </a>
+      <span> — {{ post.date | date: "%b %-d, %Y" }}</span>
+    </li>
+  {% endfor %}
+</ul>
+
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
