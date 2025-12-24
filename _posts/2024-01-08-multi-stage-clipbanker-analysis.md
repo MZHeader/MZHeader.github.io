@@ -1,5 +1,6 @@
 ---
 tags: InfoStealer
+description: Tracing ClipBanker from a JavaScript loader to executable payloads and the malwares clipboard-stealing functionality.
 ---
 
 ## Dissecting ClipBanker: From JavaScript Loader to Process Injection
