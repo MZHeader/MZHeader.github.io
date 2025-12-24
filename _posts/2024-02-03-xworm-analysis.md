@@ -1,5 +1,6 @@
 ---
 tags: RATs
+description: This sample is a loader for the XWorm RAT. It starts as an obfuscated batch script that uses PowerShell to decode, AES-decrypt, and GZip-decompress a .NET payload, which is then loaded directly into memory.
 ---
 ## Following the Execution Trail: An XWorm Loader Autopsy
 
