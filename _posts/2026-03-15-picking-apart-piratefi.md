@@ -38,7 +38,7 @@ Prior to doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq 
 | Process | Product |
 |---|---|
 | `wrsa.exe` | Webroot SecureAnywhere |
-| `opssvc.exe` | Malwarebytes |
+| `opssvc.exe` | Quick Heal |
 | `avastui.exe` | Avast |
 | `avgui.exe` | AVG |
 | `nswscsvc.exe` | Norton/Symantec |
