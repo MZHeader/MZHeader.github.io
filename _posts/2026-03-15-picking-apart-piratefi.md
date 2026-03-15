@@ -51,3 +51,5 @@ I found Howard.exe quite difficult to analyse, but got lucky by setting a breakp
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
 
 The return address of the VirtualAlloc call in this case was 02BA0000 - our memory region where a buffer of memory is to be written to.
+
+Setting a memory write breakpoint on this address, we identify a loop where a payload is being written:
