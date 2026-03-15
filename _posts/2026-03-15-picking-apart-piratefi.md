@@ -37,7 +37,7 @@ embedded/script.ps
 
 <details>
 <summary>embedded/script.ps</summary>
-```powershell
+```
 typedef Boolean = U08
 typedef Integer = S32
 typedef TExecWait = U08
