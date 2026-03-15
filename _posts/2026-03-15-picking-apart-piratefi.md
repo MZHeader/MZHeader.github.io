@@ -34,7 +34,10 @@ This  will produce three directories - data, embedded and meta.
 
 embedded/script.ps 
 
-```
+
+<details>
+<summary>embedded/script.ps</summary>
+```powershell
 typedef Boolean = U08
 typedef Integer = S32
 typedef TExecWait = U08
@@ -312,3 +315,4 @@ JumpDestination01:
   0x062   0  Ret
 end;
 ```
+</details>
