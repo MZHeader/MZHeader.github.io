@@ -10,4 +10,4 @@ The game was taken down from Steam marketplace, but the change history can be fo
 
 Upon review, Changelist #27351505 caught my eye due to the following line, showing a heavily embedded vbs script being added:
 
-![Image](https://github.com/MZHeader/MZHeader.github.io/blob/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
