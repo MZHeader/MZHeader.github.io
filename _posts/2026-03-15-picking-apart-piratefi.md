@@ -312,3 +312,70 @@ After reading the C2 response via InternetReadFile, the very next thing the malw
 ```
 
 The threat actor responsible for this malware as well as malware embedded in other titles is currently under investigation by the FBI. Additionally, the FBI are seeking victim information - https://forms.fbi.gov/victims/Steam_Malware
+
+## Visualised Execution Flow
+
+┌─────────────────────────────────────────────────────────────┐
+│                    Steam Game: PirateFi                     │
+└─────────────────────────────┬───────────────────────────────┘
+                              │
+         piratefi.vbs → piratefi.bat → batch2.vbs → batch2.bat
+                              │
+                              ▼
+                        ┌─────────────┐
+                        │  Pirate.exe │  InnoSetup
+                        └──────┬──────┘
+                               │ ef Pirate.exe [| xt -j | d2p ]
+              ┌────────────────┼─────────────────┐
+         data/│          embedded/│          meta/│
+              │           script.ps│               │
+              │                │               │
+              └────────────────┼───────────────┘
+                               │ AV Check (Webroot/Avast/AVG
+                               │ Norton/Sophos/Quick Heal)
+                               │ found? → Sleep 193s
+                               ▼
+                        ┌─────────────┐
+                        │  Howard.exe │  (dropped by installer)
+                        └──────┬──────┘
+                               │ VirtualAlloc → mem write loop
+                               │ ef Howard.exe_memory.bin
+                               │ | carve-pe | dump carved.exe
+                               ▼
+                   ┌───────────────────────┐
+                   │  carved.exe           │
+                   │  [SmartAssembly/.NET] │
+                   └───────────┬───────────┘
+                               │ AES-256 decrypt resource
+                               │ key: UlPs+RiNkeAQ...
+                               │ iv:  8VSGg0PMrhcl...
+                               ▼
+                   ┌───────────────────────┐
+                   │  payload.bin          │
+                   │  [.NET Reactor]       │
+                   └───────────┬───────────┘
+                               │ .NET Reactor Slayer
+                               │ AES decrypt + GZip decompress
+                               │ (×16 stealer modules invoked)
+                               ▼
+          ┌────────────────────────────────────────┐
+          │           Vidar Infostealer            │
+          │  vdr1.exe  |  build: 5a66c55e          │
+          │  tag: a110mgz  |  mutex: approve_april │
+          │                                        │
+          │  Browsers · Crypto · Steam · Discord   │
+          │  Telegram · WinSCP · FileZilla · Files │
+          └──────────────┬─────────────────────────┘
+                         │ Stage → C:\ProgramData\<session_id>
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+   t[.]me/sok33tn            steamcommunity[.]com
+   (Telegram C2)             /profiles/7656119982...
+   dead-drop                 (Steam C2 dead-drop)
+          └──────────────┬──────────────┘
+                         │ GET C2 response
+                         │ strcmp(response, "block")
+                         │   == "block" → ExitProcess(0)
+                         ▼
+                  POST stolen data
+                  95.216.180[.]186
