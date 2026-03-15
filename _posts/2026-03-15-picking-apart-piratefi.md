@@ -37,7 +37,8 @@ embedded/script.ps
 
 <details>
 <summary>embedded/script.ps</summary>
-typedef Boolean = U08
+```
+  typedef Boolean = U08
 typedef Integer = S32
 typedef TExecWait = U08
 typedef TSetupStep = U08
@@ -313,4 +314,5 @@ begin
 JumpDestination01:
   0x062   0  Ret
 end;
+```
 </details>
