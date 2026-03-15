@@ -19,13 +19,9 @@ The directory contains the following files:
 | Filename      | Note      |
 | ------------- | ------------- |
 | batch2.bat | launcher |
-| Cell 1, Row 2 | Cell 1, Row 2 |
-
-
-batch2.bat
-batch2.vbs
-**Engine**
-**Pirate**
-Pirate.exe
-piratefi.bat
-piratefi.vbs
+| batch2.vbs | launcher |
+| Engine | Directory |
+| Pirate | Directory |
+| Pirate.exe | executable |
+| piratefi.bat | launcher |
+| piratefi.vbs | launcher |
