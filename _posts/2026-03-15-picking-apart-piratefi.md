@@ -4,6 +4,8 @@ description: Between May 2024 and January 2026, threat actors have been observed
 
 ## Picking Apart PirateFi: A Trojanised Steam Game
 
+Wider Context: https://forms.fbi.gov/victims/Steam_Malware
+
 In February 2025, a new game hit the Steam marketplace in beta, titled "PirateFi". The free-to-play game was somewhat underwhelming due to the fact that it was uploaded in order to steal victims' information and hijack user accounts.
 
 The game was taken down from the Steam marketplace, but the change history can be found here: https://steamdb.info/app/3476470/history/
