@@ -236,7 +236,7 @@ arrYByvGYZ Method:
 The resource is then decrypted with AES.
 The Key and IV are encrypted - FPtBe5YCL3LqueRW4xM.xLjYwbE09p is a string lookup routine that utilises a hashtable.
 
-The decrypted resources is then passed to function cJ7YglW56B - which is responsible for decompressing the payload.
+The decrypted resource is then passed to function cJ7YglW56B - which is responsible for decompressing the payload.
 
 ```cs
 	// Token: 0x02000077 RID: 119
