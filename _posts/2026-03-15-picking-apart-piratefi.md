@@ -274,5 +274,19 @@ I was able to view all decrypted strings by setting a Watch window on the string
 
 ## Final Payload - Vidar Infostealer
 
-25cb28fc3c4704b938f5e95954c5a2ac1fa5d0cb40a568bde2ae1f6e1b7e7de3
+The final payload observed is Vidar Infostealer.
+Vidar is an infostealer malware  operating as malware-as-a-service that was first discovered in the wild in late 2018.
+This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurreny wallets, Steam, Discord, Telegram, Files, Applications such as WinSCP & FileZilla.
 
+Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to the dead-drop C2 domains.
+
+**Interesting IOCs**
+| Type | Value |
+|---|---|
+| `Build ID` | 5a66c55e84f3f678650d4a78841e6451 |
+| `C2 dead-drop (Telegram)` | https[://]t[.]me/sok33tn |
+| `C2 dead-drop (Steam)` | https[://]steamcommunity[.]com/profiles/76561199824159981 |
+| `Campaign tag` | a110mgz |
+| `User-Agent` | Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0 |
+| `Internal name` | vdr1.exe |
+| `Mutex/Event` | approve_april |
