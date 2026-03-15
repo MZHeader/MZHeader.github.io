@@ -294,3 +294,19 @@ Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to 
 There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2: 95.216.180[.]186
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
+
+**Kill Switch**
+
+After reading the C2 response via InternetReadFile, the very next thing the malware does is compare it against the string “block”:
+
+```
+ 0x4032B4 call  sub_40D9F0     ; resolve response string pointer
+ 0x4032B9 push  offset aBlock    ; push “block” to the stack
+ 0x4032BE push  eax         ; push response string
+ 0x4032BF call  ds:StrCmpCA     ; strcmp(response, “block”)
+ 0x4032C5 test  eax, eax
+ 0x4032C7 jz   loc_40338C     ; if equal -> kill
+ ...
+ 0x40338C push  0          ; uExitCode = 0
+ 0x40338E call  ds:ExitProcess   ; instant termination
+```
