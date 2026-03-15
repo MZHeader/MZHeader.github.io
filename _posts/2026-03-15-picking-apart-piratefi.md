@@ -13,3 +13,19 @@ Upon review, **Changelist #27351505** caught my eye due to the following line, s
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
 
 This directory within the game files contains several launchers that ultimately execute Pirate.exe.
+
+The directory contains the following files:
+
+| Filename      | Note      |
+| ------------- | ------------- |
+| batch2.bat | launcher |
+| Cell 1, Row 2 | Cell 1, Row 2 |
+
+
+batch2.bat
+batch2.vbs
+**Engine**
+**Pirate**
+Pirate.exe
+piratefi.bat
+piratefi.vbs
