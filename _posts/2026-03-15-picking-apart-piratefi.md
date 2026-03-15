@@ -26,6 +26,8 @@ The directory contains the following files:
 | `Pirate` | Directory |
 | `Engine` | Directory |
 
+## Pirate.exe
+
 Pirate.exe is a InnoSetup executable, the contents of which can be extracted with the following Binary Refinery pipeline:
 ```
 ef Pirate.exe [| xt -j | d2p ]
@@ -46,6 +48,8 @@ Prior to doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq 
 
 If any of these processes are found, the installer Sleeps for 193 seconds before proceeding, a common sandbox evasion technique.
 
+## Howard.exe
+
 I found Howard.exe quite difficult to analyse, but got lucky by setting a breakpoint on VirtualAlloc and identifying an indirect call to the API.
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
@@ -58,4 +62,16 @@ Setting a memory write breakpoint on this address, we identify a loop where a pa
 
 We can see the full buffer by resuming execution to when the loop completes.
 Within the memory buffer are the magic bytes of a PE:
+
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.28.13.png)
+
+To get the next payload, we'll dump this memory region to disk and carve the PE with the following Binary Refinery pipline:
+
+```
+ef Howard.exe_memory.bin | carve-pe | dump carved.exe
+```
+
+## SmartAssembly
+
+This next stage payload is an assembly packed with SmartAssembly.
 
