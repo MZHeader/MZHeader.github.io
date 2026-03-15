@@ -12,3 +12,4 @@ Upon review, **Changelist #27351505** caught my eye due to the following line, s
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
 
+This directory within the game files contains several launchers that ultimately execute Pirate.exe.
