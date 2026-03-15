@@ -43,3 +43,7 @@ Prior to doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq 
 | `avgui.exe` | AVG |
 | `nswscsvc.exe` | Norton/Symantec |
 | `sophoshealth.exe` | Sophos |
+
+If any of these processes are found, the installer Sleeps for 193 seconds before proceeding, a common sandbox evasion technique.
+
+I found Howard.exe quite difficult to analyse, but got lucky by setting a breakpoint on VirtualAlloc and identifying an indirect call to the API.
