@@ -268,3 +268,8 @@ I'm going to debug and set a breakpoint on 'return array3;' so that I can review
 
 In the Locals window we can see an array with an MZ header (4D 5A) - This is likely our next payload - we'll dump this to disk.
 
+I was able to view all decrypted strings by setting a Watch window on the string table as it was loaded:
+
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Hashtable3.png)
+
+
