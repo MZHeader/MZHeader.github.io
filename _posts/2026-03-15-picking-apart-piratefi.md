@@ -281,6 +281,7 @@ This sample has the capability to steal sensitive data from Chromium & Firefox b
 Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to the dead-drop C2 domains.
 
 **Interesting IOCs**
+
 | Type | Value |
 |---|---|
 | `Build ID` | 5a66c55e84f3f678650d4a78841e6451 |
