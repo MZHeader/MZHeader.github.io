@@ -18,10 +18,10 @@ The directory contains the following files:
 
 | Filename      | Note      |
 | ------------- | ------------- |
-| batch2.bat | launcher |
-| batch2.vbs | launcher |
-| Engine | Directory |
+| piratefi.vbs | Launches piratefi.bat |
+| piratefi.bat | Launches batch2.vbs |
+| batch2.vbs | Launches batch2.bat |
+| batch2.bat | Launches Pirate.exe |
+| Pirate.exe | Main Executable Payload |
 | Pirate | Directory |
-| Pirate.exe | executable |
-| piratefi.bat | launcher |
-| piratefi.vbs | launcher |
+| Engine | Directory |
