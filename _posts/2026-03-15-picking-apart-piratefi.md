@@ -16,15 +16,15 @@ This directory within the game files contains several launchers that ultimately 
 
 The directory contains the following files:
 
-| Filename      | Note      |
+| Filename      | Purpose      |
 | ------------- | ------------- |
-| piratefi.vbs | Launches piratefi.bat |
-| piratefi.bat | Launches batch2.vbs |
-| batch2.vbs | Launches batch2.bat |
-| batch2.bat | Launches Pirate.exe |
-| Pirate.exe | Main Executable Payload |
-| Pirate | Directory |
-| Engine | Directory |
+| `piratefi.vbs` | Launches piratefi.bat |
+| `piratefi.bat` | Launches batch2.vbs |
+| `batch2.vbs` | Launches batch2.bat |
+| `batch2.bat` | Launches Pirate.exe |
+| `Pirate.exe` | Main Executable Payload |
+| `Pirate` | Directory |
+| `Engine` | Directory |
 
 Pirate.exe is a InnoSetup executable, the contents of which can be extracted with the following Binary Refinery pipeline:
 ```
