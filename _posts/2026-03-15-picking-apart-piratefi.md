@@ -47,3 +47,7 @@ Prior to doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq 
 If any of these processes are found, the installer Sleeps for 193 seconds before proceeding, a common sandbox evasion technique.
 
 I found Howard.exe quite difficult to analyse, but got lucky by setting a breakpoint on VirtualAlloc and identifying an indirect call to the API.
+
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
+
+The return address of the VirtualAlloc call in this case was 02BA0000 - our memory region where a buffer of memory is to be written to.
