@@ -25,3 +25,8 @@ The directory contains the following files:
 | Pirate.exe | Main Executable Payload |
 | Pirate | Directory |
 | Engine | Directory |
+
+Pirate.exe is a InnoSetup executable, the contents of which can be extracted with the following Binary Refinery pipeline:
+```
+ef Pirate.exe [| xt -j | d2p ]
+```
