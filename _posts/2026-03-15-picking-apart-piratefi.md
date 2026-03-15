@@ -201,7 +201,7 @@ public static void AHQt3OKaB()
 
 The first line of code shows us that a resource is being given as an argument to the `arrYByvGYZ` method.
 
-arrYByvGYZ Method:
+`arrYByvGYZ` Method:
 ```cs
 	// Token: 0x02000076 RID: 118
 	internal class W9koEHYFJe2cbrx66DU
