@@ -102,7 +102,7 @@ De4dot makes the assembly easier to read, with the Main function as follows:
 		}
 ```
 
-smethod_14 takes an encrypted resource and AES decrypts it:
+smethod_14 takes an encrypted resource and AES decrypts it, it is then loaded and the AHQt3OKaB Method from the UyOmhW05bcEWWnZuqT Class from the S015sDJkvQDvP3a6cx Namespace is invoked.
 
 ```
 		static byte[] smethod_14()
@@ -130,3 +130,11 @@ smethod_14 takes an encrypted resource and AES decrypts it:
 			return array;
 		}
 ```
+
+The embedded, encrypted resource can be decrypted with the following Binary Refinery pipeline:
+
+```
+ef Reydbozimwj | aes b64:UlPs+RiNkeAQjtjBHi2FZme93GOwtujN9g03qBhA2xM= -i b64:8VSGg0PMrhcl1gUkFwmUlg== | dump payload.bin
+```
+
+This reveals another assembly, this time protected with .NET Reactor, and can be deobfuscated with .NET ReactorSlayer, but I'll uncheck the option to rename obfuscated symbol names as I want to identify the function that gets invokved by the previous assembly.
