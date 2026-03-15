@@ -282,10 +282,15 @@ Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to 
 
 **Interesting IOCs**
 
-
+| Type | Value |
+|---|---|
+| `Build ID` | 5a66c55e84f3f678650d4a78841e6451 |
+| `C2 dead-drop (Telegram)` | https[://]t[.]me/sok33tn |
+| `C2 dead-drop (Steam)` | https[://]steamcommunity[.]com/profiles/76561199824159981 |
+| `Campaign tag` | a110mgz |
+| `Internal name` | vdr1.exe |
+| `Mutex/Event` | approve_april |
 
 There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2: 95.216.180[.]186
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
-
-.
