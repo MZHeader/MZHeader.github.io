@@ -293,3 +293,6 @@ Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to 
 
 There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2:
 
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
+
+
