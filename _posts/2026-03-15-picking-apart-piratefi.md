@@ -4,7 +4,7 @@ description: Between May 2024 and January 2026, threat actors have been observed
 
 ## Picking Apart PirateFi: A Trojanised Steam Game
 
-In February 2025, a new game hit the Steam marketplace in beta, titled "PirateFi". The free-to-play game was somewhat underwhelming due to the fact that it was uploaded in order to steal victims' information and hijack user accounts.
+In February 2025, a new game hit the Steam marketplace in beta, titled PirateFi. The free-to-play game was somewhat underwhelming due to the fact that it was uploaded in order to steal victims' information and hijack user accounts.
 
 The game was taken down from the Steam marketplace, but the change history can be found here: https://steamdb.info/app/3476470/history/
 
@@ -34,8 +34,8 @@ ef Pirate.exe [| xt -j | d2p ]
 ```
 This  will produce three directories - data, embedded and meta.
 
-embedded/script.ps is the PowerShell installer script. It's main purpose is to execute the binary dropped by the installer - 'Howard.exe'.
-Before doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq <name>" /FO CSV /NH | find /I "<name>"' and searches for the following processes:
+`embedded/script.ps` is the PowerShell installer script. It's main purpose is to execute the binary dropped by the installer - `Howard.exe`.
+Before doing so, it builds the command `cmd.exe /C tasklist /FI "IMAGENAME eq <name>" /FO CSV /NH | find /I "<name>"` and searches for the following processes:
 
 | Process | Product |
 |---|---|
@@ -54,7 +54,7 @@ I found Howard.exe quite difficult to analyse, but got lucky by setting a breakp
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
 
-The return address of the VirtualAlloc call in this case was 02BA0000 - our memory region where a buffer of memory is to be written to.
+The return address of the VirtualAlloc call in this case was `02BA0000` - our memory region where a buffer of memory is to be written to.
 
 Setting a memory write breakpoint on this address, we identify a loop where a payload is being written:
 
@@ -102,7 +102,7 @@ De4dot makes the assembly easier to read, with the Main function as follows:
 		}
 ```
 
-smethod_14 takes an encrypted resource and AES decrypts it. It is then loaded and the AHQt3OKaB Method from the UyOmhW05bcEWWnZuqT Class from the S015sDJkvQDvP3a6cx Namespace is invoked.
+`smethod_14` takes an encrypted resource and AES decrypts it. It is then loaded and the `AHQt3OKaB` Method from the `UyOmhW05bcEWWnZuqT` Class from the `S015sDJkvQDvP3a6cx` Namespace is invoked.
 
 ```cs
 		static byte[] smethod_14()
@@ -199,7 +199,7 @@ public static void AHQt3OKaB()
 }
 ```
 
-The first line of code shows us that a resource is being given as an argument to the arrYByvGYZ method.
+The first line of code shows us that a resource is being given as an argument to the `arrYByvGYZ` method.
 
 arrYByvGYZ Method:
 ```cs
@@ -234,9 +234,9 @@ arrYByvGYZ Method:
 ```
 
 The resource is then decrypted with AES.
-The Key and IV are encrypted - FPtBe5YCL3LqueRW4xM.xLjYwbE09p is a string lookup routine that utilises a hashtable.
+The Key and IV are encrypted - `FPtBe5YCL3LqueRW4xM.xLjYwbE09p` is a string lookup routine that utilises a hashtable.
 
-The decrypted resource is then passed to function cJ7YglW56B - which is responsible for decompressing the payload.
+The decrypted resource is then passed to function `cJ7YglW56B` - which is responsible for decompressing the payload.
 
 ```cs
 	// Token: 0x02000077 RID: 119
@@ -262,11 +262,11 @@ The decrypted resource is then passed to function cJ7YglW56B - which is responsi
 		}
 ```
 
-I'm going to debug and set a breakpoint on 'return array3;' so that I can review the decrypted & decompressed payloads being passed through this function.
+I'm going to debug and set a breakpoint on `return array3;` so that I can review the decrypted & decompressed payloads being passed through this function.
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20175824.png)
 
-In the Locals window, we can see an array with an MZ header (4D 5A) - This is likely our next payload - we'll dump this to disk.
+In the Locals window, we can see an array with an MZ header `4D 5A` - This is likely our next payload - we'll dump this to disk.
 
 I was able to view all decrypted strings by setting a Watch window on the string table as it was loaded:
 
@@ -278,7 +278,7 @@ The final payload observed is Vidar Infostealer.
 Vidar is an infostealer malware  operating as malware-as-a-service that was first discovered in the wild in late 2018.
 This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurreny wallets, Steam, Discord, Telegram, Files, Applications such as WinSCP & FileZilla.
 
-Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to the dead-drop C2 domains.
+Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to the dead-drop C2 domains.
 
 **Interesting IOCs**
 
@@ -291,13 +291,13 @@ Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to 
 | `Internal name` | vdr1.exe |
 | `Mutex/Event` | approve_april |
 
-There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2: 95.216.180[.]186
+There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2: `95.216.180[.]186`
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
 
 **Kill Switch**
 
-After reading the C2 response via InternetReadFile, the very next thing the malware does is compare it against the string “block”:
+After reading the C2 response via InternetReadFile, the very next thing the malware does is compare it against the string `block`:
 
 ```
  0x4032B4 call  sub_40D9F0     ; resolve response string pointer
