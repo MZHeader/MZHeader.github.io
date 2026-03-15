@@ -56,4 +56,6 @@ Setting a memory write breakpoint on this address, we identify a loop where a pa
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.25.07.png)
 
+We can see the full buffer by resuming execution to when the loop completes.
+Within the memory buffer are the magic bytes of a PE:
 
