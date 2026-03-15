@@ -75,7 +75,7 @@ ef Howard.exe_memory.bin | carve-pe | dump carved.exe
 
 This next stage payload is an assembly packed with SmartAssembly.
 De4dot makes the assembly easier to read, with the Main function as follows:
-```
+```cs
 		// Token: 0x060000D1 RID: 209 RVA: 0x00006990 File Offset: 0x00004B90
 		static void Main()
 		{
@@ -104,7 +104,7 @@ De4dot makes the assembly easier to read, with the Main function as follows:
 
 smethod_14 takes an encrypted resource and AES decrypts it, it is then loaded and the AHQt3OKaB Method from the UyOmhW05bcEWWnZuqT Class from the S015sDJkvQDvP3a6cx Namespace is invoked.
 
-```
+```cs
 		static byte[] smethod_14()
 		{
 			byte[] emyrsqaglox = Class1.Emyrsqaglox; // return (byte[])Class1.Cazmb.GetObject("Reydbozimwj", Class1.cultureInfo_0);
@@ -142,7 +142,7 @@ This reveals another assembly, this time protected with .NET Reactor.
 ## Defeating .NET Reactor
 
 Navigating to the invoked method without any deobfuscation reveals an empty function:
-```
+```cs
 public static void AHQt3OKaB()
 {
 }
@@ -151,7 +151,7 @@ public static void AHQt3OKaB()
 So, I'll run the assembly through .NET Reactor Slayer, but I'll uncheck the option to deobfuscate method names as I want to be able to easily navigate back to the invoked function.
 
 Deobfuscated Method:
-```
+```cs
 // S015sDJkvQDvP3a6cx.UyOmhW05bcEWWnZuqT
 // Token: 0x0600000C RID: 12 RVA: 0x00003744 File Offset: 0x00001944
 public static void AHQt3OKaB()
@@ -202,7 +202,7 @@ public static void AHQt3OKaB()
 The first line of code shows us that a resource is being given as an argument to the arrYByvGYZ method.
 
 arrYByvGYZ Method:
-```
+```cs
 	// Token: 0x02000076 RID: 118
 	internal class W9koEHYFJe2cbrx66DU
 	{
@@ -238,7 +238,7 @@ The Key and IV are encrypted - FPtBe5YCL3LqueRW4xM.xLjYwbE09p is a string lookup
 
 The decrypted resources is then passed to function cJ7YglW56B - which is responsible for decompressing the payload.
 
-```
+```cs
 	// Token: 0x02000077 RID: 119
 	internal static class VR8byCY85iHMmkWcA17
 	{
@@ -263,4 +263,8 @@ The decrypted resources is then passed to function cJ7YglW56B - which is respons
 ```
 
 I'm going to debug and set a breakpoint on 'return array3;' so that I can review the decrypted & decompressed payloads being passed through this function.
+
+![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20175824.png)
+
+In the Locals window we can see an array with an MZ header (4D 5A) - This is likely our next payload - we'll dump this to disk.
 
