@@ -28,14 +28,14 @@ The directory contains the following files:
 
 ## Pirate.exe
 
-Pirate.exe is a InnoSetup executable, the contents of which can be extracted with the following Binary Refinery pipeline:
+Pirate.exe is an InnoSetup executable, the contents of which can be extracted with the following Binary Refinery pipeline:
 ```
 ef Pirate.exe [| xt -j | d2p ]
 ```
 This  will produce three directories - data, embedded and meta.
 
 embedded/script.ps is the PowerShell installer script. It's main purpose is to execute the binary dropped by the installer - 'Howard.exe'.
-Prior to doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq <name>" /FO CSV /NH | find /I "<name>"' and searches for the following processes:
+Before doing so, it builds the command 'cmd.exe /C tasklist /FI "IMAGENAME eq <name>" /FO CSV /NH | find /I "<name>"' and searches for the following processes:
 
 | Process | Product |
 |---|---|
@@ -73,7 +73,7 @@ ef Howard.exe_memory.bin | carve-pe | dump carved.exe
 
 ## SmartAssembly
 
-This next stage payload is an assembly packed with SmartAssembly.
+The next-stage payload is an assembly compiled with SmartAssembly.
 De4dot makes the assembly easier to read, with the Main function as follows:
 ```cs
 		// Token: 0x060000D1 RID: 209 RVA: 0x00006990 File Offset: 0x00004B90
@@ -102,7 +102,7 @@ De4dot makes the assembly easier to read, with the Main function as follows:
 		}
 ```
 
-smethod_14 takes an encrypted resource and AES decrypts it, it is then loaded and the AHQt3OKaB Method from the UyOmhW05bcEWWnZuqT Class from the S015sDJkvQDvP3a6cx Namespace is invoked.
+smethod_14 takes an encrypted resource and AES decrypts it. It is then loaded and the AHQt3OKaB Method from the UyOmhW05bcEWWnZuqT Class from the S015sDJkvQDvP3a6cx Namespace is invoked.
 
 ```cs
 		static byte[] smethod_14()
@@ -266,7 +266,7 @@ I'm going to debug and set a breakpoint on 'return array3;' so that I can review
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20175824.png)
 
-In the Locals window we can see an array with an MZ header (4D 5A) - This is likely our next payload - we'll dump this to disk.
+In the Locals window, we can see an array with an MZ header (4D 5A) - This is likely our next payload - we'll dump this to disk.
 
 I was able to view all decrypted strings by setting a Watch window on the string table as it was loaded:
 
