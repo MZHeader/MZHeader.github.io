@@ -276,7 +276,7 @@ I was able to view all decrypted strings by setting a Watch window on the string
 
 The final payload observed is Vidar Infostealer.
 Vidar is an infostealer malware  operating as malware-as-a-service that was first discovered in the wild in late 2018.
-This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurreny wallets, Steam, Discord, Telegram, Files, Applications such as WinSCP & FileZilla.
+This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurreny wallets, Steam, Discord, Telegram, Files and Applications such as WinSCP & FileZilla.
 
 Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to the dead-drop C2 domains.
 
