@@ -9,3 +9,5 @@ In February 2025, a new game hit the steam marketplace in beta, titled "PirateFi
 The game was taken down from Steam marketplace, but the change history can be found here: https://steamdb.info/app/3476470/history/
 
 Upon review, Changelist #27351505 caught my eye due to the following line, showing a heavily embedded vbs script being added:
+
+![Image](https://github.com/MZHeader/MZHeader.github.io/blob/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
