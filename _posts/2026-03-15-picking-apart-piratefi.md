@@ -302,7 +302,7 @@ After reading the C2 response via InternetReadFile, the very next thing the malw
 ```
  0x4032B4 call  sub_40D9F0     ; resolve response string pointer
  0x4032B9 push  offset aBlock    ; push “block” to the stack
- 0x4032BE push  eax         ; push response string
+ 0x4032BE push  eax         ; push response string to the stack
  0x4032BF call  ds:StrCmpCA     ; strcmp(response, “block”)
  0x4032C5 test  eax, eax
  0x4032C7 jz   loc_40338C     ; if equal -> kill
