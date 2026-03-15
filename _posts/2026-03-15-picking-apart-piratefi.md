@@ -137,6 +137,130 @@ The embedded, encrypted resource can be decrypted with the following Binary Refi
 ef Reydbozimwj | aes b64:UlPs+RiNkeAQjtjBHi2FZme93GOwtujN9g03qBhA2xM= -i b64:8VSGg0PMrhcl1gUkFwmUlg== | dump payload.bin
 ```
 
-This reveals another assembly, this time protected with .NET Reactor...
+This reveals another assembly, this time protected with .NET Reactor.
 
-Work In Progress :)
+## Defeating .NET Reactor
+
+Navigating to the invoked method without any deobfuscation reveals an empty function:
+```
+public static void AHQt3OKaB()
+{
+}
+```
+
+So, I'll run the assembly through .NET Reactor Slayer, but I'll uncheck the option to deobfuscate method names as I want to be able to easily navigate back to the invoked function.
+
+Deobfuscated Method:
+```
+// S015sDJkvQDvP3a6cx.UyOmhW05bcEWWnZuqT
+// Token: 0x0600000C RID: 12 RVA: 0x00003744 File Offset: 0x00001944
+public static void AHQt3OKaB()
+{
+	byte[] array = W9koEHYFJe2cbrx66DU.arrYByvGYZ(Resources.\uE004);
+	using (MemoryStream memoryStream = new MemoryStream(VR8byCY85iHMmkWcA17.cJ7YglW56B(array)))
+	{
+		memoryStream.Position = 0L;
+		UyOmhW05bcEWWnZuqT.WcVLolyxG(Serializer.Deserialize<G2hIrVIVBvIcoMgDTXd>(memoryStream));
+	}
+	string fileName = Process.GetCurrentProcess().MainModule.FileName;
+	if (!UyOmhW05bcEWWnZuqT.XOvH6LNBw().Af8Ig31OwW.fqBIiaUG95.IWXefBb0wc())
+	{
+		UyOmhW05bcEWWnZuqT.ya6v99WBB(fileName.Remove(fileName.Length - 4));
+	}
+	else
+	{
+		UyOmhW05bcEWWnZuqT.ya6v99WBB(fileName);
+	}
+	FrDsKD89TcS5HRpmUBY.Qa5YncKYGt();
+	new hJKfjd8vWo2m5BC6Wpx().l0Q8qruINT();
+	ELCTdV8NxKVBikYyuFt.U8P82y4wOo();
+	new JRh8eH84MCabEaYmU8A().Kfr8skRuwx();
+	new TfSVu48dKmxvm8KEswT().h4U8uTcbdl();
+	new RGocen86qh6N7GfwlvA().J8A8ZSQswQ();
+	new tG0AJHYIeqKtAmw68dT().Bt5YQ0Q3TF();
+	new s32S0o8MuDukiR5uEP1().nMf8SVA1Id();
+	new iLAO0m8yYcShq5JETKM().zeu8rn43W3();
+	new E9yQoj8YNIcMyXRnPVK().RuM80Cpwnv();
+	new aJdpAdeh0RPe9qlWvH7().olpe3i1MNq();
+	new M0cC6LIIEmdcvYv8TEE().g2xIQNJLQO();
+	new o3aauu8LXkovY1QsImm().zRv8EciZLm();
+	new YUBZYteWAfwDi3c3pfN().EWCeeeulAs();
+	new OVqCl58Ja3WRt1OtofY().cCG8HjRSQI();
+	new zVSXR08PBHganDMYBGO().gus8h2Aere();
+	ELCTdV8NxKVBikYyuFt.oKg8xJX5v1();
+	try
+	{
+		Process.GetCurrentProcess().Kill();
+	}
+	catch
+	{
+	}
+	throw new Exception();
+}
+```
+
+The first line of code shows us that a resource is being given as an argument to the arrYByvGYZ method.
+
+arrYByvGYZ Method:
+```
+	// Token: 0x02000076 RID: 118
+	internal class W9koEHYFJe2cbrx66DU
+	{
+		// Token: 0x060001F5 RID: 501 RVA: 0x00007AE4 File Offset: 0x00005CE4
+		public static byte[] arrYByvGYZ(byte[] \u0020)
+		{
+			byte[] array2;
+			using (Aes aes = Aes.Create())
+			{
+				aes.KeySize = 256;
+				aes.Key = Convert.FromBase64String(FPtBe5YCL3LqueRW4xM.xLjYwbE09p(12081));
+				aes.IV = Convert.FromBase64String(FPtBe5YCL3LqueRW4xM.xLjYwbE09p(12265));
+				ICryptoTransform cryptoTransform = aes.CreateDecryptor(aes.Key, aes.IV);
+				using (MemoryStream memoryStream = new MemoryStream())
+				{
+					using (MemoryStream memoryStream2 = new MemoryStream(\u0020))
+					{
+						using (CryptoStream cryptoStream = new CryptoStream(memoryStream2, cryptoTransform, CryptoStreamMode.Read))
+						{
+							cryptoStream.CopyTo(memoryStream);
+							byte[] array = memoryStream.ToArray();
+							array2 = array;
+						}
+					}
+				}
+			}
+			return array2;
+		}
+```
+
+The resource is then decrypted with AES.
+The Key and IV are encrypted - FPtBe5YCL3LqueRW4xM.xLjYwbE09p is a string lookup routine that utilises a hashtable.
+
+The decrypted resources is then passed to function cJ7YglW56B - which is responsible for decompressing the payload.
+
+```
+	// Token: 0x02000077 RID: 119
+	internal static class VR8byCY85iHMmkWcA17
+	{
+		// Token: 0x060001F8 RID: 504 RVA: 0x00007BE0 File Offset: 0x00005DE0
+		public static byte[] cJ7YglW56B(byte[] \u0020)
+		{
+			byte[] array3;
+			using (MemoryStream memoryStream = new MemoryStream(\u0020))
+			{
+				byte[] array = new byte[4];
+				memoryStream.Read(array, 0, 4);
+				int num = BitConverter.ToInt32(array, 0);
+				using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+				{
+					byte[] array2 = new byte[num];
+					gzipStream.Read(array2, 0, num);
+					array3 = array2;
+				}
+			}
+			return array3;
+		}
+```
+
+I'm going to debug and set a breakpoint on 'return array3;' so that I can review the decrypted & decompressed payloads being passed through this function.
+
