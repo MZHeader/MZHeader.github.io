@@ -272,4 +272,7 @@ I was able to view all decrypted strings by setting a Watch window on the string
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Hashtable3.png)
 
+## Final Payload - Vidar Infostealer
+
+25cb28fc3c4704b938f5e95954c5a2ac1fa5d0cb40a568bde2ae1f6e1b7e7de3
 
