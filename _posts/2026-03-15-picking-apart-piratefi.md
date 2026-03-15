@@ -290,3 +290,6 @@ Stolen files are staged to 'C:\ProgramData\<session_id>' before being POSTed to 
 | `User-Agent` | Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:136.0) Gecko/20100101 Firefox/136.0 |
 | `Internal name` | vdr1.exe |
 | `Mutex/Event` | approve_april |
+
+There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2:
+
