@@ -90,7 +90,7 @@ for post in $(ls _posts/*.md | sort -r); do
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title} — Malware Under the Microscope</title>
+  <title>${title} — Reverse Engineering Malware</title>
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
@@ -201,7 +201,7 @@ cat > "_site/index.html" << ENDINDEX
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Malware Under the Microscope</title>
+  <title>Reverse Engineering Malware</title>
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
@@ -250,13 +250,18 @@ cat > "_site/index.html" << ENDINDEX
       display: inline-block;
       margin-right: 0.15em;
     }
-    .title-rest {
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: #8a8aaa;
-      text-shadow: none;
-      letter-spacing: 0.02em;
+    .title-re {
+      display: block;
+      font-size: 0.95rem;
+      font-family: "Fira Code", "Consolas", monospace;
+      color: #50fa7b;
+      opacity: 0.55;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 0.2em;
     }
+    .re-char { display: inline-block; }
+    .re-char.scrambling { color: #50fa7b; opacity: 1; }
     @keyframes glitch-malware {
       0%,88%,100% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
       90% { text-shadow: -2px 0 #ff79c6,2px 0 #8be9fd,0 0 12px rgba(198,40,40,0.5); transform: translate(-2px,0); }
@@ -549,7 +554,7 @@ cat > "_site/index.html" << ENDINDEX
 <body>
 
 <header>
-  <h1 class="site-title" id="siteTitle"><span class="title-malware">Malware</span><span class="title-rest">Under the Microscope</span></h1>
+  <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
   <div class="magnifier" id="magnifier"></div>
 
   <div class="pe-viewer">
@@ -641,6 +646,30 @@ ${posts_list_html}
       panel.classList.remove('active');
     });
   });
+
+  (function() {
+    const reEl = document.getElementById('titleRE');
+    const reText = 'Reverse Engineering';
+    const hexChars = '0123456789ABCDEF';
+    reEl.innerHTML = reText.split('').map(c =>
+      c === ' ' ? ' ' : '<span class="re-char" data-c="' + c + '">' + c + '</span>'
+    ).join('');
+    const reSpans = Array.from(reEl.querySelectorAll('.re-char'));
+    function scrambleRE() {
+      const pick = reSpans[Math.floor(Math.random() * reSpans.length)];
+      pick.classList.add('scrambling');
+      pick.textContent = hexChars[Math.floor(Math.random() * 16)];
+      setTimeout(() => {
+        pick.textContent = hexChars[Math.floor(Math.random() * 16)];
+        setTimeout(() => {
+          pick.textContent = pick.dataset.c;
+          pick.classList.remove('scrambling');
+        }, 60);
+      }, 60);
+      setTimeout(scrambleRE, 100 + Math.random() * 250);
+    }
+    scrambleRE();
+  })();
 
   (function() {
     const title = document.getElementById('siteTitle');
