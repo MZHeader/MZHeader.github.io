@@ -90,29 +90,18 @@ for post in $(ls _posts/*.md | sort -r); do
   <style>
     ${SHARED_CSS}
 
-    /* Scanline overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.08) 2px,
-        rgba(0, 0, 0, 0.08) 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-    }
-    /* Vignette */
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%);
-      pointer-events: none;
-      z-index: 9998;
+    /* Scanline + vignette as body background layers */
+    body {
+      background-color: #1e1e1e;
+      background-image:
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.06) 2px,
+          rgba(0, 0, 0, 0.06) 4px
+        );
     }
 
     .post-nav {
