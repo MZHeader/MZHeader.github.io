@@ -43,7 +43,7 @@ SHARED_CSS='
       padding: 0.1em 0.3em;
       border-radius: 3px;
       font-size: 0.9em;
-      border: 1px solid #5625be;
+      border: 1px solid rgba(86, 37, 190, 0.4);
     }
     img { max-width: 100%; border-radius: 4px; }
     .back-link {
