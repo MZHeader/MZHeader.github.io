@@ -115,42 +115,60 @@ for post in $(ls _posts/*.md | sort -r); do
       z-index: 9998;
     }
 
+    .post-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #2a2a3a;
+    }
     .back-link {
-      display: inline-block;
-      margin-bottom: 2rem;
       color: #50fa7b;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.85rem;
       text-shadow: 0 0 6px rgba(80, 250, 123, 0.3);
     }
     .back-link:hover { text-decoration: none; text-shadow: 0 0 10px rgba(80, 250, 123, 0.6); }
-
-    .post-header {
-      padding: 1.5rem 2rem;
-      margin-bottom: 2rem;
-      background: linear-gradient(180deg, rgba(86, 37, 190, 0.06) 0%, transparent 100%);
-      border: 1px solid #2a2a3a;
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(86, 37, 190, 0.08), inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-    .post-header h2:first-child { margin-top: 0; }
-
     .post-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.78rem;
-      color: #666;
-      margin-top: 0.75rem;
+      color: #555;
       letter-spacing: 0.03em;
     }
-    .post-meta::before { content: "// "; color: #444; }
+
+    /* Post title - first h2 */
+    article h2:first-of-type {
+      font-size: 1.9rem;
+      color: #7c4dff;
+      text-shadow: 0 0 16px rgba(124, 77, 255, 0.5), 0 0 32px rgba(124, 77, 255, 0.2);
+      border-bottom: 1px solid #2a2a3a;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    /* Section headings */
+    article h2 {
+      font-size: 1.2rem;
+      color: #8be9fd;
+      border-left: 3px solid #5625be;
+      padding-left: 0.75rem;
+      margin-top: 2rem;
+    }
+    article h3 {
+      font-size: 1rem;
+      color: #bd93f9;
+      border-left: 2px solid #444;
+      padding-left: 0.6rem;
+      margin-top: 1.5rem;
+    }
 
     article { max-width: 100%; }
   </style>
 </head>
 <body>
-  <a class="back-link" href="/">&larr; cd ..</a>
-  <div class="post-header">
-    <div class="post-meta">${formatted_date}</div>
+  <div class="post-nav">
+    <a class="back-link" href="/">&larr; cd ..</a>
+    <span class="post-meta">${formatted_date}</span>
   </div>
   <article>
 ENDHEADER
