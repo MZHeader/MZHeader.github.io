@@ -129,20 +129,64 @@ cat > "_site/index.html" << ENDINDEX
     header {
       border-bottom: 1px solid #333;
       margin-bottom: 2rem;
-      padding-bottom: 1rem;
+      padding-bottom: 2rem;
+      text-align: center;
     }
-    header p { color: #bbbbbb; max-width: 70ch; }
+    header p { color: #bbbbbb; max-width: 70ch; margin: 0.5rem auto; text-align: left; }
     .normal-link { color: #8be9fd !important; }
-    pre {
+
+    .ascii-art {
       font-family: monospace;
       color: #ff79c6;
       text-align: center;
       background: transparent;
       border: none;
       box-shadow: none;
-      padding: 0;
+      padding: 0.5rem 0;
       font-size: 0.75rem;
+      line-height: 1.4;
+      text-shadow: 0 0 8px #ff79c680;
+      animation: pulse 4s ease-in-out infinite;
     }
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 8px #ff79c680; }
+      50% { text-shadow: 0 0 16px #ff79c6, 0 0 32px #ff79c640; }
+    }
+
+    .site-title {
+      font-size: 2rem;
+      font-family: "Fira Code", "Consolas", monospace;
+      color: #5625be;
+      text-shadow: 0 0 12px #5625be80;
+      animation: glitch 6s infinite;
+      margin-bottom: 0;
+    }
+    @keyframes glitch {
+      0%, 88%, 100% {
+        text-shadow: 0 0 12px #5625be80;
+        transform: translate(0);
+      }
+      90% { text-shadow: -2px 0 #ff79c6, 2px 0 #8be9fd; transform: translate(-1px, 0); }
+      92% { text-shadow: 2px 0 #ff79c6, -2px 0 #8be9fd; transform: translate(1px, 0); }
+      94% { text-shadow: -1px 0 #ff79c6; transform: translate(-1px, 0); }
+      96% { text-shadow: 1px 0 #8be9fd; transform: translate(1px, 0); }
+      98% { text-shadow: 0 0 12px #5625be80; transform: translate(0); }
+    }
+
+    .hex-dump {
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      color: #444;
+      text-align: center;
+      margin: 0.75rem 0;
+      letter-spacing: 0.05em;
+    }
+    .hex-dump .hex-addr { color: #333; margin-right: 1em; }
+    .hex-dump .hex-bytes { color: #4a4a6a; margin-right: 1em; }
+    .hex-dump .hex-mz { color: #5625be90; }
+
+    .intro-block { text-align: left; margin-top: 1.5rem; }
+
     ul { list-style: none; padding: 0; }
     li { margin-bottom: 1.25rem; }
     .post-description { color: #aaa; margin: 0.25rem 0 0 0; font-size: 0.9rem; }
@@ -152,8 +196,8 @@ cat > "_site/index.html" << ENDINDEX
 <body>
 
 <header>
-  <h1>Malware Under the Microscope 🔍</h1>
-  <pre>
+  <h1 class="site-title">Malware Under the Microscope</h1>
+  <pre class="ascii-art">
  __  __ ______
 |  \/  |___  /
 | |\/| |  / /
@@ -161,18 +205,26 @@ cat > "_site/index.html" << ENDINDEX
 |_|  |_|/____|
  MZ HEADER
 </pre>
-  <p>
-    Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
-  </p>
-  <p>
-    I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.
-  </p>
-  <p>
-    All samples referenced are publically available on
-    <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and
-    <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>
-    and you can also grab them from my <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.
-  </p>
+  <div class="hex-dump">
+    <span class="hex-addr">00000000</span>
+    <span class="hex-bytes">4D 5A 90 00 03 00 00 00  04 00 00 00 FF FF 00 00</span>
+    <span class="hex-mz">MZ..............</span>
+  </div>
+
+  <div class="intro-block">
+    <p>
+      Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
+    </p>
+    <p>
+      I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.
+    </p>
+    <p>
+      All samples referenced are publically available on
+      <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and
+      <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>
+      and you can also grab them from my <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.
+    </p>
+  </div>
 </header>
 
 <h1>Write-ups</h1>
