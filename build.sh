@@ -76,7 +76,7 @@ for post in $(ls _posts/*.md | sort -r); do
     body=$(pandoc "$post" \
         --from markdown+yaml_metadata_block \
         --to html \
-        --syntax-highlighting=none)
+        --no-highlight)
 
     # Write post header (variables expanded)
     cat > "_site/posts/${slug}.html" << ENDHEADER
