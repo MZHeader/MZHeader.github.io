@@ -703,6 +703,12 @@ ${posts_list_html}
   })();
 </script>
 
+<footer style="margin-top:2rem; text-align:center; font-family:'Fira Code','Consolas',monospace; font-size:0.82rem; color:#3a3a55;">
+  <a href="https://www.linkedin.com/in/liam-chugg/" target="_blank" style="color:#8be9fd; text-decoration:none; margin: 0 1rem;">LinkedIn</a>
+  <span style="color:#252535;">|</span>
+  <a href="https://github.com/MZHeader" target="_blank" style="color:#8be9fd; text-decoration:none; margin: 0 1rem;">GitHub</a>
+</footer>
+
 </body>
 </html>
 ENDINDEX
