@@ -75,9 +75,8 @@ title: Home
 |_|  |_|/____|
  MZ HEADER
 </pre>
-  <p style="text-align: center; color: #888; font-size: 0.85rem; margin-top: -0.5rem;">Liam Chugg &mdash; Security Researcher at CrowdStrike</p>
   <p>
-    A deep dive into the world of malware analysis. Here, I break down real-world samples with practical techniques - from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
+    Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
   </p>
   <p>
     I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.
