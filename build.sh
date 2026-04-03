@@ -353,26 +353,16 @@ cat > "_site/index.html" << ENDINDEX
 
     /* Section divider between .text and .rsrc */
     .pe-section-divider {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      padding: 0.1rem 1rem;
-      background: #161620;
-      border-top: 1px solid #2a2a3a;
-      border-bottom: 1px solid #2a2a3a;
-    }
-    .pe-section-divider::before,
-    .pe-section-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #2a2a3a;
+      padding: 0.25rem 1rem;
+      background: rgba(10, 10, 16, 0.7);
+      border-top: 1px solid #1e1e28;
+      border-bottom: 1px solid #1e1e28;
+      text-align: right;
     }
     .pe-section-divider-label {
-      font-size: 0.68rem;
-      color: #3a3a55;
-      letter-spacing: 0.08em;
-      white-space: nowrap;
+      font-size: 0.62rem;
+      color: #252535;
+      letter-spacing: 0.06em;
     }
 
     /* .text disasm rows */
@@ -563,12 +553,7 @@ cat > "_site/index.html" << ENDINDEX
       <span class="pe-section-name">.text</span>
       <span class="pe-section-flags">IMAGE_SCN_CNT_CODE | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ</span>
     </div>
-    <div class="pe-section-meta">
-      <span><span class="meta-label">VirtualSize:</span> <span class="meta-value">0x00000340</span></span>
-      <span><span class="meta-label">VirtualAddress:</span> <span class="meta-value">0x00001000</span></span>
-      <span><span class="meta-label">SizeOfRawData:</span> <span class="meta-value">0x00000400</span></span>
-      <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x60000020</span></span>
-    </div>
+    <div class="pe-section-meta" style="display:none"></div>
     <div class="pe-section-body">
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0000</span>
