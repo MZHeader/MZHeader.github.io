@@ -62,7 +62,6 @@ HLJS_HEAD='
 '
 
 posts_list_html=""
-post_js_data="const postData = {};"
 post_idx=0
 
 for post in $(ls _posts/*.md | sort -r); do
@@ -177,38 +176,14 @@ ENDHEADER
 </html>
 ENDFOOTER
 
-    # Encode first 8 chars of title as hex bytes (compact hex column)
-    title_hex=""
-    for ((i=0; i<8; i++)); do
-        if [ $i -lt ${#title} ]; then
-            c="${title:$i:1}"
-            hb=$(printf '%02X' "'$c" 2>/dev/null || printf '3F')
-        else
-            hb="00"
-        fi
-        title_hex+="${hb} "
-        [ $i -eq 3 ] && title_hex+=" "
-    done
-    title_hex="${title_hex% }"
-
-    # Decoded column shows full title (no truncation)
-    decoded="${title}"
-
     offset=$(printf '%08X' $(( (post_idx - 1) * 8 )) )
 
-    # Escape for JS string (basic)
-    title_js=$(echo "$title" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")
-    desc_js=$(echo "$description" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")
-
-    post_js_data+="
-postData['post-${post_idx}'] = {slug: '/posts/${slug}.html', title: '${title_js}', desc: '${desc_js}', date: '${date_str}'};"
-
     posts_list_html+="
-      <div class=\"hex-row post-entry\" id=\"post-${post_idx}\" onclick=\"window.location='/posts/${slug}.html'\">
-        <span class=\"hex-addr\">${offset}</span>
-        <span class=\"hex-bytes post-hex\">${title_hex}</span>
-        <span class=\"hex-ascii\"><span class=\"ascii-vis post-decoded\">${decoded}</span></span>
-      </div>"
+      <a class=\"rsrc-post-row\" href=\"/posts/${slug}.html\">
+        <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
+        <span class=\"rsrc-title\">${title}</span>
+        <span class=\"rsrc-desc\">${description}</span>
+      </a>"
 
     echo "Built: posts/${slug}.html"
 done
@@ -269,56 +244,59 @@ cat > "_site/index.html" << ENDINDEX
       98% { text-shadow: 0 0 12px #5625be80; transform: translate(0); }
     }
 
-    /* Hex editor panel */
-    .hex-editor {
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.85rem;
-      line-height: 1.8;
-      letter-spacing: 0.03em;
+    /* .rsrc section post list */
+    .rsrc-section {
       text-align: left;
-      margin: 1.5rem auto 0;
+      margin: 2rem auto 0;
       max-width: 900px;
-      position: relative;
+      font-family: "Fira Code", "Consolas", monospace;
     }
-    .hex-editor-toolbar {
+    .rsrc-post-row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.45rem 1rem;
-      background: #161620;
-      border: 1px solid #2a2a3a;
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
-      font-size: 0.78rem;
-      color: #555;
+      align-items: baseline;
+      padding: 0.5rem 1rem;
+      line-height: 1.7;
+      cursor: pointer;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: background 0.12s ease, border-left-color 0.12s ease;
     }
-    .hex-editor-toolbar .toolbar-title { color: #5625be; font-weight: 600; }
-    .hex-editor-toolbar .toolbar-info { color: #444; }
-    .hex-editor-body {
-      background: rgba(10, 10, 16, 0.7);
-      border: 1px solid #2a2a3a;
-      border-radius: 0 0 6px 6px;
-      padding: 0.6rem 0;
-      overflow-x: auto;
+    .rsrc-post-row:hover {
+      background: rgba(86, 37, 190, 0.10);
+      border-left-color: #5625be;
+      text-decoration: none;
     }
-    .hex-editor-colheader {
-      display: flex;
-      padding: 0 1rem 0.4rem;
-      border-bottom: 1px solid #222233;
-      margin-bottom: 0.3rem;
+    .rsrc-post-row .rsrc-gutter {
+      width: 7em;
+      flex-shrink: 0;
       color: #3a3a55;
-      font-size: 0.72rem;
+      font-size: 0.82rem;
       user-select: none;
     }
-    .hex-editor-colheader .col-offset { width: 5.5em; flex-shrink: 0; }
-    .hex-editor-colheader .col-hex { width: 14em; flex-shrink: 0; }
-    .hex-editor-colheader .col-ascii { flex: 1; padding-left: 1.2em; }
-    .hex-row { display: flex; padding: 0.15rem 1rem; transition: background 0.1s ease; }
-    .hex-row:hover { background: rgba(86, 37, 190, 0.06); }
-    .hex-row .hex-addr { width: 5.5em; flex-shrink: 0; color: #3a3a55; user-select: none; }
-    .hex-row .hex-bytes { width: 14em; flex-shrink: 0; color: #3a3a55; font-size: 0.78rem; opacity: 0.7; }
-    .hex-row .hex-ascii { flex: 1; padding-left: 1.2em; color: #888; }
-    .hex-row .hex-ascii .ascii-vis { color: #888; }
+    .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
+    .rsrc-post-row .rsrc-title {
+      color: #c0c0c0;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-right: 1.5em;
+    }
+    .rsrc-post-row:hover .rsrc-title {
+      color: #ff79c6;
+      text-shadow: 0 0 8px rgba(255, 121, 198, 0.3);
+    }
+    .rsrc-post-row .rsrc-desc {
+      flex: 1;
+      color: #555;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rsrc-post-row:hover .rsrc-desc { color: #777; }
 
     /* PE .text section bio block */
     .pe-section {
@@ -373,7 +351,7 @@ cat > "_site/index.html" << ENDINDEX
       width: 7em;
       flex-shrink: 0;
       color: #3a3a55;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       user-select: none;
       padding-top: 0.15em;
     }
@@ -381,23 +359,20 @@ cat > "_site/index.html" << ENDINDEX
       color: #5625be;
       width: 3.5em;
       flex-shrink: 0;
-      font-size: 0.82rem;
+      font-size: 0.86rem;
       user-select: none;
       padding-top: 0.15em;
     }
     .pe-operand {
       flex: 1;
-      color: #dcdcdc;
+      color: #e4e4e4;
       font-family: "Segoe UI", "Roboto", sans-serif;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       line-height: 1.65;
     }
     .pe-operand strong { color: #ff79c6; }
     .pe-operand a { color: #8be9fd !important; }
     .pe-operand a:hover { color: #50fa7b !important; }
-    .pe-comment { display: flex; padding: 0.15rem 1rem; }
-    .pe-comment-gutter { width: 7em; flex-shrink: 0; }
-    .pe-comment-text { color: #3a3a55; font-size: 0.75rem; font-style: italic; }
 
     .section-heading {
       font-family: "Fira Code", "Consolas", monospace;
@@ -433,40 +408,6 @@ cat > "_site/index.html" << ENDINDEX
     .status-bar.visible { opacity: 1; }
     .status-bar .cmd-prompt { color: #5625be; margin-right: 0.5em; }
 
-    .post-entry {
-      cursor: pointer;
-      transition: background 0.1s ease, border-left-color 0.1s ease;
-      border-left: 2px solid transparent;
-    }
-    .post-entry .post-decoded {
-      color: #aaa;
-      font-size: 0.88rem;
-    }
-    .post-entry:hover, .post-entry.active {
-      background: rgba(86, 37, 190, 0.09);
-      border-left-color: #5625be;
-    }
-    .post-entry:hover .post-hex, .post-entry.active .post-hex { color: #5a5a8a; opacity: 1; }
-    .post-entry:hover .post-decoded, .post-entry.active .post-decoded { color: #ff79c6; text-shadow: 0 0 8px rgba(255,121,198,0.3); }
-    .post-entry:hover .hex-addr, .post-entry.active .hex-addr { color: #5625be; }
-
-    .hex-info-panel {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 0.6rem 1rem;
-      border-top: 1px solid #222233;
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.82rem;
-      min-height: 3.2rem;
-      background: rgba(10, 10, 16, 0.5);
-      border-radius: 0 0 6px 6px;
-    }
-    .hex-info-prompt { color: #3a3a55; user-select: none; flex-shrink: 0; padding-top: 0.05rem; }
-    .hex-info-content { flex: 1; }
-    .hex-info-title { color: #555; transition: color 0.15s ease; }
-    .hex-info-panel.has-content .hex-info-title { color: #dcdcdc; font-weight: 600; }
-    .hex-info-desc { color: #666; font-family: "Segoe UI", "Roboto", sans-serif; font-size: 0.78rem; margin-top: 0.25rem; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -486,27 +427,15 @@ cat > "_site/index.html" << ENDINDEX
       <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x60000020</span></span>
     </div>
     <div class="pe-section-body">
-      <div class="pe-comment">
-        <span class="pe-comment-gutter"></span>
-        <span class="pe-comment-text">;; Liam &mdash; Security Researcher @ CrowdStrike</span>
-      </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0000</span>
         <span class="pe-instr">push</span>
-        <span class="pe-operand">Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
-      </div>
-      <div class="pe-comment">
-        <span class="pe-comment-gutter"></span>
-        <span class="pe-comment-text">;; tooling</span>
+        <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0028</span>
         <span class="pe-instr">lea</span>
         <span class="pe-operand">I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.</span>
-      </div>
-      <div class="pe-comment">
-        <span class="pe-comment-gutter"></span>
-        <span class="pe-comment-text">;; sample sources</span>
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0050</span>
@@ -517,25 +446,19 @@ cat > "_site/index.html" << ENDINDEX
   </div>
 </header>
 
-<div class="hex-editor" id="writeUpsHex">
-  <div class="hex-editor-toolbar">
-    <span class="toolbar-title">write-ups.db</span>
-    <span class="toolbar-info">11 entries &mdash; click to open</span>
+<div class="rsrc-section">
+  <div class="pe-section-toolbar">
+    <span class="pe-section-name">.rsrc</span>
+    <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ</span>
   </div>
-  <div class="hex-editor-body">
-    <div class="hex-editor-colheader">
-      <span class="col-offset">Offset</span>
-      <span class="col-hex">00 01 02 03  04 05 06 07</span>
-      <span class="col-ascii">Decoded text</span>
-    </div>
+  <div class="pe-section-meta">
+    <span><span class="meta-label">NumberOfEntries:</span> <span class="meta-value">${post_idx}</span></span>
+    <span><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">$(date +%Y-%m-%dT%H:%M:%S)</span></span>
+    <span><span class="meta-label">MajorVersion:</span> <span class="meta-value">0x0001</span></span>
+    <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x40000040</span></span>
+  </div>
+  <div class="pe-section-body">
 ${posts_list_html}
-  </div>
-  <div class="hex-info-panel" id="hexInfoPanel">
-    <span class="hex-info-prompt">;;</span>
-    <div class="hex-info-content">
-      <div class="hex-info-title" id="hexInfoTitle">hover an entry to inspect</div>
-      <div class="hex-info-desc" id="hexInfoDesc"></div>
-    </div>
   </div>
 </div>
 
@@ -544,32 +467,15 @@ ${posts_list_html}
 </div>
 
 <script>
-  ${post_js_data}
-
   const bar = document.getElementById('statusBar');
   const cmd = document.getElementById('statusCmd');
-  const infoTitle = document.getElementById('hexInfoTitle');
-  const infoDesc = document.getElementById('hexInfoDesc');
-  const infoPanel = document.getElementById('hexInfoPanel');
 
-  document.querySelectorAll('.post-entry').forEach(row => {
-    const data = postData[row.id];
-    if (!data) return;
-
+  document.querySelectorAll('.rsrc-post-row').forEach(row => {
     row.addEventListener('mouseenter', () => {
-      row.classList.add('active');
-      infoTitle.textContent = data.title;
-      infoDesc.textContent = data.desc;
-      infoPanel.classList.add('has-content');
-      cmd.textContent = 'open ' + data.slug;
+      cmd.textContent = 'open ' + row.getAttribute('href');
       bar.classList.add('visible');
     });
-
     row.addEventListener('mouseleave', () => {
-      row.classList.remove('active');
-      infoTitle.textContent = 'hover an entry to inspect';
-      infoDesc.textContent = '';
-      infoPanel.classList.remove('has-content');
       bar.classList.remove('visible');
     });
   });
