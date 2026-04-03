@@ -264,11 +264,11 @@ cat > "_site/index.html" << ENDINDEX
     .re-char.scrambling { color: #50fa7b; opacity: 1; }
     @keyframes glitch-malware {
       0%,88%,100% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
-      90% { text-shadow: -2px 0 #ff79c6,2px 0 #8be9fd,0 0 12px rgba(198,40,40,0.5); transform: translate(-2px,0); }
-      91% { text-shadow: 3px 0 #ff79c6,-1px 0 #8be9fd; transform: translate(1px,1px); }
-      92% { text-shadow: 2px 0 #ff79c6,-2px 0 #8be9fd; transform: translate(2px,0); }
-      93% { text-shadow: -1px 0 #c62828,1px 0 #ff79c6; transform: translate(-1px,-1px); }
-      94% { text-shadow: -1px 0 #ff79c6; transform: translate(-1px,0); }
+      90% { text-shadow: -2px 0 #8be9fd,2px 0 #8be9fd,0 0 12px rgba(198,40,40,0.5); transform: translate(-2px,0); }
+      91% { text-shadow: 3px 0 #8be9fd,-1px 0 #8be9fd; transform: translate(1px,1px); }
+      92% { text-shadow: 2px 0 #8be9fd,-2px 0 #8be9fd; transform: translate(2px,0); }
+      93% { text-shadow: -1px 0 #c62828,1px 0 #8be9fd; transform: translate(-1px,-1px); }
+      94% { text-shadow: -1px 0 #8be9fd; transform: translate(-1px,0); }
       96% { text-shadow: 1px 0 #8be9fd; transform: translate(1px,0); }
       98% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
     }
@@ -328,7 +328,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.78rem;
       color: #555;
     }
-    .pe-section-toolbar .pe-section-name { color: #ff79c6; font-weight: 600; }
+    .pe-section-toolbar .pe-section-name { color: #8be9fd; font-weight: 600; }
     .pe-section-toolbar .pe-section-flags { color: #444; font-size: 0.72rem; }
 
     /* Shared meta row */
@@ -401,7 +401,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.95rem;
       line-height: 1.65;
     }
-    .pe-operand strong { color: #ff79c6; }
+    .pe-operand strong { color: #8be9fd; }
     .pe-operand a { color: #8be9fd !important; }
     .pe-operand a:hover { color: #50fa7b !important; }
 
@@ -439,7 +439,7 @@ cat > "_site/index.html" << ENDINDEX
       text-overflow: ellipsis;
     }
     .rsrc-post-row:hover .rsrc-title {
-      color: #ff79c6;
+      color: #8be9fd;
       text-shadow: 0 0 8px rgba(255, 121, 198, 0.3);
     }
 
@@ -474,7 +474,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.7rem;
       color: #555;
     }
-    .pe-detail-toolbar .detail-label { color: #ff79c6; font-weight: 600; }
+    .pe-detail-toolbar .detail-label { color: #8be9fd; font-weight: 600; }
     .pe-detail-toolbar .detail-type { color: #3a3a55; }
     .pe-detail-body {
       padding: 0.75rem;
@@ -488,7 +488,7 @@ cat > "_site/index.html" << ENDINDEX
       margin-bottom: 0.6rem;
     }
     .pe-detail-panel.active .pe-detail-title {
-      color: #ff79c6;
+      color: #8be9fd;
       text-shadow: 0 0 8px rgba(255, 121, 198, 0.2);
     }
     .pe-detail-desc {
