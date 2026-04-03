@@ -513,57 +513,17 @@ cat > "_site/index.html" << ENDINDEX
       <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x60000020</span></span>
     </div>
     <div class="pe-section-body">
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0000</span>
-        <span class="pe-instr">push</span><span class="pe-asm-operand">ebp</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0001</span>
-        <span class="pe-instr">mov</span><span class="pe-asm-operand">ebp, esp</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0003</span>
-        <span class="pe-instr">push</span><span class="pe-asm-operand">ebx</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0004</span>
-        <span class="pe-instr">push</span><span class="pe-asm-operand">esi</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0005</span>
-        <span class="pe-instr">push</span><span class="pe-asm-operand">edi</span>
-      </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0006</span>
+        <span class="pe-gutter">.text:0000</span>
         <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:002E</span>
+        <span class="pe-gutter">.text:0028</span>
         <span class="pe-operand">I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0056</span>
+        <span class="pe-gutter">.text:0050</span>
         <span class="pe-operand">All samples referenced are publically available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:007E</span>
-        <span class="pe-instr">pop</span><span class="pe-asm-operand">edi</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:007F</span>
-        <span class="pe-instr">pop</span><span class="pe-asm-operand">esi</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0080</span>
-        <span class="pe-instr">pop</span><span class="pe-asm-operand">ebx</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0081</span>
-        <span class="pe-instr">pop</span><span class="pe-asm-operand">ebp</span>
-      </div>
-      <div class="pe-disasm-row pe-asm">
-        <span class="pe-gutter">.text:0082</span>
-        <span class="pe-instr">ret</span><span class="pe-asm-operand"></span>
       </div>
     </div>
 
