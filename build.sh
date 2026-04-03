@@ -74,7 +74,7 @@ for post in $(ls _posts/*.md | sort -r); do
     [ -z "$title" ] && title="$slug"
 
     body=$(pandoc "$post" \
-        --from markdown+yaml_metadata_block \
+        --from markdown+yaml_metadata_block-implicit_figures \
         --to html \
         --no-highlight)
 
