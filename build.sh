@@ -157,6 +157,14 @@ for post in $(ls _posts/*.md | sort -r); do
     }
 
     article { max-width: 100%; }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+      article h2:first-of-type { font-size: 1.4rem; }
+      article h2 { font-size: 1.05rem; }
+      pre code { font-size: 0.8rem; }
+    }
   </style>
 </head>
 <body>
@@ -538,6 +546,16 @@ cat > "_site/index.html" << ENDINDEX
     }
     .status-bar.visible { opacity: 1; }
     .status-bar .cmd-prompt { color: #5625be; margin-right: 0.5em; }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .title-malware { font-size: 1.8rem; }
+      .title-re { font-size: 0.75rem; letter-spacing: 0.12em; }
+      .pe-section-flags { display: none; }
+      .pe-gutter { display: none; }
+      .rsrc-post-row .rsrc-gutter { display: none; }
+      .rsrc-post-row .rsrc-title { white-space: normal; }
+    }
 
   </style>
 </head>
