@@ -67,6 +67,7 @@ title: Home
 
 <header>
   <h1>Malware Under the Microscope 🔍</h1>
+  <p style="color: #bbbbbb; margin: 0.25rem 0 0 0; font-size: 0.95rem;">Liam Chugg — Security Researcher at CrowdStrike</p>
     <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
  __  __ ______ 
 |  \/  |___  /
