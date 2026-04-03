@@ -67,7 +67,6 @@ title: Home
 
 <header>
   <h1>Malware Under the Microscope 🔍</h1>
-  <p style="color: #bbbbbb; margin: 0.25rem 0 0 0; font-size: 0.95rem;">Liam Chugg — Security Researcher at CrowdStrike</p>
     <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
  __  __ ______ 
 |  \/  |___  /
@@ -76,6 +75,7 @@ title: Home
 |_|  |_|/____|
  MZ HEADER
 </pre>
+  <p style="text-align: center; color: #888; font-size: 0.85rem; margin-top: -0.5rem;">Liam Chugg &mdash; Security Researcher at CrowdStrike</p>
   <p>
     A deep dive into the world of malware analysis. Here, I break down real-world samples with practical techniques - from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
   </p>
