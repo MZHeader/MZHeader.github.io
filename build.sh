@@ -177,7 +177,7 @@ ENDHEADER
 </html>
 ENDFOOTER
 
-    offset=$(printf '%08X' $(( (post_idx - 1) * 8 )) )
+    offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
 
     # Escape single quotes for JS string
     js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
