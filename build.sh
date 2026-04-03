@@ -343,6 +343,11 @@ cat > "_site/index.html" << ENDINDEX
       user-select: none;
       padding-top: 0.15em;
     }
+    .pe-asm-operand {
+      color: #4a4a6a;
+      font-size: 0.82rem;
+      padding-top: 0.15em;
+    }
     .pe-operand {
       flex: 1;
       color: #e4e4e4;
@@ -394,6 +399,7 @@ cat > "_site/index.html" << ENDINDEX
 
     /* Right detail panel */
     .pe-detail-panel {
+      display: none;
       position: fixed;
       top: 50%;
       transform: translateY(-50%);
@@ -409,6 +415,7 @@ cat > "_site/index.html" << ENDINDEX
       pointer-events: none;
     }
     .pe-detail-panel.active {
+      display: block;
       border-color: #3a3a55;
     }
     .pe-detail-toolbar {
@@ -506,20 +513,57 @@ cat > "_site/index.html" << ENDINDEX
       <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x60000020</span></span>
     </div>
     <div class="pe-section-body">
-      <div class="pe-disasm-row">
+      <div class="pe-disasm-row pe-asm">
         <span class="pe-gutter">.text:0000</span>
-        <span class="pe-instr">push</span>
+        <span class="pe-instr">push</span><span class="pe-asm-operand">ebp</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0001</span>
+        <span class="pe-instr">mov</span><span class="pe-asm-operand">ebp, esp</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0003</span>
+        <span class="pe-instr">push</span><span class="pe-asm-operand">ebx</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0004</span>
+        <span class="pe-instr">push</span><span class="pe-asm-operand">esi</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0005</span>
+        <span class="pe-instr">push</span><span class="pe-asm-operand">edi</span>
+      </div>
+      <div class="pe-disasm-row">
+        <span class="pe-gutter">.text:0006</span>
         <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0028</span>
-        <span class="pe-instr">lea</span>
+        <span class="pe-gutter">.text:002E</span>
         <span class="pe-operand">I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0050</span>
-        <span class="pe-instr">mov</span>
+        <span class="pe-gutter">.text:0056</span>
         <span class="pe-operand">All samples referenced are publically available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:007E</span>
+        <span class="pe-instr">pop</span><span class="pe-asm-operand">edi</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:007F</span>
+        <span class="pe-instr">pop</span><span class="pe-asm-operand">esi</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0080</span>
+        <span class="pe-instr">pop</span><span class="pe-asm-operand">ebx</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0081</span>
+        <span class="pe-instr">pop</span><span class="pe-asm-operand">ebp</span>
+      </div>
+      <div class="pe-disasm-row pe-asm">
+        <span class="pe-gutter">.text:0082</span>
+        <span class="pe-instr">ret</span><span class="pe-asm-operand"></span>
       </div>
     </div>
 
@@ -533,11 +577,7 @@ cat > "_site/index.html" << ENDINDEX
       <span class="pe-section-name">.rsrc</span>
       <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ</span>
     </div>
-    <div class="pe-section-meta">
-      <span><span class="meta-label">NumberOfEntries:</span> <span class="meta-value">${post_idx}</span></span>
-      <span><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">$(date +%Y-%m-%dT%H:%M:%S)</span></span>
-      <span><span class="meta-label">MajorVersion:</span> <span class="meta-value">0x0001</span></span>
-      <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x40000040</span></span>
+    <div class="pe-section-meta" style="display:none">
     </div>
     <div class="pe-section-body">
 ${posts_list_html}
@@ -587,7 +627,6 @@ ${posts_list_html}
     row.addEventListener('mouseleave', () => {
       bar.classList.remove('visible');
       panel.classList.remove('active');
-      detailBody.innerHTML = placeholder;
     });
   });
 </script>
