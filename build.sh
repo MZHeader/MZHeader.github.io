@@ -457,7 +457,7 @@ cat > "_site/index.html" << ENDINDEX
       position: fixed;
       top: 50%;
       transform: translateY(-50%);
-      right: calc((100vw - 900px) / 2 - 320px);
+      right: 1.5rem;
       width: 300px;
       font-family: "Fira Code", "Consolas", monospace;
       border: 1px solid #2a2a3a;
