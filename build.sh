@@ -62,8 +62,11 @@ HLJS_HEAD='
 '
 
 posts_list_html=""
+post_idx=0
 
 for post in $(ls _posts/*.md | sort -r); do
+    post_idx=$((post_idx + 1))
+    idx=$(printf "%03d" $post_idx)
     filename=$(basename "$post" .md)
     date_str="${filename:0:10}"
     slug="${filename:11}"
@@ -175,9 +178,14 @@ ENDFOOTER
 
     posts_list_html+="
     <li>
-      <a href=\"/posts/${slug}.html\">${title}</a>
-      $([ -n "$description" ] && echo "<p class=\"post-description\">${description}</p>")
-      <span class=\"post-date\"> &mdash; ${formatted_date}</span>
+      <div class=\"entry-prefix\" aria-hidden=\"true\"><span class=\"prompt\">&gt;</span><span class=\"idx\">${idx}</span></div>
+      <div class=\"entry-body\">
+        <div class=\"entry-header\">
+          <a href=\"/posts/${slug}.html\">${title}</a>
+          <span class=\"post-date\">${date_str}</span>
+        </div>
+        $([ -n "$description" ] && echo "<p class=\"post-description\">${description}</p>")
+      </div>
     </li>"
 
     echo "Built: posts/${slug}.html"
@@ -307,24 +315,52 @@ cat > "_site/index.html" << ENDINDEX
       margin-right: 0.5em;
     }
 
-    ul { list-style: none; padding: 0; }
+    ul { list-style: none; padding: 0; margin: 0; font-family: "Fira Code", "Consolas", monospace; }
     li {
-      margin-bottom: 1rem;
-      padding: 1rem 1.25rem;
-      background: #252530;
-      border: 1px solid #2a2a3a;
-      border-left: 3px solid #5625be;
-      border-radius: 6px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      margin-bottom: 0;
+      padding: 0.7rem 0.9rem;
+      background: transparent;
+      border-left: 2px solid transparent;
+      border-bottom: 1px solid #2a2a3a;
+      position: relative;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
-    li:hover {
-      border-left-color: #50fa7b;
-      box-shadow: 0 0 12px rgba(86, 37, 190, 0.15), 0 2px 8px rgba(0, 0, 0, 0.3);
-      transform: translateX(3px);
+    li::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
-    li a { font-size: 1.05rem; font-weight: 600; }
-    .post-description { color: #999; margin: 0.35rem 0 0 0; font-size: 0.88rem; line-height: 1.5; }
-    .post-date { color: #666; font-size: 0.78rem; font-family: "Fira Code", "Consolas", monospace; letter-spacing: 0.03em; }
+    li:hover { background: rgba(86, 37, 190, 0.07); border-left-color: #5625be; }
+    li:hover::before { opacity: 1; }
+    .entry-prefix {
+      flex-shrink: 0;
+      width: 3.8rem;
+      padding-top: 0.15rem;
+      user-select: none;
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+    }
+    .entry-prefix .prompt { color: #5625be; font-weight: 700; font-size: 0.8rem; transition: color 0.15s ease; }
+    li:hover .entry-prefix .prompt { color: #50fa7b; }
+    .entry-prefix .idx { color: #444; font-size: 0.72rem; letter-spacing: 0.05em; }
+    li:hover .entry-prefix .idx { color: #666; }
+    .entry-body { flex: 1; min-width: 0; }
+    .entry-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+    .entry-header a { font-size: 0.95rem; font-weight: 600; color: #dcdcdc; text-decoration: none; transition: color 0.15s ease; }
+    li:hover .entry-header a { color: #8be9fd; }
+    li:hover .entry-header a:hover { color: #ff79c6; }
+    .post-date { flex-shrink: 0; color: #555; font-size: 0.75rem; letter-spacing: 0.04em; white-space: nowrap; }
+    li:hover .post-date { color: #50fa7b; }
+    .post-description { color: #777; margin: 0.2rem 0 0 0; font-size: 0.8rem; line-height: 1.55; font-family: "Segoe UI", "Roboto", sans-serif; }
+    li:hover .post-description { color: #999; }
   </style>
 </head>
 <body>
