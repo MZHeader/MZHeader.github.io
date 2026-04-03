@@ -318,7 +318,6 @@ cat > "_site/index.html" << ENDINDEX
     .status-bar {
       position: fixed;
       bottom: 0;
-      left: 0;
       right: 0;
       padding: 0.3rem 1rem;
       font-family: "Fira Code", "Consolas", monospace;
@@ -326,6 +325,8 @@ cat > "_site/index.html" << ENDINDEX
       color: #50fa7b;
       background: rgba(18, 18, 24, 0.95);
       border-top: 1px solid #2a2a3a;
+      border-left: 1px solid #2a2a3a;
+      border-radius: 4px 0 0 0;
       opacity: 0;
       transition: opacity 0.15s ease;
       pointer-events: none;
