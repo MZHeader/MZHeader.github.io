@@ -87,12 +87,72 @@ for post in $(ls _posts/*.md | sort -r); do
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title} — Malware Under the Microscope</title>
   ${HLJS_HEAD}
-  <style>${SHARED_CSS}</style>
+  <style>
+    ${SHARED_CSS}
+
+    /* Scanline overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+    /* Vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%);
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      color: #50fa7b;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.85rem;
+      text-shadow: 0 0 6px rgba(80, 250, 123, 0.3);
+    }
+    .back-link:hover { text-decoration: none; text-shadow: 0 0 10px rgba(80, 250, 123, 0.6); }
+
+    .post-header {
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      background: linear-gradient(180deg, rgba(86, 37, 190, 0.06) 0%, transparent 100%);
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(86, 37, 190, 0.08), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .post-header h2:first-child { margin-top: 0; }
+
+    .post-meta {
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 0.75rem;
+      letter-spacing: 0.03em;
+    }
+    .post-meta::before { content: "// "; color: #444; }
+
+    article { max-width: 100%; }
+  </style>
 </head>
 <body>
-  <a class="back-link" href="/">&larr; Back to home</a>
-  <article>
+  <a class="back-link" href="/">&larr; cd ..</a>
+  <div class="post-header">
     <div class="post-meta">${formatted_date}</div>
+  </div>
+  <article>
 ENDHEADER
 
     # Append body safely (no variable expansion on content)
