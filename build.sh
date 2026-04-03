@@ -62,6 +62,7 @@ HLJS_HEAD='
 '
 
 posts_list_html=""
+post_js_data="const postData = {};"
 post_idx=0
 
 for post in $(ls _posts/*.md | sort -r); do
@@ -176,17 +177,38 @@ ENDHEADER
 </html>
 ENDFOOTER
 
+    # Encode first 16 chars of title as hex bytes
+    title_hex=""
+    for ((i=0; i<16; i++)); do
+        if [ $i -lt ${#title} ]; then
+            c="${title:$i:1}"
+            hb=$(printf '%02X' "'$c" 2>/dev/null || printf '3F')
+        else
+            hb="00"
+        fi
+        title_hex+="${hb} "
+        [ $i -eq 7 ] && title_hex+=" "
+    done
+    title_hex="${title_hex% }"
+
+    decoded="${title:0:16}"
+    while [ ${#decoded} -lt 16 ]; do decoded+="."; done
+
+    offset=$(printf '%08X' $(( (post_idx - 1) * 16 )) )
+
+    # Escape for JS string (basic)
+    title_js=$(echo "$title" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")
+    desc_js=$(echo "$description" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")
+
+    post_js_data+="
+postData['post-${post_idx}'] = {slug: '/posts/${slug}.html', title: '${title_js}', desc: '${desc_js}', date: '${date_str}'};"
+
     posts_list_html+="
-    <li>
-      <div class=\"entry-prefix\" aria-hidden=\"true\"><span class=\"prompt\">&gt;</span><span class=\"idx\">${idx}</span></div>
-      <div class=\"entry-body\">
-        <div class=\"entry-header\">
-          <a href=\"/posts/${slug}.html\">${title}</a>
-          <span class=\"post-date\">${date_str}</span>
-        </div>
-        $([ -n "$description" ] && echo "<p class=\"post-description\">${description}</p>")
-      </div>
-    </li>"
+      <div class=\"hex-row post-entry\" id=\"post-${post_idx}\" onclick=\"window.location='/posts/${slug}.html'\">
+        <span class=\"hex-addr\">${offset}</span>
+        <span class=\"hex-bytes post-hex\">${title_hex}</span>
+        <span class=\"hex-ascii\"><span class=\"ascii-vis post-decoded\">${decoded}</span></span>
+      </div>"
 
     echo "Built: posts/${slug}.html"
 done
@@ -350,52 +372,36 @@ cat > "_site/index.html" << ENDINDEX
     .status-bar.visible { opacity: 1; }
     .status-bar .cmd-prompt { color: #5625be; margin-right: 0.5em; }
 
-    ul { list-style: none; padding: 0; margin: 0; font-family: "Fira Code", "Consolas", monospace; }
-    li {
+    .post-entry {
+      cursor: pointer;
+      transition: background 0.1s ease, border-left-color 0.1s ease;
+      border-left: 2px solid transparent;
+    }
+    .post-entry:hover, .post-entry.active {
+      background: rgba(86, 37, 190, 0.09);
+      border-left-color: #5625be;
+    }
+    .post-entry:hover .post-hex, .post-entry.active .post-hex { color: #8be9fd; }
+    .post-entry:hover .post-decoded, .post-entry.active .post-decoded { color: #ff79c6; }
+    .post-entry:hover .hex-addr, .post-entry.active .hex-addr { color: #5625be; }
+
+    .hex-info-panel {
       display: flex;
       align-items: flex-start;
-      gap: 0;
-      margin-bottom: 0;
-      padding: 0.7rem 0.9rem;
-      background: transparent;
-      border-left: 2px solid transparent;
-      border-bottom: 1px solid #2a2a3a;
-      position: relative;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      gap: 0.75rem;
+      padding: 0.6rem 0.8rem;
+      border-top: 1px solid #222233;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.75rem;
+      min-height: 3.2rem;
+      background: rgba(10, 10, 16, 0.5);
+      border-radius: 0 0 6px 6px;
     }
-    li::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    li:hover { background: rgba(86, 37, 190, 0.07); border-left-color: #5625be; }
-    li:hover::before { opacity: 1; }
-    .entry-prefix {
-      flex-shrink: 0;
-      width: 3.8rem;
-      padding-top: 0.15rem;
-      user-select: none;
-      display: flex;
-      align-items: baseline;
-      gap: 0.3rem;
-    }
-    .entry-prefix .prompt { color: #5625be; font-weight: 700; font-size: 0.8rem; transition: color 0.15s ease; }
-    li:hover .entry-prefix .prompt { color: #50fa7b; }
-    .entry-prefix .idx { color: #444; font-size: 0.72rem; letter-spacing: 0.05em; }
-    li:hover .entry-prefix .idx { color: #666; }
-    .entry-body { flex: 1; min-width: 0; }
-    .entry-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-    .entry-header a { font-size: 0.95rem; font-weight: 600; color: #dcdcdc; text-decoration: none; transition: color 0.15s ease; }
-    li:hover .entry-header a { color: #8be9fd; }
-    li:hover .entry-header a:hover { color: #ff79c6; }
-    .post-date { flex-shrink: 0; color: #555; font-size: 0.75rem; letter-spacing: 0.04em; white-space: nowrap; }
-    li:hover .post-date { color: #50fa7b; }
-    .post-description { color: #777; margin: 0.2rem 0 0 0; font-size: 0.8rem; line-height: 1.55; font-family: "Segoe UI", "Roboto", sans-serif; }
-    li:hover .post-description { color: #999; }
+    .hex-info-prompt { color: #3a3a55; user-select: none; flex-shrink: 0; padding-top: 0.05rem; }
+    .hex-info-content { flex: 1; }
+    .hex-info-title { color: #555; transition: color 0.15s ease; }
+    .hex-info-panel.has-content .hex-info-title { color: #dcdcdc; font-weight: 600; }
+    .hex-info-desc { color: #666; font-family: "Segoe UI", "Roboto", sans-serif; font-size: 0.78rem; margin-top: 0.25rem; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -499,25 +505,59 @@ cat > "_site/index.html" << ENDINDEX
   </div>
 </header>
 
-<h2 class="section-heading"><span class="prompt">\$</span> ls ./write-ups/</h2>
-<ul>
+<div class="hex-editor" id="writeUpsHex">
+  <div class="hex-editor-toolbar">
+    <span class="toolbar-title">write-ups.db</span>
+    <span class="toolbar-info">11 entries &mdash; click to open</span>
+  </div>
+  <div class="hex-editor-body">
+    <div class="hex-editor-colheader">
+      <span class="col-offset">Offset</span>
+      <span class="col-hex">00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F</span>
+      <span class="col-ascii">Decoded text</span>
+    </div>
 ${posts_list_html}
-</ul>
+  </div>
+  <div class="hex-info-panel" id="hexInfoPanel">
+    <span class="hex-info-prompt">;;</span>
+    <div class="hex-info-content">
+      <div class="hex-info-title" id="hexInfoTitle">hover an entry to inspect</div>
+      <div class="hex-info-desc" id="hexInfoDesc"></div>
+    </div>
+  </div>
+</div>
 
 <div class="status-bar" id="statusBar">
   <span class="cmd-prompt">\$</span><span id="statusCmd"></span>
 </div>
 
 <script>
+  ${post_js_data}
+
   const bar = document.getElementById('statusBar');
   const cmd = document.getElementById('statusCmd');
-  document.querySelectorAll('li').forEach(li => {
-    const slug = li.querySelector('a').getAttribute('href').replace('/posts/', '').replace('.html', '');
-    li.addEventListener('mouseenter', () => {
-      cmd.textContent = 'cd ./write-ups/' + slug;
+  const infoTitle = document.getElementById('hexInfoTitle');
+  const infoDesc = document.getElementById('hexInfoDesc');
+  const infoPanel = document.getElementById('hexInfoPanel');
+
+  document.querySelectorAll('.post-entry').forEach(row => {
+    const data = postData[row.id];
+    if (!data) return;
+
+    row.addEventListener('mouseenter', () => {
+      row.classList.add('active');
+      infoTitle.textContent = data.title;
+      infoDesc.textContent = data.desc;
+      infoPanel.classList.add('has-content');
+      cmd.textContent = 'open ' + data.slug;
       bar.classList.add('visible');
     });
-    li.addEventListener('mouseleave', () => {
+
+    row.addEventListener('mouseleave', () => {
+      row.classList.remove('active');
+      infoTitle.textContent = 'hover an entry to inspect';
+      infoDesc.textContent = '';
+      infoPanel.classList.remove('has-content');
       bar.classList.remove('visible');
     });
   });
