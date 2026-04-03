@@ -320,7 +320,84 @@ cat > "_site/index.html" << ENDINDEX
     .hex-row .hex-ascii { flex: 1; padding-left: 1.2em; color: #888; }
     .hex-row .hex-ascii .ascii-vis { color: #888; }
 
-    .intro-block { text-align: left; margin-top: 2rem; padding-top: 0.5rem; }
+    /* PE .text section bio block */
+    .pe-section {
+      text-align: left;
+      margin: 2rem auto 0;
+      max-width: 900px;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .pe-section-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 1rem;
+      background: #161620;
+      border: 1px solid #2a2a3a;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      font-size: 0.78rem;
+      color: #555;
+    }
+    .pe-section-toolbar .pe-section-name { color: #ff79c6; font-weight: 600; }
+    .pe-section-toolbar .pe-section-flags { color: #444; font-size: 0.72rem; }
+    .pe-section-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem 1.8rem;
+      padding: 0.4rem 1rem;
+      background: rgba(10, 10, 16, 0.7);
+      border-left: 1px solid #2a2a3a;
+      border-right: 1px solid #2a2a3a;
+      font-size: 0.72rem;
+      color: #3a3a55;
+    }
+    .pe-section-meta span { white-space: nowrap; }
+    .pe-section-meta .meta-label { color: #3a3a55; }
+    .pe-section-meta .meta-value { color: #50fa7b; }
+    .pe-section-body {
+      background: rgba(10, 10, 16, 0.7);
+      border: 1px solid #2a2a3a;
+      border-top: 1px solid #222233;
+      border-radius: 0 0 6px 6px;
+      padding: 0.8rem 0;
+    }
+    .pe-disasm-row {
+      display: flex;
+      padding: 0.3rem 1rem;
+      line-height: 1.7;
+      transition: background 0.1s ease;
+    }
+    .pe-disasm-row:hover { background: rgba(86, 37, 190, 0.06); }
+    .pe-gutter {
+      width: 7em;
+      flex-shrink: 0;
+      color: #3a3a55;
+      font-size: 0.78rem;
+      user-select: none;
+      padding-top: 0.15em;
+    }
+    .pe-instr {
+      color: #5625be;
+      width: 3.5em;
+      flex-shrink: 0;
+      font-size: 0.82rem;
+      user-select: none;
+      padding-top: 0.15em;
+    }
+    .pe-operand {
+      flex: 1;
+      color: #dcdcdc;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+    .pe-operand strong { color: #ff79c6; }
+    .pe-operand a { color: #8be9fd !important; }
+    .pe-operand a:hover { color: #50fa7b !important; }
+    .pe-comment { display: flex; padding: 0.15rem 1rem; }
+    .pe-comment-gutter { width: 7em; flex-shrink: 0; }
+    .pe-comment-text { color: #3a3a55; font-size: 0.75rem; font-style: italic; }
 
     .section-heading {
       font-family: "Fira Code", "Consolas", monospace;
@@ -397,19 +474,46 @@ cat > "_site/index.html" << ENDINDEX
 <header>
   <h1 class="site-title">Malware Under the Microscope</h1>
 
-  <div class="intro-block">
-    <p>
-      Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
-    </p>
-    <p>
-      I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.
-    </p>
-    <p>
-      All samples referenced are publically available on
-      <a class="normal-link" href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and
-      <a class="normal-link" href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>
-      and you can also grab them from my <a class="normal-link" href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.
-    </p>
+  <div class="pe-section">
+    <div class="pe-section-toolbar">
+      <span class="pe-section-name">.text</span>
+      <span class="pe-section-flags">IMAGE_SCN_CNT_CODE | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ</span>
+    </div>
+    <div class="pe-section-meta">
+      <span><span class="meta-label">VirtualSize:</span> <span class="meta-value">0x00000340</span></span>
+      <span><span class="meta-label">VirtualAddress:</span> <span class="meta-value">0x00001000</span></span>
+      <span><span class="meta-label">SizeOfRawData:</span> <span class="meta-value">0x00000400</span></span>
+      <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x60000020</span></span>
+    </div>
+    <div class="pe-section-body">
+      <div class="pe-comment">
+        <span class="pe-comment-gutter"></span>
+        <span class="pe-comment-text">;; Liam &mdash; Security Researcher @ CrowdStrike</span>
+      </div>
+      <div class="pe-disasm-row">
+        <span class="pe-gutter">.text:0000</span>
+        <span class="pe-instr">push</span>
+        <span class="pe-operand">Hi, I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
+      </div>
+      <div class="pe-comment">
+        <span class="pe-comment-gutter"></span>
+        <span class="pe-comment-text">;; tooling</span>
+      </div>
+      <div class="pe-disasm-row">
+        <span class="pe-gutter">.text:0028</span>
+        <span class="pe-instr">lea</span>
+        <span class="pe-operand">I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.</span>
+      </div>
+      <div class="pe-comment">
+        <span class="pe-comment-gutter"></span>
+        <span class="pe-comment-text">;; sample sources</span>
+      </div>
+      <div class="pe-disasm-row">
+        <span class="pe-gutter">.text:0050</span>
+        <span class="pe-instr">mov</span>
+        <span class="pe-operand">All samples referenced are publically available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.</span>
+      </div>
+    </div>
   </div>
 </header>
 
