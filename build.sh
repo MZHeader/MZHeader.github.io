@@ -126,11 +126,44 @@ cat > "_site/index.html" << ENDINDEX
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
+
+    /* Scanline overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+    /* Vignette */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.45) 100%);
+      pointer-events: none;
+      z-index: 9998;
+    }
+
     header {
-      border-bottom: 1px solid #333;
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
+      border-bottom: none;
+      margin-bottom: 2.5rem;
+      padding: 2rem 2rem 2rem;
       text-align: center;
+      position: relative;
+      background: linear-gradient(180deg, rgba(86, 37, 190, 0.06) 0%, transparent 100%);
+      border-radius: 8px;
+      border: 1px solid #2a2a3a;
+      box-shadow:
+        0 0 20px rgba(86, 37, 190, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
     }
     header p { color: #bbbbbb; max-width: 70ch; margin: 0.5rem auto; text-align: left; }
     .normal-link { color: #8be9fd !important; }
@@ -178,8 +211,13 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.72rem;
       color: #444;
       text-align: center;
-      margin: 0.75rem 0;
+      margin: 0.75rem auto;
       letter-spacing: 0.05em;
+      background: rgba(0, 0, 0, 0.25);
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #2a2a3a;
     }
     .hex-dump .hex-addr { color: #333; margin-right: 1em; }
     .hex-dump .hex-bytes { color: #4a4a6a; margin-right: 1em; }
@@ -187,10 +225,38 @@ cat > "_site/index.html" << ENDINDEX
 
     .intro-block { text-align: left; margin-top: 1.5rem; }
 
+    .section-heading {
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 1.1rem;
+      color: #8be9fd;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #2a2a3a;
+      text-shadow: 0 0 6px rgba(139, 233, 253, 0.2);
+    }
+    .section-heading .prompt {
+      color: #50fa7b;
+      margin-right: 0.5em;
+    }
+
     ul { list-style: none; padding: 0; }
-    li { margin-bottom: 1.25rem; }
-    .post-description { color: #aaa; margin: 0.25rem 0 0 0; font-size: 0.9rem; }
-    .post-date { color: #888; font-size: 0.85rem; }
+    li {
+      margin-bottom: 1rem;
+      padding: 1rem 1.25rem;
+      background: #252530;
+      border: 1px solid #2a2a3a;
+      border-left: 3px solid #5625be;
+      border-radius: 6px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    }
+    li:hover {
+      border-left-color: #50fa7b;
+      box-shadow: 0 0 12px rgba(86, 37, 190, 0.15), 0 2px 8px rgba(0, 0, 0, 0.3);
+      transform: translateX(3px);
+    }
+    li a { font-size: 1.05rem; font-weight: 600; }
+    .post-description { color: #999; margin: 0.35rem 0 0 0; font-size: 0.88rem; line-height: 1.5; }
+    .post-date { color: #666; font-size: 0.78rem; font-family: "Fira Code", "Consolas", monospace; letter-spacing: 0.03em; }
   </style>
 </head>
 <body>
@@ -227,7 +293,7 @@ cat > "_site/index.html" << ENDINDEX
   </div>
 </header>
 
-<h1>Write-ups</h1>
+<h2 class="section-heading"><span class="prompt">\$</span> ls ./write-ups/</h2>
 <ul>
 ${posts_list_html}
 </ul>
