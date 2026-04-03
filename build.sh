@@ -557,15 +557,19 @@ cat > "_site/index.html" << ENDINDEX
     <div class="pe-section-body">
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0000</span>
-        <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>. This is my personal blog where I break down real-world malware samples with practical techniques &mdash; from unpacking and deobfuscation to debugging, disassembly, and memory forensics.</span>
+        <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0028</span>
-        <span class="pe-operand">I use tools that are freely available, most of which come pre-installed on <strong>FLARE VM</strong>, so you can follow along without extra setup.</span>
+        <span class="pe-gutter">.text:0020</span>
+        <span class="pe-operand">This blog documents my analysis of malware, with a focus on practical reverse engineering techniques: unpacking, deobfuscation, debugging, disassembly, and memory forensics.</span>
       </div>
       <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:0050</span>
-        <span class="pe-operand">All samples referenced are publically available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.</span>
+        <span class="pe-gutter">.text:0040</span>
+        <span class="pe-operand">Everything here is reproducible. I mostly stick to freely available tools so you can easily follow along!</span>
+      </div>
+      <div class="pe-disasm-row">
+        <span class="pe-gutter">.text:0060</span>
+        <span class="pe-operand">All samples referenced are publicly available via <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a>, and are also mirrored in my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repository</a> for convenience.</span>
       </div>
     </div>
 
