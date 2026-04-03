@@ -236,19 +236,70 @@ cat > "_site/index.html" << ENDINDEX
     .site-title {
       font-size: 2rem;
       font-family: "Fira Code", "Consolas", monospace;
-      color: #5625be;
-      text-shadow: 0 0 12px #5625be80;
-      animation: glitch 6s infinite;
       margin-bottom: 0;
+      position: relative;
+      display: inline-block;
     }
-    @keyframes glitch {
-      0%, 88%, 100% { text-shadow: 0 0 12px #5625be80; transform: translate(0); }
-      90% { text-shadow: -2px 0 #ff79c6, 2px 0 #8be9fd; transform: translate(-1px, 0); }
-      92% { text-shadow: 2px 0 #ff79c6, -2px 0 #8be9fd; transform: translate(1px, 0); }
-      94% { text-shadow: -1px 0 #ff79c6; transform: translate(-1px, 0); }
-      96% { text-shadow: 1px 0 #8be9fd; transform: translate(1px, 0); }
-      98% { text-shadow: 0 0 12px #5625be80; transform: translate(0); }
+    .title-malware {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #c62828;
+      text-shadow: 0 0 8px rgba(198,40,40,0.6), 0 0 20px rgba(198,40,40,0.3);
+      animation: glitch-malware 6s infinite;
+      letter-spacing: 0.04em;
+      display: inline-block;
+      margin-right: 0.15em;
     }
+    .title-rest {
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: #8a8aaa;
+      text-shadow: none;
+      letter-spacing: 0.02em;
+    }
+    @keyframes glitch-malware {
+      0%,88%,100% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
+      90% { text-shadow: -2px 0 #ff79c6,2px 0 #8be9fd,0 0 12px rgba(198,40,40,0.5); transform: translate(-2px,0); }
+      91% { text-shadow: 3px 0 #ff79c6,-1px 0 #8be9fd; transform: translate(1px,1px); }
+      92% { text-shadow: 2px 0 #ff79c6,-2px 0 #8be9fd; transform: translate(2px,0); }
+      93% { text-shadow: -1px 0 #c62828,1px 0 #ff79c6; transform: translate(-1px,-1px); }
+      94% { text-shadow: -1px 0 #ff79c6; transform: translate(-1px,0); }
+      96% { text-shadow: 1px 0 #8be9fd; transform: translate(1px,0); }
+      98% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
+    }
+    .magnifier {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid rgba(138,138,170,0.35);
+      box-shadow: 0 0 12px rgba(86,37,190,0.15), inset 0 0 30px rgba(86,37,190,0.05);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+      overflow: hidden;
+      background: rgba(30,30,30,0.4);
+    }
+    .magnifier.active { opacity: 1; }
+    .magnifier::after {
+      content: "";
+      position: absolute;
+      bottom: -18px;
+      right: -6px;
+      width: 3px;
+      height: 28px;
+      background: rgba(138,138,170,0.3);
+      transform: rotate(-45deg);
+      border-radius: 2px;
+    }
+    .magnifier-content {
+      position: absolute;
+      white-space: nowrap;
+      font-family: "Fira Code","Consolas",monospace;
+      transform-origin: 0 0;
+    }
+    .magnifier-content .title-malware { animation: none; }
 
     /* Unified PE viewer container */
     .pe-viewer {
@@ -498,7 +549,8 @@ cat > "_site/index.html" << ENDINDEX
 <body>
 
 <header>
-  <h1 class="site-title">Malware Under the Microscope</h1>
+  <h1 class="site-title" id="siteTitle"><span class="title-malware">Malware</span><span class="title-rest">Under the Microscope</span></h1>
+  <div class="magnifier" id="magnifier"></div>
 
   <div class="pe-viewer">
     <!-- .text section -->
@@ -589,6 +641,30 @@ ${posts_list_html}
       panel.classList.remove('active');
     });
   });
+
+  (function() {
+    const title = document.getElementById('siteTitle');
+    const mag = document.getElementById('magnifier');
+    const magSize = 120;
+    const zoom = 1.8;
+    const clone = document.createElement('div');
+    clone.className = 'magnifier-content';
+    clone.innerHTML = title.innerHTML;
+    mag.appendChild(clone);
+    title.addEventListener('mouseenter', () => mag.classList.add('active'));
+    title.addEventListener('mouseleave', () => mag.classList.remove('active'));
+    title.addEventListener('mousemove', (e) => {
+      const rect = title.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      mag.style.left = (e.clientX - magSize/2) + 'px';
+      mag.style.top = (e.clientY - magSize/2) + 'px';
+      mag.style.position = 'fixed';
+      clone.style.transform = 'scale(' + zoom + ')';
+      clone.style.left = (-x * zoom + magSize/2) + 'px';
+      clone.style.top = (-y * zoom + magSize/2) + 'px';
+    });
+  })();
 </script>
 
 </body>
