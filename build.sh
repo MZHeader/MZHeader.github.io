@@ -110,13 +110,20 @@ for post in $(ls _posts/*.md | sort -r); do
     }
 
     .post-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 2.5rem;
-      padding-bottom: 0.75rem;
+      padding: 0.6rem 2rem;
+      background: rgba(16, 16, 22, 0.96);
       border-bottom: 1px solid #2a2a3a;
+      backdrop-filter: blur(6px);
     }
+    body { padding-top: 3.5rem; }
     .back-link {
       color: #50fa7b;
       font-family: "Fira Code", "Consolas", monospace;
