@@ -67,7 +67,7 @@ title: Home
 
 <header>
   <h1>Malware Under the Microscope 🔍</h1>
-    <pre style="font-family: monospace; color: #ff79c6; text-align: center;">
+    <pre style="font-family: monospace; color: #ff79c6; text-align: center; background: transparent; border: none; box-shadow: none; padding: 0; max-width: 70ch; margin: 0 auto; font-size: 0.75rem;">
  __  __ ______ 
 |  \/  |___  /
 | |\/| |  / / 
