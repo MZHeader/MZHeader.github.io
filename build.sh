@@ -177,9 +177,9 @@ ENDHEADER
 </html>
 ENDFOOTER
 
-    # Encode first 16 chars of title as hex bytes
+    # Encode first 8 chars of title as hex bytes (compact hex column)
     title_hex=""
-    for ((i=0; i<16; i++)); do
+    for ((i=0; i<8; i++)); do
         if [ $i -lt ${#title} ]; then
             c="${title:$i:1}"
             hb=$(printf '%02X' "'$c" 2>/dev/null || printf '3F')
@@ -187,14 +187,14 @@ ENDFOOTER
             hb="00"
         fi
         title_hex+="${hb} "
-        [ $i -eq 7 ] && title_hex+=" "
+        [ $i -eq 3 ] && title_hex+=" "
     done
     title_hex="${title_hex% }"
 
-    decoded="${title:0:16}"
-    while [ ${#decoded} -lt 16 ]; do decoded+="."; done
+    # Decoded column shows full title (no truncation)
+    decoded="${title}"
 
-    offset=$(printf '%08X' $(( (post_idx - 1) * 16 )) )
+    offset=$(printf '%08X' $(( (post_idx - 1) * 8 )) )
 
     # Escape for JS string (basic)
     title_js=$(echo "$title" | sed "s/\\\\/\\\\\\\\/g; s/'/\\\\'/g")
@@ -272,24 +272,24 @@ cat > "_site/index.html" << ENDINDEX
     /* Hex editor panel */
     .hex-editor {
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.72rem;
-      line-height: 1.7;
-      letter-spacing: 0.04em;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      letter-spacing: 0.03em;
       text-align: left;
       margin: 1.5rem auto 0;
-      max-width: 720px;
+      max-width: 900px;
       position: relative;
     }
     .hex-editor-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.35rem 0.8rem;
+      padding: 0.45rem 1rem;
       background: #161620;
       border: 1px solid #2a2a3a;
       border-bottom: none;
       border-radius: 6px 6px 0 0;
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       color: #555;
     }
     .hex-editor-toolbar .toolbar-title { color: #5625be; font-weight: 600; }
@@ -303,38 +303,22 @@ cat > "_site/index.html" << ENDINDEX
     }
     .hex-editor-colheader {
       display: flex;
-      padding: 0 0.8rem 0.35rem;
+      padding: 0 1rem 0.4rem;
       border-bottom: 1px solid #222233;
       margin-bottom: 0.3rem;
       color: #3a3a55;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       user-select: none;
     }
-    .hex-editor-colheader .col-offset { width: 6.5em; flex-shrink: 0; }
-    .hex-editor-colheader .col-hex { flex: 1; }
-    .hex-editor-colheader .col-ascii { width: 12em; flex-shrink: 0; text-align: right; padding-right: 0.4rem; }
-    .hex-row { display: flex; padding: 0.05rem 0.8rem; transition: background 0.1s ease; }
+    .hex-editor-colheader .col-offset { width: 5.5em; flex-shrink: 0; }
+    .hex-editor-colheader .col-hex { width: 14em; flex-shrink: 0; }
+    .hex-editor-colheader .col-ascii { flex: 1; padding-left: 1.2em; }
+    .hex-row { display: flex; padding: 0.15rem 1rem; transition: background 0.1s ease; }
     .hex-row:hover { background: rgba(86, 37, 190, 0.06); }
-    .hex-row .hex-addr { width: 6.5em; flex-shrink: 0; color: #3a3a55; user-select: none; }
-    .hex-row .hex-bytes { flex: 1; color: #4a4a6a; }
-    .hex-row .hex-bytes .mz-magic { color: #ff79c6; text-shadow: 0 0 6px rgba(255,121,198,0.3); }
-    .hex-row .hex-bytes .pe-sig { color: #50fa7b; text-shadow: 0 0 6px rgba(80,250,123,0.25); }
-    .hex-row .hex-bytes .highlight-byte { color: #8be9fd; }
-    .hex-row .hex-ascii { width: 12em; flex-shrink: 0; color: #333; text-align: right; padding-right: 0.4rem; }
-    .hex-row .hex-ascii .ascii-vis { color: #4a4a6a; }
-    .hex-row .hex-ascii .ascii-mz { color: #ff79c680; }
-    .hex-row .hex-ascii .ascii-pe { color: #50fa7b80; }
-    .hex-row.row-fade-1 .hex-bytes, .hex-row.row-fade-1 .hex-addr { opacity: 0.6; }
-    .hex-row.row-fade-2 .hex-bytes, .hex-row.row-fade-2 .hex-addr { opacity: 0.35; }
-    .hex-row.row-fade-3 .hex-bytes, .hex-row.row-fade-3 .hex-addr { opacity: 0.15; }
-    .hex-fade-out {
-      height: 1.5rem;
-      background: linear-gradient(180deg, transparent, #1e1e1e);
-      margin-top: -1.5rem;
-      position: relative;
-      z-index: 1;
-      border-radius: 0 0 6px 6px;
-    }
+    .hex-row .hex-addr { width: 5.5em; flex-shrink: 0; color: #3a3a55; user-select: none; }
+    .hex-row .hex-bytes { width: 14em; flex-shrink: 0; color: #3a3a55; font-size: 0.78rem; opacity: 0.7; }
+    .hex-row .hex-ascii { flex: 1; padding-left: 1.2em; color: #888; }
+    .hex-row .hex-ascii .ascii-vis { color: #888; }
 
     .intro-block { text-align: left; margin-top: 2rem; padding-top: 0.5rem; }
 
@@ -358,7 +342,7 @@ cat > "_site/index.html" << ENDINDEX
       right: 0;
       padding: 0.3rem 1rem;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       color: #50fa7b;
       background: rgba(18, 18, 24, 0.95);
       border-top: 1px solid #2a2a3a;
@@ -377,22 +361,26 @@ cat > "_site/index.html" << ENDINDEX
       transition: background 0.1s ease, border-left-color 0.1s ease;
       border-left: 2px solid transparent;
     }
+    .post-entry .post-decoded {
+      color: #aaa;
+      font-size: 0.88rem;
+    }
     .post-entry:hover, .post-entry.active {
       background: rgba(86, 37, 190, 0.09);
       border-left-color: #5625be;
     }
-    .post-entry:hover .post-hex, .post-entry.active .post-hex { color: #8be9fd; }
-    .post-entry:hover .post-decoded, .post-entry.active .post-decoded { color: #ff79c6; }
+    .post-entry:hover .post-hex, .post-entry.active .post-hex { color: #5a5a8a; opacity: 1; }
+    .post-entry:hover .post-decoded, .post-entry.active .post-decoded { color: #ff79c6; text-shadow: 0 0 8px rgba(255,121,198,0.3); }
     .post-entry:hover .hex-addr, .post-entry.active .hex-addr { color: #5625be; }
 
     .hex-info-panel {
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      padding: 0.6rem 0.8rem;
+      padding: 0.6rem 1rem;
       border-top: 1px solid #222233;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.75rem;
+      font-size: 0.82rem;
       min-height: 3.2rem;
       background: rgba(10, 10, 16, 0.5);
       border-radius: 0 0 6px 6px;
@@ -408,86 +396,6 @@ cat > "_site/index.html" << ENDINDEX
 
 <header>
   <h1 class="site-title">Malware Under the Microscope</h1>
-
-  <div class="hex-editor">
-    <div class="hex-editor-toolbar">
-      <span class="toolbar-title">MZ_HEADER.exe</span>
-      <span class="toolbar-info">PE32 executable &mdash; 0x00000000..0x000000FF</span>
-    </div>
-    <div class="hex-editor-body">
-      <div class="hex-editor-colheader">
-        <span class="col-offset">Offset</span>
-        <span class="col-hex">00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F</span>
-        <span class="col-ascii">Decoded text</span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000000</span>
-        <span class="hex-bytes"><span class="mz-magic">4D 5A</span> 90 00 03 00 00 00  04 00 00 00 FF FF 00 00</span>
-        <span class="hex-ascii"><span class="ascii-mz">MZ</span><span class="ascii-vis">..............</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000010</span>
-        <span class="hex-bytes">B8 00 00 00 00 00 00 00  40 00 00 00 00 00 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">........@.......</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000020</span>
-        <span class="hex-bytes">00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">................</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000030</span>
-        <span class="hex-bytes">00 00 00 00 00 00 00 00  00 00 00 00 <span class="highlight-byte">80 00</span> 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">................</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000040</span>
-        <span class="hex-bytes">0E 1F BA 0E 00 B4 09 CD  21 B8 01 4C CD 21 54 68</span>
-        <span class="hex-ascii"><span class="ascii-vis">........!..L.!Th</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000050</span>
-        <span class="hex-bytes">69 73 20 70 72 6F 67 72  61 6D 20 63 61 6E 6E 6F</span>
-        <span class="hex-ascii"><span class="ascii-vis">is program canno</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000060</span>
-        <span class="hex-bytes">74 20 62 65 20 72 75 6E  20 69 6E 20 44 4F 53 20</span>
-        <span class="hex-ascii"><span class="ascii-vis">t be run in DOS </span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000070</span>
-        <span class="hex-bytes">6D 6F 64 65 2E 0D 0D 0A  24 00 00 00 00 00 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">mode....$.......</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000080</span>
-        <span class="hex-bytes"><span class="pe-sig">50 45</span> 00 00 <span class="highlight-byte">4C 01</span> 05 00  00 00 00 00 00 00 00 00</span>
-        <span class="hex-ascii"><span class="ascii-pe">PE</span><span class="ascii-vis">..</span><span class="ascii-vis">L...........</span></span>
-      </div>
-      <div class="hex-row">
-        <span class="hex-addr">00000090</span>
-        <span class="hex-bytes">00 00 00 00 <span class="highlight-byte">E0 00</span> 02 01  0B 01 0E 00 00 02 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">................</span></span>
-      </div>
-      <div class="hex-row row-fade-1">
-        <span class="hex-addr">000000A0</span>
-        <span class="hex-bytes">00 06 00 00 00 00 00 00  00 10 00 00 00 10 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">................</span></span>
-      </div>
-      <div class="hex-row row-fade-2">
-        <span class="hex-addr">000000B0</span>
-        <span class="hex-bytes">00 20 00 00 00 00 40 00  00 10 00 00 00 02 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">. ....@.........</span></span>
-      </div>
-      <div class="hex-row row-fade-3">
-        <span class="hex-addr">000000C0</span>
-        <span class="hex-bytes">06 00 00 00 00 00 00 00  06 00 00 00 00 00 00 00</span>
-        <span class="hex-ascii"><span class="ascii-vis">................</span></span>
-      </div>
-    </div>
-    <div class="hex-fade-out"></div>
-  </div>
 
   <div class="intro-block">
     <p>
@@ -513,7 +421,7 @@ cat > "_site/index.html" << ENDINDEX
   <div class="hex-editor-body">
     <div class="hex-editor-colheader">
       <span class="col-offset">Offset</span>
-      <span class="col-hex">00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F</span>
+      <span class="col-hex">00 01 02 03  04 05 06 07</span>
       <span class="col-ascii">Decoded text</span>
     </div>
 ${posts_list_html}
