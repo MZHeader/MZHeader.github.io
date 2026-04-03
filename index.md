@@ -75,7 +75,18 @@ title: Home
 |_|  |_|/____|
  MZ HEADER
 </pre>
-  <p style="text-align: center; color: #888; font-size: 0.85rem; margin-top: -0.5rem;">Liam Chugg &mdash; Security Researcher at CrowdStrike</p>
+  <div style="
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    color: #8be9fd;
+    text-align: left;
+    max-width: 520px;
+    margin: 0.75rem auto 1.5rem auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  ">
+    <span style="color: #50fa7b;">researcher@mzheader</span><span style="color: #f8f8f2;">:</span><span style="color: #bd93f9;">~</span><span style="color: #f8f8f2;">$ whoami</span><br>
+    <span style="color: #f8f8f2;">Liam Chugg &mdash; Security Researcher @ CrowdStrike</span>
+  </div>
   <p>
     A deep dive into the world of malware analysis. Here, I break down real-world samples with practical techniques - from unpacking and deobfuscation to debugging, disassembly, and memory forensics.
   </p>
@@ -89,6 +100,21 @@ title: Home
   </p>
 </header>
 
+
+<footer style="
+  margin-top: 4rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid #333;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.8;
+">
+  Built by <span style="color: #f8f8f2;">Liam Chugg</span>
+  &mdash; Security Researcher at
+  <span style="color: #ff79c6;">CrowdStrike</span><br>
+  <span style="color: #444;">Opinions are my own.</span>
+</footer>
 
 </body>
 </html>
