@@ -45,7 +45,7 @@ SHARED_CSS='
       font-size: 0.9em;
       border: 1px solid rgba(86, 37, 190, 0.4);
     }
-    img { max-width: 100%; border-radius: 4px; }
+    img { max-width: 100%; height: auto; border-radius: 4px; }
     .back-link {
       display: inline-block;
       margin-bottom: 2rem;
