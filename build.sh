@@ -62,6 +62,7 @@ HLJS_HEAD='
 '
 
 posts_list_html=""
+post_data_js=""
 post_idx=0
 
 for post in $(ls _posts/*.md | sort -r); do
@@ -178,11 +179,16 @@ ENDFOOTER
 
     offset=$(printf '%08X' $(( (post_idx - 1) * 8 )) )
 
+    # Escape single quotes for JS string
+    js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
+    js_desc=$(printf '%s' "$description" | sed "s/'/\\\\'/g")
+
+    post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}'};"
+
     posts_list_html+="
-      <a class=\"rsrc-post-row\" href=\"/posts/${slug}.html\">
+      <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
         <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
         <span class=\"rsrc-title\">${title}</span>
-        <span class=\"rsrc-desc\">${description}</span>
       </a>"
 
     echo "Built: posts/${slug}.html"
@@ -244,102 +250,76 @@ cat > "_site/index.html" << ENDINDEX
       98% { text-shadow: 0 0 12px #5625be80; transform: translate(0); }
     }
 
-    /* .rsrc section post list */
-    .rsrc-section {
+    /* Unified PE viewer container */
+    .pe-viewer {
       text-align: left;
       margin: 2rem auto 0;
       max-width: 900px;
       font-family: "Fira Code", "Consolas", monospace;
-    }
-    .rsrc-post-row {
-      display: flex;
-      align-items: baseline;
-      padding: 0.5rem 1rem;
-      line-height: 1.7;
-      cursor: pointer;
-      text-decoration: none;
-      border-left: 2px solid transparent;
-      transition: background 0.12s ease, border-left-color 0.12s ease;
-    }
-    .rsrc-post-row:hover {
-      background: rgba(86, 37, 190, 0.10);
-      border-left-color: #5625be;
-      text-decoration: none;
-    }
-    .rsrc-post-row .rsrc-gutter {
-      width: 7em;
-      flex-shrink: 0;
-      color: #3a3a55;
-      font-size: 0.82rem;
-      user-select: none;
-    }
-    .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
-    .rsrc-post-row .rsrc-title {
-      color: #c0c0c0;
-      font-family: "Segoe UI", "Roboto", sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      white-space: nowrap;
-      flex-shrink: 0;
-      margin-right: 1.5em;
-    }
-    .rsrc-post-row:hover .rsrc-title {
-      color: #ff79c6;
-      text-shadow: 0 0 8px rgba(255, 121, 198, 0.3);
-    }
-    .rsrc-post-row .rsrc-desc {
-      flex: 1;
-      color: #555;
-      font-family: "Segoe UI", "Roboto", sans-serif;
-      font-size: 0.85rem;
-      white-space: nowrap;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
       overflow: hidden;
-      text-overflow: ellipsis;
+      background: rgba(10, 10, 16, 0.7);
     }
-    .rsrc-post-row:hover .rsrc-desc { color: #777; }
 
-    /* PE .text section bio block */
-    .pe-section {
-      text-align: left;
-      margin: 2rem auto 0;
-      max-width: 900px;
-      font-family: "Fira Code", "Consolas", monospace;
-    }
+    /* Shared toolbar (used by both .text and .rsrc) */
     .pe-section-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0.45rem 1rem;
       background: #161620;
-      border: 1px solid #2a2a3a;
-      border-bottom: none;
-      border-radius: 6px 6px 0 0;
       font-size: 0.78rem;
       color: #555;
     }
     .pe-section-toolbar .pe-section-name { color: #ff79c6; font-weight: 600; }
     .pe-section-toolbar .pe-section-flags { color: #444; font-size: 0.72rem; }
+
+    /* Shared meta row */
     .pe-section-meta {
       display: flex;
       flex-wrap: wrap;
       gap: 0.2rem 1.8rem;
       padding: 0.4rem 1rem;
       background: rgba(10, 10, 16, 0.7);
-      border-left: 1px solid #2a2a3a;
-      border-right: 1px solid #2a2a3a;
       font-size: 0.72rem;
       color: #3a3a55;
     }
     .pe-section-meta span { white-space: nowrap; }
     .pe-section-meta .meta-label { color: #3a3a55; }
     .pe-section-meta .meta-value { color: #50fa7b; }
+
+    /* Shared body */
     .pe-section-body {
       background: rgba(10, 10, 16, 0.7);
-      border: 1px solid #2a2a3a;
-      border-top: 1px solid #222233;
-      border-radius: 0 0 6px 6px;
       padding: 0.8rem 0;
     }
+
+    /* Section divider between .text and .rsrc */
+    .pe-section-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.1rem 1rem;
+      background: #161620;
+      border-top: 1px solid #2a2a3a;
+      border-bottom: 1px solid #2a2a3a;
+    }
+    .pe-section-divider::before,
+    .pe-section-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #2a2a3a;
+    }
+    .pe-section-divider-label {
+      font-size: 0.68rem;
+      color: #3a3a55;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    /* .text disasm rows */
     .pe-disasm-row {
       display: flex;
       padding: 0.3rem 1rem;
@@ -374,18 +354,116 @@ cat > "_site/index.html" << ENDINDEX
     .pe-operand a { color: #8be9fd !important; }
     .pe-operand a:hover { color: #50fa7b !important; }
 
-    .section-heading {
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 1.1rem;
-      color: #8be9fd;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #2a2a3a;
-      text-shadow: 0 0 6px rgba(139, 233, 253, 0.2);
+    /* .rsrc post rows */
+    .rsrc-post-row {
+      display: flex;
+      align-items: baseline;
+      padding: 0.5rem 1rem;
+      line-height: 1.7;
+      cursor: pointer;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: background 0.12s ease, border-left-color 0.12s ease;
     }
-    .section-heading .prompt {
-      color: #50fa7b;
-      margin-right: 0.5em;
+    .rsrc-post-row:hover {
+      background: rgba(86, 37, 190, 0.10);
+      border-left-color: #5625be;
+      text-decoration: none;
+    }
+    .rsrc-post-row .rsrc-gutter {
+      width: 7em;
+      flex-shrink: 0;
+      color: #3a3a55;
+      font-size: 0.82rem;
+      user-select: none;
+    }
+    .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
+    .rsrc-post-row .rsrc-title {
+      color: #c0c0c0;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rsrc-post-row:hover .rsrc-title {
+      color: #ff79c6;
+      text-shadow: 0 0 8px rgba(255, 121, 198, 0.3);
+    }
+
+    /* Right detail panel */
+    .pe-detail-panel {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      right: calc((100vw - 900px) / 2 - 320px);
+      width: 300px;
+      font-family: "Fira Code", "Consolas", monospace;
+      border: 1px solid #2a2a3a;
+      border-radius: 4px;
+      background: rgba(16, 16, 22, 0.95);
+      overflow: hidden;
+      transition: opacity 0.15s ease, border-color 0.15s ease;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .pe-detail-panel.active {
+      border-color: #3a3a55;
+    }
+    .pe-detail-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0.75rem;
+      background: #161620;
+      border-bottom: 1px solid #2a2a3a;
+      font-size: 0.7rem;
+      color: #555;
+    }
+    .pe-detail-toolbar .detail-label { color: #ff79c6; font-weight: 600; }
+    .pe-detail-toolbar .detail-type { color: #3a3a55; }
+    .pe-detail-body {
+      padding: 0.75rem;
+    }
+    .pe-detail-title {
+      color: #c0c0c0;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 0.6rem;
+    }
+    .pe-detail-panel.active .pe-detail-title {
+      color: #ff79c6;
+      text-shadow: 0 0 8px rgba(255, 121, 198, 0.2);
+    }
+    .pe-detail-desc {
+      color: #666;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .pe-detail-panel.active .pe-detail-desc { color: #888; }
+    .pe-detail-date {
+      margin-top: 0.5rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid #222233;
+      font-size: 0.7rem;
+      color: #3a3a55;
+    }
+    .pe-detail-date .meta-value { color: #50fa7b; }
+    .pe-detail-placeholder {
+      color: #2a2a3a;
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 1rem 0.5rem;
+      line-height: 1.6;
+    }
+
+    /* Hide detail panel on narrow screens */
+    @media (max-width: 1340px) {
+      .pe-detail-panel { display: none; }
     }
 
     .status-bar {
@@ -415,7 +493,8 @@ cat > "_site/index.html" << ENDINDEX
 <header>
   <h1 class="site-title">Malware Under the Microscope</h1>
 
-  <div class="pe-section">
+  <div class="pe-viewer">
+    <!-- .text section -->
     <div class="pe-section-toolbar">
       <span class="pe-section-name">.text</span>
       <span class="pe-section-flags">IMAGE_SCN_CNT_CODE | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ</span>
@@ -443,22 +522,37 @@ cat > "_site/index.html" << ENDINDEX
         <span class="pe-operand">All samples referenced are publically available on <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> and <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> and you can also grab them from my <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">repo</a>.</span>
       </div>
     </div>
+
+    <!-- Section divider -->
+    <div class="pe-section-divider">
+      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00001000</span>
+    </div>
+
+    <!-- .rsrc section -->
+    <div class="pe-section-toolbar">
+      <span class="pe-section-name">.rsrc</span>
+      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ</span>
+    </div>
+    <div class="pe-section-meta">
+      <span><span class="meta-label">NumberOfEntries:</span> <span class="meta-value">${post_idx}</span></span>
+      <span><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">$(date +%Y-%m-%dT%H:%M:%S)</span></span>
+      <span><span class="meta-label">MajorVersion:</span> <span class="meta-value">0x0001</span></span>
+      <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x40000040</span></span>
+    </div>
+    <div class="pe-section-body">
+${posts_list_html}
+    </div>
   </div>
 </header>
 
-<div class="rsrc-section">
-  <div class="pe-section-toolbar">
-    <span class="pe-section-name">.rsrc</span>
-    <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ</span>
+<!-- Right detail panel -->
+<div class="pe-detail-panel" id="detailPanel">
+  <div class="pe-detail-toolbar">
+    <span class="detail-label">RESOURCE_DATA</span>
+    <span class="detail-type">RT_RCDATA</span>
   </div>
-  <div class="pe-section-meta">
-    <span><span class="meta-label">NumberOfEntries:</span> <span class="meta-value">${post_idx}</span></span>
-    <span><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">$(date +%Y-%m-%dT%H:%M:%S)</span></span>
-    <span><span class="meta-label">MajorVersion:</span> <span class="meta-value">0x0001</span></span>
-    <span><span class="meta-label">Characteristics:</span> <span class="meta-value">0x40000040</span></span>
-  </div>
-  <div class="pe-section-body">
-${posts_list_html}
+  <div class="pe-detail-body" id="detailBody">
+    <div class="pe-detail-placeholder">; hover a .rsrc entry<br>; to inspect resource data</div>
   </div>
 </div>
 
@@ -469,14 +563,31 @@ ${posts_list_html}
 <script>
   const bar = document.getElementById('statusBar');
   const cmd = document.getElementById('statusCmd');
+  const panel = document.getElementById('detailPanel');
+  const detailBody = document.getElementById('detailBody');
+  const placeholder = '<div class="pe-detail-placeholder">; hover a .rsrc entry<br>; to inspect resource data</div>';
+
+  const postData = {};
+  ${post_data_js}
 
   document.querySelectorAll('.rsrc-post-row').forEach(row => {
     row.addEventListener('mouseenter', () => {
       cmd.textContent = 'open ' + row.getAttribute('href');
       bar.classList.add('visible');
+
+      const data = postData[row.id];
+      if (data) {
+        panel.classList.add('active');
+        detailBody.innerHTML =
+          '<div class="pe-detail-title">' + data.title + '</div>' +
+          '<div class="pe-detail-desc">' + data.desc + '</div>' +
+          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>';
+      }
     });
     row.addEventListener('mouseleave', () => {
       bar.classList.remove('visible');
+      panel.classList.remove('active');
+      detailBody.innerHTML = placeholder;
     });
   });
 </script>
