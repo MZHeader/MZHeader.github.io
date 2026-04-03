@@ -557,7 +557,7 @@ cat > "_site/index.html" << ENDINDEX
     <div class="pe-section-body">
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0000</span>
-        <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong>CrowdStrike</strong>.</span>
+        <span class="pe-operand">Hi! I'm Liam, a Security Researcher at <strong style="color:#c62828">CrowdStrike</strong>.</span>
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0020</span>
