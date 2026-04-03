@@ -315,6 +315,25 @@ cat > "_site/index.html" << ENDINDEX
       margin-right: 0.5em;
     }
 
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.3rem 1rem;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.75rem;
+      color: #50fa7b;
+      background: rgba(18, 18, 24, 0.95);
+      border-top: 1px solid #2a2a3a;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .status-bar.visible { opacity: 1; }
+    .status-bar .cmd-prompt { color: #5625be; margin-right: 0.5em; }
+
     ul { list-style: none; padding: 0; margin: 0; font-family: "Fira Code", "Consolas", monospace; }
     li {
       display: flex;
@@ -401,6 +420,25 @@ cat > "_site/index.html" << ENDINDEX
 <ul>
 ${posts_list_html}
 </ul>
+
+<div class="status-bar" id="statusBar">
+  <span class="cmd-prompt">\$</span><span id="statusCmd"></span>
+</div>
+
+<script>
+  const bar = document.getElementById('statusBar');
+  const cmd = document.getElementById('statusCmd');
+  document.querySelectorAll('li').forEach(li => {
+    const slug = li.querySelector('a').getAttribute('href').replace('/posts/', '').replace('.html', '');
+    li.addEventListener('mouseenter', () => {
+      cmd.textContent = 'cd ./write-ups/' + slug;
+      bar.classList.add('visible');
+    });
+    li.addEventListener('mouseleave', () => {
+      bar.classList.remove('visible');
+    });
+  });
+</script>
 
 </body>
 </html>
