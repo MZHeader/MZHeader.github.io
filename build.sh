@@ -67,8 +67,7 @@ GA_HEAD='
 
 HLJS_HEAD='
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="hljs.highlightAll()"></script>
 '
 
 posts_list_html=""
@@ -143,6 +142,18 @@ for i in $(seq 1 $total_posts); do
     formatted_date="${p_dates[$i]}"
     date_str="${p_date_strs[$i]}"
     description="${p_descs[$i]}"
+
+    # Prev = newer post (lower index), Next = older post (higher index)
+    prev_html=""
+    next_html=""
+    prev_i=$((i - 1))
+    next_i=$((i + 1))
+    if [ $prev_i -ge 1 ]; then
+        prev_html="<a class=\"post-pagination-link\" href=\"/posts/${p_slugs[$prev_i]}.html\">&larr; ${p_titles[$prev_i]}</a>"
+    fi
+    if [ $next_i -le $total_posts ]; then
+        next_html="<a class=\"post-pagination-link post-pagination-link--right\" href=\"/posts/${p_slugs[$next_i]}.html\">${p_titles[$next_i]} &rarr;</a>"
+    fi
 
     cat > "_site/posts/${slug}.html" << ENDHEADER
 <!DOCTYPE html>
@@ -438,6 +449,49 @@ for i in $(seq 1 $total_posts); do
       pre code { font-size: 0.8rem; }
       body.sidebar-collapsed #post-main { margin-left: 0; }
     }
+
+    /* ── Post pagination ── */
+    .post-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #2a2a3a;
+      gap: 1rem;
+    }
+    .post-pagination-link {
+      color: #8be9fd;
+      text-decoration: none;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      max-width: 45%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .post-pagination-link--right { margin-left: auto; text-align: right; }
+    .post-pagination-link:hover { color: #50fa7b; }
+
+    /* ── Copy button on code blocks ── */
+    .pre-wrapper { position: relative; }
+    .copy-btn {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.4rem;
+      background: #2a2a3a;
+      border: 1px solid #444;
+      color: #8be9fd;
+      font-family: "Fira Code", monospace;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .pre-wrapper:hover .copy-btn { opacity: 1; }
+    .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
   </style>
 </head>
 <body>
@@ -467,6 +521,10 @@ ENDHEADER
 
     cat >> "_site/posts/${slug}.html" << ENDFOOTER
     </article>
+    <nav class="post-pagination">
+      ${prev_html}
+      ${next_html}
+    </nav>
   </div>
 
 <script>
@@ -513,6 +571,26 @@ ENDHEADER
       applyCollapsed(next);
     });
   }
+
+  // ── Copy buttons on code blocks ──
+  document.querySelectorAll("pre").forEach(function(pre) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "pre-wrapper";
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+    var btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.textContent = "copy";
+    btn.addEventListener("click", function() {
+      var code = pre.querySelector("code");
+      navigator.clipboard.writeText(code ? code.innerText : pre.innerText).then(function() {
+        btn.textContent = "copied!";
+        btn.classList.add("copied");
+        setTimeout(function() { btn.textContent = "copy"; btn.classList.remove("copied"); }, 1500);
+      });
+    });
+    wrapper.appendChild(btn);
+  });
 })();
 </script>
 
