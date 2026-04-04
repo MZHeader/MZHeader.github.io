@@ -314,10 +314,10 @@ for i in $(seq 1 $total_posts); do
       margin-left: 230px;
       flex: 1;
       min-width: 0;
-      padding: 2rem;
+      padding: 2rem 4rem;
     }
     .post-nav, article, .post-pagination {
-      max-width: 900px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
     }
