@@ -344,6 +344,9 @@ for i in $(seq 1 $total_posts); do
       margin-top: 1.5rem;
     }
     article { max-width: 100%; }
+    article p { color: #b8b8c8; line-height: 1.75; }
+    article li { color: #b8b8c8; line-height: 1.75; }
+    article strong { color: #dcdcdc; }
 
     article table {
       width: 100%;
