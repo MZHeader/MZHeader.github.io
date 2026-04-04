@@ -178,6 +178,19 @@ SHA 256: `EC7890D7D688DAC4EF8EF6B6E2A832280EA47BF404B851B97CDF7C709C389E65`
 
 SHA 256: `CBB7FC940A1E9B3DADB1EC625554325B5DD9A95E34A05A0EC6F7206D2128DAB9`
 
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `E5DAC6F6D2AB4C479C5C3E91064F335DE141C8399BD93F8267E13F134C578C0F` |
+| `SHA256` | `EC7890D7D688DAC4EF8EF6B6E2A832280EA47BF404B851B97CDF7C709C389E65` |
+| `SHA256` | `CBB7FC940A1E9B3DADB1EC625554325B5DD9A95E34A05A0EC6F7206D2128DAB9` |
+| `IP` | `65.1.224[.]214` |
+
+## Conclusion
+
+This XWorm sample uses a layered delivery approach: an obfuscated batch script copies PowerShell, reads a Base64-encoded and AES-encrypted blob embedded within its own commented lines, decrypts it using a hardcoded key and IV, decompresses it with GZip, and reflectively loads the resulting .NET assembly in memory. The loaded .NET binary is itself a ConfuserEx-obfuscated loader that unpacks a second stage, which contains the plaintext XWorm configuration including the C2 IP address. The use of multiple obfuscation layers and fully in-memory execution makes static detection of this chain particularly challenging.
+
 
 
 

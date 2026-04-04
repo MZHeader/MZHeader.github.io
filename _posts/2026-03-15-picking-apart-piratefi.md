@@ -313,3 +313,7 @@ After reading the C2 response via InternetReadFile, the very next thing the malw
 ```
 
 The threat actor responsible for this malware as well as malware embedded in other titles is currently under investigation by the FBI. Additionally, the FBI are seeking victim information - [FBI Victim Report Form](https://forms.fbi.gov/victims/Steam_Malware)
+
+## Conclusion
+
+PirateFi is a trojanised free-to-play Steam game that bundles Vidar Infostealer alongside a legitimate-looking application. The infection chain uses a series of VBS and batch launchers to ultimately execute `Pirate.exe`, which is a packed loader that decrypts and runs the Vidar payload in memory. Vidar operates as malware-as-a-service and is configured to steal credentials from Chromium and Firefox browsers, cryptocurrency wallets, Steam, Discord, Telegram, and applications such as WinSCP and FileZilla. Stolen data is staged locally before being exfiltrated to C2 addresses retrieved from Steam community profiles and Telegram channels used as dead-drops. A kill switch is implemented by comparing the C2 HTTP response against the string `block`, terminating execution immediately if matched.

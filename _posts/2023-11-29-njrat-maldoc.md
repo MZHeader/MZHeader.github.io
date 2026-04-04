@@ -286,6 +286,21 @@ With this, we know that keystrokes should be recorded under the `HKCU\SOFTWARE\N
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fba213b3-133c-453b-aa70-e2f92e48b105)
 
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `12237938501141149337015c546b5e02acf3b98c1c26a84b5b4befd97d0f66d0` |
+| `SHA256` | `66702e21faa38c24f49a33112d2036d8f3b6bcfd686db47299a4dc44dedf13d8` |
+| `C2` | `netflex.duckdns[.]org:2255` |
+| `Registry Key` | `HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` |
+| `Registry Key` | `HKCU\SOFTWARE\Netflex` |
+| `Dropped File` | `%APPDATA%\netflex\netflex.exe` |
+
+## Conclusion
+
+This sample demonstrates a multi-stage NJRat infection chain beginning with a macro-enabled document that uses the document's Alternative Text field to conceal a Base64-encoded Donut shellcode payload. The shellcode loads a .NET loader which decrypts and drops `netflex.exe`, which in turn decrypts and executes the final NJRat payload in memory. The RAT establishes persistence via registry run keys and the Startup directory, uses a DuckDNS C2 domain for command and control, and records keystrokes to `HKCU\SOFTWARE\Netflex`. The use of in-memory execution at each stage, combined with AMSI/ETW bypass and VM detection, reflects a deliberate effort to evade detection throughout the kill chain.
+
 
 
 

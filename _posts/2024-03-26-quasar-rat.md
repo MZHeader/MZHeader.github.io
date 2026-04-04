@@ -432,6 +432,17 @@ Stepping further, we get strong indications that this is related to the Quasar R
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e0a669d-5817-48bc-b1c5-f89a0b08be49)
 
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `98844e610a8d1e4800f8aee8d8464acc12d50f19c4025ffbf1759a899b5d66c4` |
+| `C2` | `nathwood23.mysynology[.]net:6750` |
+
+## Conclusion
+
+This Quasar RAT sample is delivered via a PowerShell script that embeds two byte arrays: a process-hollowing loader compiled in memory at runtime using CodeDom, and the final Quasar RAT payload, URL-encoded and GZip-compressed. The loader performs process hollowing against `AppLaunch.exe` to inject the payload. The payload itself is a heavily obfuscated .NET binary, which is cleaned using De4Dot and debugged with DNSpy to reveal AES-encrypted configuration strings. Decrypting these strings with a PBKDF2-derived key exposes the C2 address and confirms the binary as Quasar RAT.
+
 
 
 

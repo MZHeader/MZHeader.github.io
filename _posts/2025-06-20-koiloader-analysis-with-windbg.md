@@ -650,3 +650,21 @@ There are lots of functions typical of info-stealing malware, described below:
 **Full List of interesting function names**
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b7588e0-e338-4895-8ad3-b2dac3ddbd2e)
+
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `d950f0e4a597416aa8f4cb0682d29707cc8958b2972ab307b9f34316e806ec4d` |
+| `IP` | `87.121.61[.]55` |
+| `C2` | `hxxp[://]87.121.61[.]55/index.php` |
+| `C2` | `hxxp[://]45.129.199[.]204/index.php` |
+| `IP` | `152.89.198[.]227:5000` |
+| `URL` | `hxxps[://]casettalecese[.]it/wp-content/uploads/2022/10/sd4.ps1` |
+| `URL` | `hxxps[://]casettalecese[.]it/wp-content/uploads/2022/10/sd2.ps1` |
+| `URL` | `hxxps[://]www.fuchs.com[.]sd/media/media/js/ap2.ps1` |
+| `URL` | `hxxPs[:/\]onedrive.live[.]com/download?cid=85B4181C5D4F7514&resid=58504D327740F380%21149&authkey=AIHrvoeE31NvUiI&.msi` |
+
+## Conclusion
+
+This post covers two KoiLoader samples. The first begins as a multi-stage chain involving JavaScript, PowerShell, and shellcode loaders, ultimately executing a packed PE which is unpacked in memory using `VirtualAlloc` and `VirtualProtect`. WinDbg is used to identify the point of unpacking, dump the second-stage binary, and trace the resolution of a C2 IP address stored as a pointer. The second sample arrives via a malicious LNK file that downloads and executes an MSI containing a PowerShell script. After deobfuscation, the script contacts a C2 to retrieve an encrypted configuration, decrypts it with an XOR key, and loads a ConfuserEx-protected .NET stealer assembly in memory. The final payload implements typical infostealer capabilities including browser credential theft, cryptocurrency wallet enumeration, screenshot capture, and system information collection, with stolen data exfiltrated to the C2.
