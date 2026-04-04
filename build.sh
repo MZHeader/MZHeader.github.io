@@ -352,6 +352,13 @@ for i in $(seq 1 $total_posts); do
       line-height: 1.35;
     }
     #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #c0c0c0; }
+    #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title::before {
+      content: "call  ";
+      color: #e6db74;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.65rem;
+      font-weight: normal;
+    }
     #rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
     #rsrc-sidebar .rsrc-meta { display: none; }
 
