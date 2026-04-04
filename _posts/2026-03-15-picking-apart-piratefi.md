@@ -66,7 +66,7 @@ Within the memory buffer are the magic bytes of a PE:
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.28.13.png)
 
-To get the next payload, we'll dump this memory region to disk and carve the PE with the following Binary Refinery pipline:
+To get the next payload, we'll dump this memory region to disk and carve the PE with the following Binary Refinery pipeline:
 
 ```
 ef Howard.exe_memory.bin | carve-pe | dump carved.exe
@@ -277,7 +277,7 @@ I was able to view all decrypted strings by setting a Watch window on the string
 
 The final payload observed is Vidar Infostealer.
 Vidar is an infostealer malware  operating as malware-as-a-service that was first discovered in the wild in late 2018.
-This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurreny wallets, Steam, Discord, Telegram, Files and Applications such as WinSCP & FileZilla.
+This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurrency wallets, Steam, Discord, Telegram, Files and Applications such as WinSCP & FileZilla.
 
 Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to the dead-drop C2 domains.
 
@@ -292,7 +292,7 @@ Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to 
 | `Internal name` | vdr1.exe |
 | `Mutex/Event` | approve_april |
 
-There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-drop C2: `95.216.180[.]186`
+There's a Web Archive hit from 14th Feb 2025 showing the configured Steam dead-drop C2: `95.216.180[.]186`
 
 ![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
 

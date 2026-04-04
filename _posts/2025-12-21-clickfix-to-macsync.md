@@ -1053,8 +1053,15 @@ continueBtn.addEventListener('click', function () {
 ```
 
 ## IOCs
-- ballfrank.today
 
-- macfilearchive.com
+| Type | Value |
+|---|---|
+| `C2` | ballfrank[.]today |
+| `Lure domain` | macfilearchive[.]com |
+| `Ledger C2` | main[.]ledger-gate[.]coupons |
+| `Token` | 270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514 |
+| `API key` | 5190ef1733183a0dc63fb623357f56d6 |
 
-- ledger-gate.coupons
+## Conclusion
+
+The ClickFix to MacSync campaign demonstrates an increasingly common pattern of social-engineering-based initial access on macOS. A fake lure page tricks users into pasting a curl command that downloads and executes a multi-stage zsh payload. MacSync itself is an AppleScript-based infostealer with broad collection capabilities spanning browser credentials, Keychain items, cryptocurrency wallets, and sensitive documents. Beyond generic data theft, the campaign replaces legitimate Ledger and Trezor desktop applications with backdoored versions that silently exfiltrate seed phrases to the attacker's C2 on first use.
