@@ -1193,6 +1193,44 @@ cat > "_site/index.html" << ENDINDEX
       .rsrc-post-row .rsrc-title { white-space: normal; }
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
+      .about-toggle { display: none; }
+    }
+
+    /* About Me expandable panel */
+    .about-trigger {
+      display: flex;
+      padding: 0.3rem 1rem;
+      line-height: 1.7;
+      transition: background 0.1s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .about-trigger:hover { background: rgba(86, 37, 190, 0.06); }
+    .about-trigger .pe-comment { flex: 1; }
+    .about-toggle {
+      color: #3a3a55;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      transition: color 0.15s ease;
+      flex-shrink: 0;
+      padding-top: 0.15em;
+    }
+    .about-trigger:hover .about-toggle,
+    .about-toggle:hover { color: #8be9fd; }
+
+    .about-expanded {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .about-expanded.open {
+      max-height: 25rem;
+    }
+    .about-expanded .pe-disasm-row {
+      background: rgba(0, 0, 0, 0.15);
+    }
+    .about-sep {
+      color: #2a2a3a !important;
     }
 
   </style>
@@ -1233,6 +1271,49 @@ cat > "_site/index.html" << ENDINDEX
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0008</span>
         <span class="pe-comment">; Samples: <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> &middot; <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> &middot; <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">github.com/MZHeader/samples</a></span>
+      </div>
+      <div class="about-trigger" id="aboutTrigger" role="button" tabindex="0" aria-expanded="false">
+        <span class="pe-gutter">.text:000C</span>
+        <span class="pe-comment">; &rarr; about me</span>
+        <span class="about-toggle" id="aboutToggleIcon">[+]</span>
+      </div>
+      <div class="about-expanded" id="aboutPanel">
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0010</span>
+          <span class="pe-comment about-sep">; ────────────────────────────────────────────────────────</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0014</span>
+          <span class="pe-comment">; Security Researcher at CrowdStrike, focused on malware</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0018</span>
+          <span class="pe-comment">; reverse engineering and threat intelligence. My primary</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:001C</span>
+          <span class="pe-comment">; tools are IDA Pro, WinDbg, and Binary Ninja &mdash; used daily</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0020</span>
+          <span class="pe-comment">; to tear apart commodity infostealers, RATs, loaders, and</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0024</span>
+          <span class="pe-comment">; whatever multi-stage nastiness lands on my desk. I also</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0028</span>
+          <span class="pe-comment">; compete in CTF events (Huntress CTF) and write up anything</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:002C</span>
+          <span class="pe-comment">; interesting so others can follow along with real samples.</span>
+        </div>
+        <div class="pe-disasm-row">
+          <span class="pe-gutter">.text:0030</span>
+          <span class="pe-comment about-sep">; ────────────────────────────────────────────────────────</span>
+        </div>
       </div>
     </div>
 
@@ -1447,6 +1528,23 @@ ${posts_list_html}
       } else {
         applyFilter(cat);
       }
+    });
+  })();
+</script>
+
+<script>
+  (function() {
+    var trigger = document.getElementById('aboutTrigger');
+    var panel = document.getElementById('aboutPanel');
+    var icon = document.getElementById('aboutToggleIcon');
+    if (!trigger || !panel || !icon) return;
+    trigger.addEventListener('click', function() {
+      var open = panel.classList.toggle('open');
+      icon.textContent = open ? '[-]' : '[+]';
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    trigger.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trigger.click(); }
     });
   })();
 </script>
