@@ -134,7 +134,7 @@ for post in $(ls _posts/*.md | sort -r); do
 
     # Strip the first h2 (post title) — we render it as h1 in the template instead
     # Use awk for cross-platform compatibility (macOS sed differs from GNU sed)
-    awk 'BEGIN{found=0} !found && /<h2/{found=1; next} found && !closed && /<\/h2>/{closed=1; next} {print}' "/tmp/mzbuild_${slug}.html" > "/tmp/mzbuild_${slug}_stripped.html"
+    awk 'BEGIN{found=0;closed=0} !found && /<h2/{found=1} found && !closed{if(/<\/h2>/){closed=1}; next} {print}' "/tmp/mzbuild_${slug}.html" > "/tmp/mzbuild_${slug}_stripped.html"
     mv "/tmp/mzbuild_${slug}_stripped.html" "/tmp/mzbuild_${slug}.html"
 
     # Calculate reading time (~200 words per minute)
