@@ -1112,6 +1112,8 @@ cat > "_site/index.html" << ENDINDEX
       }
     }
 
+    @keyframes hex-shift { 0% { color: #5625be; } 50% { color: #8be9fd; } 100% { color: #50fa7b; } }
+
     /* .text disasm rows */
     .pe-disasm-row {
       display: flex;
@@ -1150,7 +1152,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .pe-operand strong { color: #8be9fd; }
     .pe-operand a { color: #8be9fd !important; transition: letter-spacing 0.15s ease; }
-    .pe-operand a:hover { letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
+    .pe-operand a:hover { color: #50fa7b !important; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
     .pe-comment {
       flex: 1;
       font-family: "Fira Code", "Consolas", monospace;
@@ -1160,7 +1162,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .pe-comment strong { color: #c62828; font-weight: 600; }
     .pe-comment a { color: #8be9fd !important; transition: letter-spacing 0.15s ease; }
-    .pe-comment a:hover { letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
+    .pe-comment a:hover { color: #50fa7b !important; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
 
     /* .rsrc post rows */
     .rsrc-post-row {
