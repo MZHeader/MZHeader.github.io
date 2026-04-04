@@ -249,6 +249,7 @@ for i in $(seq 1 $total_posts); do
       display: block;
       font-family: "Segoe UI", "Roboto", sans-serif;
       font-size: 0.75rem;
+      font-weight: 500;
       color: #888;
       white-space: normal;
       overflow: visible;
@@ -257,6 +258,7 @@ for i in $(seq 1 $total_posts); do
     }
     #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #c0c0c0; }
     #rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
+    #rsrc-sidebar .rsrc-meta { display: none; }
 
     /* ── Main content ── */
     #post-main {
