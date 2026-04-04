@@ -1,5 +1,5 @@
 ---
-tags: RATs
+tags: RAT
 description: This post dissects a PowerShell loader used by Quasar RAT. It covers its execution chain, including payload decoding, process injection, and persistence mechanisms. The loader uses AES encryption for securing its configuration and employs process hollowing to evade detection.
 ---
 

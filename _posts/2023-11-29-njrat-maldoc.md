@@ -1,5 +1,5 @@
 ---
-tags: RATs
+tags: RAT
 description: NJRat is a long-standing RAT with versatile capabilities. Our investigation reconstructed the full infection chain, from malicious document to loaders and dropped binaries, highlighting the RAT’s persistence strategies and its approach to gaining control over compromised systems.
 ---
 
