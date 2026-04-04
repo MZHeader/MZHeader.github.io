@@ -1210,7 +1210,7 @@ cat > "_site/index.html" << ENDINDEX
         <span class="pe-window-dot dot-min"></span>
         <span class="pe-window-dot dot-max"></span>
       </div>
-      <span class="window-title"><span class="wt-app">pe-viewer</span><span class="wt-sep">&#8212;</span><span class="wt-path">C:\Samples\</span><span class="wt-file">mzheader.tech</span></span>
+      <span class="window-title"><span class="wt-app">pe-viewer</span><span class="wt-sep">&#8212;</span><span class="wt-path">C:\Samples\</span><span class="wt-file">mzheader</span></span>
       <span class="window-spacer"></span>
       <span class="window-tag">reverse engineering / malware</span>
     </div>
