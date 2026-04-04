@@ -9,7 +9,7 @@ description: NJRat is a long-standing RAT with versatile capabilities. Our inves
 Password-protected malware samples used in this write-up are available for hands-on follow-along.  
 
 🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/NjRAT)  
-🔑 **Password:** 'mzheader'
+🔑 **Password:** `mzheader`
 
 ## 🔍 **Analysis**
 Another RAT variant, NJRat is typically attributed to ECrime actors, it is supposedly popular with actors in the Middle East. It's primary infection vectors are phishing attacks and drive-by downloads, and like many other RATs, it has the capability to log keystrokes, access the victim's camera, steal credentials stored in browsers, open a reverse shell, upload/download files, view the victim's desktop, perform process, file, and registry manipulations, etc...
@@ -59,13 +59,13 @@ Sub autoopen()
 End Sub
 ```
 
-Essentially, a Base64 string is being taken from ActiveDocument.InlineShapes(1).AlternativeText and decoded, we can assess that the contents are then executed in memory using CreateThread, VirtualAlloc and RtlMoveMemory API calls.
+Essentially, a Base64 string is being taken from `ActiveDocument.InlineShapes(1).AlternativeText` and decoded, we can assess that the contents are then executed in memory using `CreateThread`, `VirtualAlloc` and `RtlMoveMemory` API calls.
 
 The base64 string is hidden inside a text box on the first page of the document, utilising the Alternative Text field
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/4c944195-0f30-4bdb-bf49-6967865241bd)
 
-I found the full string by querying the 'Data' stream, using OLE tools.
+I found the full string by querying the `Data` stream, using OLE tools.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe007626-91e1-4cc1-b51f-5667a6ddfdf0)
 
@@ -73,7 +73,7 @@ _Base64 Snippet:_
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/53b37b49-c1de-4051-83c8-fae9faddce0c)
 
-This is donut Shellcode - https://github.com/TheWover/donut
+This is [Donut Shellcode|https://github.com/TheWover/donut]
 
 ## Shellcode Analysis
 
@@ -81,13 +81,13 @@ A simple From Base64 operation will reveal the raw shellcode. To investigate thi
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0734d4a3-15b5-4077-8998-04858c32b2cf)
 
-We'll set a breakpoint in x32dbg for the base address 0x012d0000 and run the shellcode.
+We'll set a breakpoint in x32dbg for the base address `0x012d0000` and run the shellcode.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7bc92678-f8d7-4d58-94ec-47861d5d2bbd)
 
 I decided to leave this here for now, and instead switched to API monitor to see if i could see some interesting function calls.
 
-Within some of the API calls, there are references to netflex.exe in the AppData directory, which is one of our final payloads.
+Within some of the API calls, there are references to `netflex.exe` in the `AppData` directory, which is one of our final payloads.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fcb9df18-624f-4385-9615-51c036dd2b14)
 
@@ -95,15 +95,15 @@ We also see indications that a registry run key is going to be a form of persist
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8be53c65-f5cc-41aa-824c-8963e1810e88)
 
-Most interestingly, we can see a NtWriteFile API call occurring. It only seems to show the first 1024 bytes of what it is writing but from this content alone we can see that it is writing an executable, which we should investigate further.
+Most interestingly, we can see a `NtWriteFile` API call occurring. It only seems to show the first 1024 bytes of what it is writing but from this content alone we can see that it is writing an executable, which we should investigate further.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/db05a2ba-1cb1-4cbc-821e-be7dbfa3e387)
 
-We'll set a breakpoint in x32dbg with "bp NtWriteFile" and run until that breakpoint is met.
+We'll set a breakpoint in x32dbg with `bp NtWriteFile` and run until that breakpoint is met.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/703b708b-975a-476c-8d35-e203f022ddcf)
 
-We can see in the stack that there is an address with "MZ" text which is likely our executable, so we'll follow this in dump.
+We can see in the stack that there is an address with `MZ` text which is likely our executable, so we'll follow this in dump.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7f3a3a6e-c861-4025-a930-276a3beb477e)
 
@@ -125,7 +125,7 @@ This is a .NET binary so we will run it through DNSpy to figure out what it's do
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/28ef07f4-5a8a-421d-8b18-d8acbca8338c)
 
-This appears to be a loader with the injection target of svchost.exe
+This appears to be a loader with the injection target of `svchost.exe`.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/63e29b47-8ecd-4118-851d-2af3fdde3d59)
 
@@ -150,13 +150,13 @@ A From Base64 operation will reveal our next binary, dropped from this loader.
 
 ## 2nd Executable - Netflex
 
-Taking a look at the dropped 'netflex.exe' in DNSpy, there are a few things to note.
+Taking a look at the dropped `netflex.exe` in DNSpy, there are a few things to note.
 
-Firstly, the binary does a basic check to decide if the host is in a virtualised environment by querying Win32_CacheMemory
+Firstly, the binary does a basic check to decide if the host is in a virtualised environment by querying `Win32_CacheMemory`
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6882b2c3-d2b7-4700-b20d-9296049a7200)
 
-If there is a value for Win32_CacheMemory, the program assumes the host is not a virtual machine and will execute the next function.
+If there is a value for `Win32_CacheMemory`, the program assumes the host is not a virtual machine and will execute the next function.
 
 The next function involves breaking/disabling AMSI and ETW, likely through the use of SharpUnhooker or a similar tool.
 
@@ -167,7 +167,7 @@ Next up is the main function, which essentially decrypts and executes a payload 
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/af3e374a-7c42-4e6f-8775-aae8ad36c471)
 
-The first line derives an AES key by getting the SHA 256 value of Settings.aes_key and taking the first 32 bytes.
+The first line derives an AES key by getting the SHA 256 value of `Settings.aes_key` and taking the first 32 bytes.
 
 The second line takes the contents of baseData, converts it from base64, decompresses the data with the Decompress function, decrypts the data and finally base64 decodes the unencrypted data.
 
@@ -177,7 +177,7 @@ _Decompress Function_
 
 The key point here is that the first 4 bytes of baseData declare the length of the data and are not needed for decompression.
 
-The Settings class is compromised of 3 key components, baseData, aes_key and aes_iv.
+The `Settings` class is compromised of 3 key components, `baseData`, `aes_key` and `aes_iv`.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/1f4f0997-0af7-488a-bfde-bdd9bfda3e2d)
 
@@ -191,7 +191,7 @@ We now have everything needed to decrypt the base64 string.
    
 3) Decompress with Gunzip
    
-4) AES decrypt with base64 key "78e3e7cc513ff8ae00a177366efa4060" _(First 32 bytes of the SHA 256 value of 'Q4NP7JPHRA5AJB28')_
+4) AES decrypt with base64 key `78e3e7cc513ff8ae00a177366efa4060` _(First 32 bytes of the SHA 256 value of `Q4NP7JPHRA5AJB28`)_
    
 5) Decode from base64
 
@@ -205,7 +205,7 @@ This leaves us with another .NET executable, which, upon execution, netflex.exe 
 
 Within this executable, we can see the C2 domain and installation directory being declared. 
 
-C2: netflex.duckdns[.]org:2255
+C2: `netflex.duckdns[.]org:2255`
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6f7fd25f-61d4-4658-bfac-a22c4f894da3)
 
@@ -262,7 +262,7 @@ As well as the binary being copied to the Startup directory.
 
 **Keylogging**
 
-The 'kl' class in the binary presents the keylogging functionality.
+The `kl` class in the binary presents the keylogging functionality.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/baf8b432-0770-42ea-a296-6c91518e97c6)
 
@@ -277,7 +277,7 @@ The following line defines where the keystrokes are to be recorded.
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0bee5133-49f0-4b5a-9674-7d18cde86dc5)
 
 
-With this, we know that keystrokes should be recorded under the HKCU\SOFTWARE\Netflex [kl] registry key.
+With this, we know that keystrokes should be recorded under the `HKCU\SOFTWARE\Netflex` registry key.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9c582bd7-186c-400d-983d-ea2deddfd01e)
 
