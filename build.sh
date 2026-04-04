@@ -979,25 +979,6 @@ cat > "_site/index.html" << ENDINDEX
       .pe-detail-panel { display: none !important; }
     }
 
-    .status-bar {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      padding: 0.3rem 1rem;
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.82rem;
-      color: #50fa7b;
-      background: rgba(18, 18, 24, 0.95);
-      border-top: 1px solid #2a2a3a;
-      border-left: 1px solid #2a2a3a;
-      border-radius: 4px 0 0 0;
-      opacity: 0;
-      transition: opacity 0.15s ease;
-      pointer-events: none;
-      z-index: 100;
-    }
-    .status-bar.visible { opacity: 1; }
-    .status-bar .cmd-prompt { color: #5625be; margin-right: 0.5em; }
 
     @media (max-width: 600px) {
       body { padding: 1rem; }
@@ -1116,13 +1097,7 @@ ${posts_list_html}
   </div>
 </div>
 
-<div class="status-bar" id="statusBar">
-  <span class="cmd-prompt">\$</span><span id="statusCmd"></span>
-</div>
-
 <script>
-  const bar = document.getElementById('statusBar');
-  const cmd = document.getElementById('statusCmd');
   const panel = document.getElementById('detailPanel');
   const detailBody = document.getElementById('detailBody');
   const placeholder = '<div class="pe-detail-placeholder">; hover a .rsrc entry<br>; to inspect resource data</div>';
@@ -1132,9 +1107,6 @@ ${posts_list_html}
 
   document.querySelectorAll('.rsrc-post-row').forEach(row => {
     row.addEventListener('mouseenter', () => {
-      cmd.textContent = 'open ' + row.getAttribute('href');
-      bar.classList.add('visible');
-
       const data = postData[row.id];
       if (data) {
         panel.classList.add('active');
@@ -1145,7 +1117,6 @@ ${posts_list_html}
       }
     });
     row.addEventListener('mouseleave', () => {
-      bar.classList.remove('visible');
       panel.classList.remove('active');
     });
   });
