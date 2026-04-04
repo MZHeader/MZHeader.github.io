@@ -1015,10 +1015,6 @@ cat > "_site/index.html" << ENDINDEX
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0008</span>
-        <span class="pe-comment">; Focus: unpacking &middot; deobfuscation &middot; disassembly &middot; memory forensics &middot; freely available tools</span>
-      </div>
-      <div class="pe-disasm-row">
-        <span class="pe-gutter">.text:000C</span>
         <span class="pe-comment">; Samples: <a href="https://www.virustotal.com/" target="_blank">VirusTotal</a> &middot; <a href="https://bazaar.abuse.ch/" target="_blank">MalwareBazaar</a> &middot; <a href="https://github.com/MZHeader/MZHeader.github.io/tree/main/samples" target="_blank">github.com/MZHeader/samples</a></span>
       </div>
     </div>
