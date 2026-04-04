@@ -710,18 +710,28 @@ cat > "_site/index.html" << ENDINDEX
       padding: 0.8rem 0;
     }
 
-    /* Section divider between .text and .rsrc */
+    /* Section divider — PE section table entry */
     .pe-section-divider {
-      padding: 0.25rem 1rem;
-      background: rgba(10, 10, 16, 0.7);
+      padding: 0.3rem 1rem;
+      background: rgba(13, 13, 20, 0.85);
       border-top: 1px solid #1e1e28;
       border-bottom: 1px solid #1e1e28;
-      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .pe-section-divider-label {
-      font-size: 0.62rem;
-      color: #252535;
-      letter-spacing: 0.06em;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.72rem;
+      color: #2e2e4a;
+      letter-spacing: 0.04em;
+    }
+    .pe-section-divider-label .pe-divider-detail {
+      color: #2e2e4a;
+    }
+    @media (max-width: 600px) {
+      .pe-section-divider-label .pe-divider-detail {
+        display: none;
+      }
     }
 
     /* .text disasm rows */
@@ -1015,7 +1025,7 @@ cat > "_site/index.html" << ENDINDEX
 
     <!-- Section divider -->
     <div class="pe-section-divider">
-      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00001000</span>
+      <span class="pe-section-divider-label">Section[1]&nbsp;&nbsp;.rsrc&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00004000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00001200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x40000040</span>
     </div>
 
     <!-- .rsrc section -->
@@ -1031,7 +1041,7 @@ ${posts_list_html}
 
     <!-- Section divider -->
     <div class="pe-section-divider">
-      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00002000</span>
+      <span class="pe-section-divider-label">Section[2]&nbsp;&nbsp;.lnkin&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00006000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
     </div>
 
     <!-- .lnkin section -->
@@ -1048,7 +1058,7 @@ ${posts_list_html}
 
     <!-- Section divider -->
     <div class="pe-section-divider">
-      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00003000</span>
+      <span class="pe-section-divider-label">Section[3]&nbsp;&nbsp;.gthb&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00007000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
     </div>
 
     <!-- .gthb section -->
