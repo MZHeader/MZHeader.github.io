@@ -30,12 +30,12 @@ SHARED_CSS='
       padding: 1em;
       background: #2d2d2d;
       color: #f8f8f2;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow-x: auto;
       font-size: 0.95rem;
       font-family: "Fira Code", "Consolas", monospace;
-      box-shadow: 0 0 8px #00000080;
-      border: 1px solid #444;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+      border: 1px solid #3a3a4a;
     }
     code {
       font-family: "Fira Code", "Consolas", monospace;
@@ -45,14 +45,15 @@ SHARED_CSS='
       font-size: 0.9em;
       border: 1px solid rgba(86, 37, 190, 0.4);
     }
-    img { max-width: 100%; height: auto; border-radius: 4px; }
+    img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #2a2a3a; }
+    hr { border: none; border-top: 1px solid #2a2a3a; margin: 2rem 0; }
     .back-link {
       display: inline-block;
       margin-bottom: 2rem;
       color: #8be9fd;
       font-size: 0.9rem;
     }
-    .post-meta { color: #888; font-size: 0.85rem; margin-bottom: 2rem; }
+    .post-meta { color: #999; font-size: 0.85rem; margin-bottom: 2rem; }
 '
 
 # Write shared CSS to external file
@@ -71,6 +72,7 @@ GA_HEAD='
 ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
+  <link rel="alternate" type="application/atom+xml" title="MZHeader RSS Feed" href="/atom.xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -85,7 +87,7 @@ posts_list_html=""
 post_data_js=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -127,12 +129,18 @@ for post in $(ls _posts/*.md | sort -r); do
         --to html \
         --no-highlight > "/tmp/mzbuild_${slug}.html"
 
+    # Calculate reading time (~200 words per minute)
+    word_count=$(sed -e 's/<[^>]*>//g' "/tmp/mzbuild_${slug}.html" | wc -w | tr -d ' ')
+    read_time=$(( (word_count + 199) / 200 ))
+    [ "$read_time" -lt 1 ] && read_time=1
+    p_read_times[$post_idx]="$read_time"
+
     offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
 
     js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
     js_desc=$(printf '%s' "$description" | sed "s/'/\\\\'/g")
 
-    post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}'};"
+    post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}',readTime:'${read_time} min read'};"
 
     posts_list_html+="
       <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
@@ -153,6 +161,7 @@ for i in $(seq 1 $total_posts); do
     formatted_date="${p_dates[$i]}"
     date_str="${p_date_strs[$i]}"
     description="${p_descs[$i]}"
+    read_time="${p_read_times[$i]}"
     short_title="${title%%:*}"
 
     # Prev = newer post (lower index), Next = older post (higher index)
@@ -184,9 +193,11 @@ for i in $(seq 1 $total_posts); do
   <meta property="og:description" content="${description}" />
   <meta property="og:url" content="https://mzheader.tech/posts/${slug}.html" />
   <meta property="og:site_name" content="Reverse Engineering Malware" />
+  <meta property="og:image" content="https://mzheader.tech/assets/og-preview.png" />
   <meta property="article:published_time" content="${date_str}" />
   <meta property="article:author" content="Liam Chugg" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://mzheader.tech/assets/og-preview.png" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
   ${ASSET_HEAD}
@@ -302,7 +313,7 @@ for i in $(seq 1 $total_posts); do
       font-family: "Segoe UI", "Roboto", sans-serif;
       font-size: 0.75rem;
       font-weight: 500;
-      color: #888;
+      color: #999;
       white-space: normal;
       overflow: visible;
       text-overflow: unset;
@@ -345,7 +356,7 @@ for i in $(seq 1 $total_posts); do
     .post-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.78rem;
-      color: #555;
+      color: #777;
       letter-spacing: 0.03em;
     }
 
@@ -368,7 +379,7 @@ for i in $(seq 1 $total_posts); do
     article h3 {
       font-size: 1rem;
       color: #bd93f9;
-      border-left: 2px solid #444;
+      border-left: 2px solid #3a3a4a;
       padding-left: 0.6rem;
       margin-top: 1.5rem;
     }
@@ -384,7 +395,7 @@ for i in $(seq 1 $total_posts); do
       font-size: 0.85rem;
       margin: 1.5rem 0;
       border: 1px solid #2a2a3a;
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
     }
     article th {
@@ -568,7 +579,7 @@ ${posts_list_html}
   <div id="post-main">
     <div class="post-nav">
       <a class="back-link" href="/">&larr; cd ..</a>
-      <span class="post-meta">${formatted_date}</span>
+      <span class="post-meta">${formatted_date} &middot; ${read_time} min read</span>
     </div>
     <article>
 ENDHEADER
@@ -673,7 +684,9 @@ cat > "_site/index.html" << ENDINDEX
   <meta property="og:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   <meta property="og:url" content="https://mzheader.tech/" />
   <meta property="og:site_name" content="Reverse Engineering Malware" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content="https://mzheader.tech/assets/og-preview.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://mzheader.tech/assets/og-preview.png" />
   <meta name="twitter:title" content="Reverse Engineering Malware" />
   <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   ${ASSET_HEAD}
@@ -799,7 +812,7 @@ cat > "_site/index.html" << ENDINDEX
       border-bottom: 1px solid #2a2a3a;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.72rem;
-      color: #555;
+      color: #666;
       gap: 0.6rem;
       user-select: none;
     }
@@ -818,7 +831,7 @@ cat > "_site/index.html" << ENDINDEX
     .pe-window-dot.dot-min { background: #555; }
     .pe-window-dot.dot-max { background: #555; }
     .pe-window-titlebar .window-title {
-      color: #888;
+      color: #999;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -826,7 +839,7 @@ cat > "_site/index.html" << ENDINDEX
     .pe-window-titlebar .window-title .wt-app { color: #5625be; }
     .pe-window-titlebar .window-title .wt-sep { color: #333; margin: 0 0.3em; }
     .pe-window-titlebar .window-title .wt-file { color: #c62828; }
-    .pe-window-titlebar .window-title .wt-path { color: #555; }
+    .pe-window-titlebar .window-title .wt-path { color: #666; }
     .pe-window-titlebar .window-spacer { flex: 1; }
     .pe-window-titlebar .window-tag {
       color: #50fa7b;
@@ -851,10 +864,10 @@ cat > "_site/index.html" << ENDINDEX
       padding: 0.45rem 1rem;
       background: #161620;
       font-size: 0.78rem;
-      color: #555;
+      color: #666;
     }
     .pe-section-toolbar .pe-section-name { color: #8be9fd; font-weight: 600; }
-    .pe-section-toolbar .pe-section-flags { color: #444; font-size: 0.72rem; }
+    .pe-section-toolbar .pe-section-flags { color: #666; font-size: 0.72rem; }
 
     /* Shared meta row */
     .pe-section-meta {
@@ -888,11 +901,11 @@ cat > "_site/index.html" << ENDINDEX
     .pe-section-divider-label {
       font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
       font-size: 0.72rem;
-      color: #2e2e4a;
+      color: #4a4a6a;
       letter-spacing: 0.04em;
     }
     .pe-section-divider-label .pe-divider-detail {
-      color: #2e2e4a;
+      color: #4a4a6a;
     }
     @media (max-width: 600px) {
       .pe-section-divider-label .pe-divider-detail {
@@ -1031,6 +1044,15 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-badge--analysis    { color: #8a8aaa; }
     .rsrc-badge--analysis::before    { color: #8a8aaa; }
 
+    /* Social link hover glow */
+    .rsrc-post-row[target="_blank"]:hover .rsrc-title {
+      color: #8be9fd;
+      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
+    }
+    .rsrc-post-row[target="_blank"]:hover .rsrc-gutter {
+      color: #5625be;
+    }
+
     /* Right detail panel */
     .pe-detail-panel {
       display: none;
@@ -1041,7 +1063,7 @@ cat > "_site/index.html" << ENDINDEX
       width: 300px;
       font-family: "Fira Code", "Consolas", monospace;
       border: 1px solid #2a2a3a;
-      border-radius: 4px;
+      border-radius: 6px;
       background: rgba(16, 16, 22, 0.95);
       overflow: hidden;
       transition: opacity 0.15s ease, border-color 0.15s ease;
@@ -1060,7 +1082,7 @@ cat > "_site/index.html" << ENDINDEX
       background: #161620;
       border-bottom: 1px solid #2a2a3a;
       font-size: 0.7rem;
-      color: #555;
+      color: #666;
     }
     .pe-detail-toolbar .detail-label { color: #8be9fd; font-weight: 600; }
     .pe-detail-toolbar .detail-type { color: #3a3a55; }
@@ -1085,7 +1107,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.82rem;
       line-height: 1.55;
     }
-    .pe-detail-panel.active .pe-detail-desc { color: #888; }
+    .pe-detail-panel.active .pe-detail-desc { color: #999; }
     .pe-detail-date {
       margin-top: 0.5rem;
       padding-top: 0.4rem;
@@ -1194,6 +1216,13 @@ cat > "_site/index.html" << ENDINDEX
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
       .about-toggle { display: none; }
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      .title-malware { animation: none !important; }
+      .magnifier { display: none !important; }
+      .re-char.scrambling { color: inherit; opacity: inherit; }
     }
 
     /* About Me expandable panel */
@@ -1427,7 +1456,8 @@ ${posts_list_html}
         detailBody.innerHTML =
           '<div class="pe-detail-title">' + data.title + '</div>' +
           '<div class="pe-detail-desc">' + data.desc + '</div>' +
-          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>';
+          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
+          '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
       }
     });
     row.addEventListener('mouseleave', () => {
@@ -1436,51 +1466,56 @@ ${posts_list_html}
   });
 
   (function() {
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const reEl = document.getElementById('titleRE');
     const reText = 'Reverse Engineering';
     const hexChars = '0123456789ABCDEF';
     reEl.innerHTML = reText.split('').map(c =>
       c === ' ' ? ' ' : '<span class="re-char" data-c="' + c + '">' + c + '</span>'
     ).join('');
-    const reSpans = Array.from(reEl.querySelectorAll('.re-char'));
-    function scrambleRE() {
-      const pick = reSpans[Math.floor(Math.random() * reSpans.length)];
-      pick.classList.add('scrambling');
-      pick.textContent = hexChars[Math.floor(Math.random() * 16)];
-      setTimeout(() => {
+
+    if (!prefersReducedMotion) {
+      const reSpans = Array.from(reEl.querySelectorAll('.re-char'));
+      function scrambleRE() {
+        const pick = reSpans[Math.floor(Math.random() * reSpans.length)];
+        pick.classList.add('scrambling');
         pick.textContent = hexChars[Math.floor(Math.random() * 16)];
         setTimeout(() => {
-          pick.textContent = pick.dataset.c;
-          pick.classList.remove('scrambling');
+          pick.textContent = hexChars[Math.floor(Math.random() * 16)];
+          setTimeout(() => {
+            pick.textContent = pick.dataset.c;
+            pick.classList.remove('scrambling');
+          }, 60);
         }, 60);
-      }, 60);
-      setTimeout(scrambleRE, 100 + Math.random() * 250);
+        setTimeout(scrambleRE, 100 + Math.random() * 250);
+      }
+      scrambleRE();
     }
-    scrambleRE();
-  })();
 
-  (function() {
-    const title = document.getElementById('siteTitle');
-    const mag = document.getElementById('magnifier');
-    const magSize = 120;
-    const zoom = 1.8;
-    const clone = document.createElement('div');
-    clone.className = 'magnifier-content';
-    clone.innerHTML = title.innerHTML;
-    mag.appendChild(clone);
-    title.addEventListener('mouseenter', () => mag.classList.add('active'));
-    title.addEventListener('mouseleave', () => mag.classList.remove('active'));
-    title.addEventListener('mousemove', (e) => {
-      const rect = title.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      mag.style.left = (e.clientX - magSize/2) + 'px';
-      mag.style.top = (e.clientY - magSize/2) + 'px';
-      mag.style.position = 'fixed';
-      clone.style.transform = 'scale(' + zoom + ')';
-      clone.style.left = (-x * zoom + magSize/2) + 'px';
-      clone.style.top = (-y * zoom + magSize/2) + 'px';
-    });
+    if (!prefersReducedMotion) {
+      const title = document.getElementById('siteTitle');
+      const mag = document.getElementById('magnifier');
+      const magSize = 120;
+      const zoom = 1.8;
+      const clone = document.createElement('div');
+      clone.className = 'magnifier-content';
+      clone.innerHTML = title.innerHTML;
+      mag.appendChild(clone);
+      title.addEventListener('mouseenter', () => mag.classList.add('active'));
+      title.addEventListener('mouseleave', () => mag.classList.remove('active'));
+      title.addEventListener('mousemove', (e) => {
+        const rect = title.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mag.style.left = (e.clientX - magSize/2) + 'px';
+        mag.style.top = (e.clientY - magSize/2) + 'px';
+        mag.style.position = 'fixed';
+        clone.style.transform = 'scale(' + zoom + ')';
+        clone.style.left = (-x * zoom + magSize/2) + 'px';
+        clone.style.top = (-y * zoom + magSize/2) + 'px';
+      });
+    }
   })();
 
   // ── Category filter ──
@@ -1582,6 +1617,38 @@ cat > "_site/sitemap.xml" << ENDSITEMAP
 ENDSITEMAP
 echo "Built: sitemap.xml"
 
+# ── atom.xml (RSS feed) ───────────────────────────────────────────────────
+feed_entries=""
+for i in $(seq 1 $total_posts); do
+    escaped_title=$(printf '%s' "${p_titles[$i]}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+    escaped_desc=$(printf '%s' "${p_descs[$i]}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+    feed_entries+="
+  <entry>
+    <title>${escaped_title}</title>
+    <link href=\"https://mzheader.tech/posts/${p_slugs[$i]}.html\" rel=\"alternate\" />
+    <id>https://mzheader.tech/posts/${p_slugs[$i]}.html</id>
+    <published>${p_date_strs[$i]}T00:00:00Z</published>
+    <updated>${p_date_strs[$i]}T00:00:00Z</updated>
+    <summary>${escaped_desc}</summary>
+    <author><name>Liam Chugg</name></author>
+    <category term=\"${p_tags[$i]}\" />
+  </entry>"
+done
+
+cat > "_site/atom.xml" << ENDFEED
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>MZHeader: Reverse Engineering Malware</title>
+  <subtitle>Malware analysis blog by Liam Chugg</subtitle>
+  <link href="https://mzheader.tech/" rel="alternate" />
+  <link href="https://mzheader.tech/atom.xml" rel="self" />
+  <id>https://mzheader.tech/</id>
+  <updated>${p_date_strs[1]}T00:00:00Z</updated>
+  <author><name>Liam Chugg</name></author>${feed_entries}
+</feed>
+ENDFEED
+echo "Built: atom.xml"
+
 # ── robots.txt ─────────────────────────────────────────────────────────────
 cat > "_site/robots.txt" << 'ENDROBOTS'
 User-agent: *
@@ -1596,7 +1663,10 @@ cat > "_site/404.html" << 'END404'
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 — MZHeader: Reverse Engineering Malware</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
   <script>
     // Redirect old Jekyll URLs (/posts/slug) to new ones (/posts/slug.html)
     var path = window.location.pathname.replace(/\/$/, '');
@@ -1605,17 +1675,37 @@ cat > "_site/404.html" << 'END404'
     }
   </script>
   <style>
-    body { background:#1e1e1e; color:#dcdcdc; font-family:"Fira Code","Consolas",monospace; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; flex-direction:column; gap:1rem; }
-    .code { color:#c62828; font-size:3rem; font-weight:700; }
-    .msg { color:#555; font-size:0.9rem; }
-    a { color:#8be9fd; text-decoration:none; }
-    a:hover { color:#50fa7b; }
+    body { background:#1e1e1e; color:#dcdcdc; font-family:"Fira Code","Consolas",monospace; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; flex-direction:column; gap:0; }
+    .pe-box { border:1px solid #2a2a3a; border-radius:6px; overflow:hidden; background:rgba(10,10,16,0.7); max-width:420px; width:90%; }
+    .pe-titlebar { display:flex; align-items:center; padding:0.4rem 0.75rem; background:#12121a; border-bottom:1px solid #2a2a3a; font-size:0.72rem; color:#666; gap:0.6rem; }
+    .pe-dots { display:flex; gap:5px; margin-right:0.3rem; }
+    .pe-dot { width:7px; height:7px; border-radius:50%; background:#555; }
+    .pe-dot.close { background:#c62828; box-shadow:0 0 4px rgba(198,40,40,0.5); }
+    .pe-body { padding:1.2rem 1rem; }
+    .code { color:#c62828; font-size:2.4rem; font-weight:700; text-shadow:0 0 8px rgba(198,40,40,0.4); margin-bottom:0.6rem; }
+    .msg { color:#777; font-size:0.82rem; margin-bottom:0.3rem; }
+    .detail { color:#4a4a6a; font-size:0.72rem; margin-bottom:1.2rem; }
+    a { color:#50fa7b; text-decoration:none; font-size:0.85rem; text-shadow:0 0 6px rgba(80,250,123,0.3); }
+    a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
   </style>
 </head>
 <body>
-  <div class="code">0x404</div>
-  <div class="msg">; address not found</div>
-  <a href="/">← cd ..</a>
+  <div class="pe-box">
+    <div class="pe-titlebar">
+      <div class="pe-dots">
+        <span class="pe-dot close"></span>
+        <span class="pe-dot"></span>
+        <span class="pe-dot"></span>
+      </div>
+      <span>pe-viewer &#8212; exception</span>
+    </div>
+    <div class="pe-body">
+      <div class="code">0x00000404</div>
+      <div class="msg">; STATUS_SECTION_NOT_FOUND</div>
+      <div class="detail">; the requested section does not exist in the PE header</div>
+      <a href="/">&larr; cd ..</a>
+    </div>
+  </div>
 </body>
 </html>
 END404
