@@ -1811,6 +1811,7 @@ ${posts_list_html}
     if (!trigger || !panel || !icon) return;
     trigger.addEventListener('click', function() {
       var open = panel.classList.toggle('open');
+      trigger.classList.toggle('open', open);
       icon.textContent = open ? '[-]' : '[+]';
       trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
