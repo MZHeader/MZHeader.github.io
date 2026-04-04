@@ -17,7 +17,7 @@ This directory within the game files contains several launchers that ultimately 
 
 The directory contains the following files:
 
-| Filename      | Purpose      |
+| Filename | Purpose |
 | ------------- | ------------- |
 | `piratefi.vbs` | Launches piratefi.bat |
 | `piratefi.bat` | Launches batch2.vbs |
@@ -33,7 +33,7 @@ Pirate.exe is an InnoSetup executable, the contents of which can be extracted wi
 ```
 ef Pirate.exe [| xt -j | d2p ]
 ```
-This  will produce three directories - data, embedded and meta.
+This will produce three directories - data, embedded and meta.
 
 `embedded/script.ps` is the PowerShell installer script. It's main purpose is to execute the binary dropped by the installer - `Howard.exe`.
 Before doing so, it builds the command `cmd.exe /C tasklist /FI "IMAGENAME eq <name>" /FO CSV /NH | find /I "<name>"` and searches for the following processes:
@@ -276,7 +276,7 @@ I was able to view all decrypted strings by setting a Watch window on the string
 ## Final Payload - Vidar Infostealer
 
 The final payload observed is Vidar Infostealer.
-Vidar is an infostealer malware  operating as malware-as-a-service that was first discovered in the wild in late 2018.
+Vidar is an infostealer malware operating as malware-as-a-service that was first discovered in the wild in late 2018.
 This sample has the capability to steal sensitive data from Chromium & Firefox browsers, Cryptocurrency wallets, Steam, Discord, Telegram, Files and Applications such as WinSCP & FileZilla.
 
 Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to the dead-drop C2 domains.

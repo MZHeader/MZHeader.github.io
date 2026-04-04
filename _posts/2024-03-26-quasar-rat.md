@@ -5,10 +5,10 @@ description: This post dissects a PowerShell loader used by Quasar RAT. It cover
 
 ## Inside Quasar RAT: Unpacking a Multi-Stage PowerShell Loader
 
-### 🧪 **Samples**  
-Password-protected malware samples used in this write-up are available for hands-on follow-along.  
+### 🧪 **Samples** 
+Password-protected malware samples used in this write-up are available for hands-on follow-along. 
 
-🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/Quasar_RAT)  
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/Quasar_RAT) 
 🔑 **Password:** `mzheader`
 
 ## 🔍 **Analysis**

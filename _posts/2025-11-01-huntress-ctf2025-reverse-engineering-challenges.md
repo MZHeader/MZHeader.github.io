@@ -91,7 +91,7 @@ A few instructions into this function, data gets moved to RDX, and the length of
 
 <img width="626" height="94" alt="image" src="https://github.com/user-attachments/assets/12c78e24-d558-4171-86fa-1fdb090db1fe" />
 
-Jump over this instruction in a debugger and  right click the RDX register > Follow in dump to see the data
+Jump over this instruction in a debugger and right click the RDX register > Follow in dump to see the data
 
 <img width="622" height="62" alt="image" src="https://github.com/user-attachments/assets/5dd9c3e4-81e6-4f69-bdda-4a9641f908dd" />
 

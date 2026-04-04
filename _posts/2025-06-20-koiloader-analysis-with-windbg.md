@@ -5,10 +5,10 @@ description: KoiLoader and its companion KoiStealer are known for complex memory
 
 ## Analyzing KoiLoader: WinDbg‑Driven Reverse Engineering of a Multi‑Stage Malware Loader
 
-### 🧪 **Samples**  
-Password-protected malware samples used in this write-up are available for hands-on follow-along.  
+### 🧪 **Samples** 
+Password-protected malware samples used in this write-up are available for hands-on follow-along. 
 
-🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/KoiStealer)  
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/KoiStealer) 
 🔑 **Password:** `mzheader`
 
 ## 🔍 **Analysis**
@@ -150,7 +150,7 @@ Stepping through the program, I can see that the following instruction pushes my
 
 <img width="900" alt="image" src="https://github.com/user-attachments/assets/a23bba20-e433-45f4-8d85-a0ceab657dbb" />
 
-After passing the `test    eax, eax` instruction, my Zero Flag is changed to 0 (Visible in the Registers View)
+After passing the `test eax, eax` instruction, my Zero Flag is changed to 0 (Visible in the Registers View)
 
 <img width="550" alt="image" src="https://github.com/user-attachments/assets/2dec2267-1dbb-4192-8e2a-e00c4cf202c0" />
 
@@ -612,7 +612,7 @@ C:\Users\mzheader\Desktop\ConfuserEx-Unpacker-master\ConfuserEx Dynamic Unpacker
 
 Instantly, we can see the two arguments being passed from the previous web request
 
-(buildID = `ezzcAvVW` and URL =  `hxxp[://]45.129.199[.]204/index.php`)
+(buildID = `ezzcAvVW` and URL = `hxxp[://]45.129.199[.]204/index.php`)
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca)
 

@@ -5,10 +5,10 @@ description: UPATRE is a lightweight downloader that spreads across systems by r
 
 ## UPATRE Downloader: Replication, Decryption, and Execution
 
-### 🧪 **Samples**  
-Password-protected malware samples used in this write-up are available for hands-on follow-along.  
+### 🧪 **Samples** 
+Password-protected malware samples used in this write-up are available for hands-on follow-along. 
 
-🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/UPATRE_Downloader)  
+🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/UPATRE_Downloader) 
 🔑 **Password:** `mzheader`
 
 ## 🔍 **Analysis**
