@@ -9,7 +9,7 @@ description: This post dissects a PowerShell loader used by Quasar RAT. It cover
 Password-protected malware samples used in this write-up are available for hands-on follow-along.  
 
 🔗 [View Samples](https://github.com/MZHeader/MZHeader.github.io/tree/main/samples/Quasar_RAT)  
-🔑 **Password:** 'mzheader'
+🔑 **Password:** `mzheader`
 
 ## 🔍 **Analysis**
 Quasar RAT is a malware family written in .NET which is used by a variety of attackers, as it's fully functional and open source.
@@ -321,7 +321,7 @@ This will make our analysis a lot more difficult.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
 
-To overcome this, we can use a tool like De4Dot, which identifies and "cleans" obfuscated .NET binaries. This tool can be downloaded from [here](https://github.com/de4dot/de4dot)
+To overcome this, we can use a tool like [De4Dot](https://github.com/de4dot/de4dot), which identifies and "cleans" obfuscated .NET binaries.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/40b9706a-1afc-4417-bcfe-c2089f0bfd04)
 
@@ -345,7 +345,7 @@ As well as the method which is used to decrypt and obtain the data.
 
 **Static Decrypting**
 
-GClass0.smethod_0 is composed of the following:
+`GClass0.smethod_0` is composed of the following:
 ```csharp
 	public static bool smethod_0()
 	{
@@ -365,29 +365,29 @@ GClass0.smethod_0 is composed of the following:
 		GClass0.smethod_1();
 		return true;
 ```
-Firstly, the value of string_9 is being passed to GClass30.smethod_0.
+Firstly, the value of string_9 is being passed to `GClass30.smethod_0`.
 
-We can see the contents of string_9 among the other configuration information:
+We can see the contents of `string_9` among the other configuration information:
 
 ```chsarp
 string_9 = "QzXTNaNU0qNKGByM57rH";
 ```
 
-Following GClass.smethod_0, we can see that the value QzXTNaNU0qNKGByM57rH is being passed as a key, and has some operations applied to it.
+Following `GClass.smethod_0`, we can see that the value `QzXTNaNU0qNKGByM57rH` is being passed as a key, and has some operations applied to it.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/852a3607-8303-42c9-a7dd-a6ec2af05546)
 
-Following Rfc2898DeriveBytes, we can see that the strings are named password, salt, and iterations, as well as the SHA1 hashing algorithm.
+Following `Rfc2898DeriveBytes`, we can see that the strings are named password, salt, and iterations, as well as the SHA1 hashing algorithm.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fe61ec3-64a2-4c6e-ab56-1d2a5e1d85fb)
 
-A SHA1 sum is being calculated from the value of key/password (QzXTNaNU0qNKGByM57rH), plus a salt, with 50000 iterations.
+A SHA1 sum is being calculated from the value of key/password (`QzXTNaNU0qNKGByM57rH`), plus a salt, with 50000 iterations.
 
-We can find the salt by following GClass30.byte2
+We can find the salt by following `GClass30.byte2`.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/22eb8275-ac85-4e0a-8a1a-d146acacc313)
 
-The result of this is the key to be used for AES decryption, evident from the use of GClass.byte0:
+The result of this is the key to be used for AES decryption, evident from the use of `GClass.byte0`:
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b86c5b66-d8ba-452a-81e6-84a0ced14659)
 
@@ -414,7 +414,7 @@ The remaining bytes after the first 48 are our input which we are trying to decr
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fd07aebb-f26e-4c55-be11-0ed23c0d9be9)
 
-From the encrypted segment we took, we have managed to get the C2 for this RAT: **nathwood23.mysynology[.]net:6750**
+From the encrypted segment we took, we have managed to get the C2 for this RAT: `nathwood23.mysynology[.]net:6750`
 
 **Decrypting by Debugging**
 
