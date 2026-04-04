@@ -150,7 +150,7 @@ for i in $(seq 1 $total_posts); do
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${title} — Reverse Engineering Malware</title>
+  <title>${title} — MZHeader: Reverse Engineering Malware</title>
   <meta name="description" content="${description}" />
   <meta name="author" content="Liam Chugg" />
   <link rel="canonical" href="https://mzheader.tech/posts/${slug}.html" />
@@ -530,7 +530,7 @@ cat > "_site/index.html" << ENDINDEX
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reverse Engineering Malware</title>
+  <title>MZHeader: Reverse Engineering Malware</title>
   <meta name="description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   <meta name="author" content="Liam Chugg" />
   <link rel="canonical" href="https://mzheader.tech/" />
@@ -1215,7 +1215,7 @@ cat > "_site/404.html" << 'END404'
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>404 — Reverse Engineering Malware</title>
+  <title>404 — MZHeader: Reverse Engineering Malware</title>
   <script>
     // Redirect old Jekyll URLs (/posts/slug) to new ones (/posts/slug.html)
     var path = window.location.pathname.replace(/\/$/, '');
