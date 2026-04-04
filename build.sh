@@ -55,6 +55,16 @@ SHARED_CSS='
     .post-meta { color: #888; font-size: 0.85rem; margin-bottom: 2rem; }
 '
 
+GA_HEAD='
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-48M02RY99Q"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-48M02RY99Q");
+  </script>
+'
+
 HLJS_HEAD='
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -150,6 +160,7 @@ for i in $(seq 1 $total_posts); do
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
+  ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
