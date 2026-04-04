@@ -1455,7 +1455,7 @@ cat > "_site/index.html" << ENDINDEX
       background: rgba(0, 0, 0, 0.2);
     }
     .about-expanded.open {
-      max-height: 25rem;
+      max-height: 30rem;
     }
     .about-expanded .pe-disasm-row {
       background: transparent;
@@ -1542,31 +1542,7 @@ cat > "_site/index.html" << ENDINDEX
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0014</span>
-          <span class="pe-comment">; Hey! I&apos;m Liam, a Security Researcher at CrowdStrike.</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:0018</span>
-          <span class="pe-comment">; I originally started this blog while working as a security</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:001C</span>
-          <span class="pe-comment">; analyst, mainly as a way to get into reverse engineering</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:0020</span>
-          <span class="pe-comment">; and sharpen my skills. Over time it&apos;s grown into a place</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:0024</span>
-          <span class="pe-comment">; where I share things I find interesting, from challenges</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:0028</span>
-          <span class="pe-comment">; to random deep dives. Hoping to keep it growing with</span>
-        </div>
-        <div class="pe-disasm-row">
-          <span class="pe-gutter">.text:002C</span>
-          <span class="pe-comment">; even more cool stuff!</span>
+          <span class="pe-comment">; Hey! I&apos;m Liam, a Security Researcher at CrowdStrike. I originally started this blog while working as a security analyst, mainly as a way to get into reverse engineering and sharpen my skills. Over time it&apos;s grown into a place where I share things I find interesting, from challenges to random deep dives. Hoping to keep it growing with even more cool stuff!</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0030</span>
