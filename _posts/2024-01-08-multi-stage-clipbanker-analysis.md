@@ -66,11 +66,11 @@ Again, annoyingly long variable names, we can rename these just to make it a lit
 
 We can then work out parts of the script, simply by reversing the strings for the PowerShell part, and doing a From Hex operation on the later parts.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9838b0c5-600c-4c17-bab6-ef82d75c67a9)
+![deobfuscated JavaScript showing PowerShell command after string reversal and hex decode](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9838b0c5-600c-4c17-bab6-ef82d75c67a9)
 
 The Base64 element can be analysed by utilising the following Operators in CyberChef:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/de584242-bd66-4c9e-b305-39a9e120e00b)
+![CyberChef recipe decoding the base64 PowerShell command from the JavaScript loader](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/de584242-bd66-4c9e-b305-39a9e120e00b)
 
 Which reveals the following:
 
@@ -95,9 +95,9 @@ We can extract the contents of the first by downloading the image, running a str
 ```
 curl https[:]//uploaddeimagens[.]com[.]br/images/004/691/257/original/js.jpg?1702591609 -o test.txt | strings test.txt
 ```
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
+![strings output showing BASE64_START and BASE64_END flags in the downloaded image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7ae91d50-d7f6-42f1-8b17-eaf7dee97fdf)
+![base64 blob extracted between flag markers from the steganographic image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/7ae91d50-d7f6-42f1-8b17-eaf7dee97fdf)
 
 When decoding this from Base64 we are given an executable file.
 
@@ -111,14 +111,14 @@ The first executable appears to be a generic loader / malware deployment framewo
 
 Within the first line after the entry point, we can see the variable `LAbWJK` which is the name given to the 2nd executable, as it was given as an argument in the previous PowerShell command.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/74401b9a-3d72-4a46-8ecc-ccf43619ed47)
+![DNSpy showing LAbWJK variable holding the second payload filename passed as argument](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/74401b9a-3d72-4a46-8ecc-ccf43619ed47)
 
 Moving down, there are references to generic persistence mechanisms, which in this case, have not been enabled. 
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/071802e4-6b24-48e3-ad53-319043036be8)
+![DNSpy showing disabled persistence mechanism code in the loader](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/071802e4-6b24-48e3-ad53-319043036be8)
 
 Next, we can see more Base64 content being extracted from an image, reversed, and executed.
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe9c374a-5c80-4d55-870e-77a7635ef61f)
+![DNSpy showing code to extract reversed base64 from a remote image URL](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fe9c374a-5c80-4d55-870e-77a7635ef61f)
 
 After reversing the string, downloading the image, reversing the base64 and decoding to an executable, we are presented with a binary whose sole purpose is to inject code.
 
@@ -137,21 +137,21 @@ private static readonly Class1.Delegate0 delegate0_0 = Class1.smethod_0<Class1.D
 
 Following this, we can see that `LAbWJK` - our 2nd executable - is being injected into `RegAsm.exe`.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/11a435b8-b82e-4d19-b4a0-7f91dcea8088)
+![DNSpy showing process hollowing of RegAsm.exe with LAbWJK payload](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/11a435b8-b82e-4d19-b4a0-7f91dcea8088)
 
 The 2nd executable is our main payload, which is ClipBanker Malware.
 
 Below we can see the main functionality, which is to monitor the victims clipboard, and when conditions are met, replace it with one of the attacker's wallet addresses.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b18fdb28-f3e3-4cee-9101-aeab63a9e315)
+![DNSpy showing clipboard monitoring and wallet address replacement logic in ClipBanker](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b18fdb28-f3e3-4cee-9101-aeab63a9e315)
 
 Here are the references to the attacker's wallet addresses:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3313d627-d9db-4b98-b3b2-0be9cfac69bf)
+![DNSpy showing hardcoded attacker cryptocurrency wallet addresses in ClipBanker](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3313d627-d9db-4b98-b3b2-0be9cfac69bf)
 
 It doesn't look like it's been too successful so far!
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8892fc96-43d7-4453-b914-7bd92abc9536)
+![blockchain explorer showing no transactions to attacker wallet addresses](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8892fc96-43d7-4453-b914-7bd92abc9536)
 
 ## IOCs
 

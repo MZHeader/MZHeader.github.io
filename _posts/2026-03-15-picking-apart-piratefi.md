@@ -11,7 +11,7 @@ The game was taken down from the Steam marketplace, but the change history can b
 
 Upon review, **Changelist #27351505** caught my eye due to the following line, showing a heavily embedded vbs script being added:
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
+![SteamDB changelist 27351505 showing embedded VBS script added to PirateFi game files](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/2026-03-15%2013_30_44-Desktop%20-%20File%20Explorer.png)
 
 This directory within the game files contains several launchers that ultimately execute Pirate.exe.
 
@@ -53,18 +53,18 @@ If any of these processes are found, the installer Sleeps for 193 seconds before
 
 I found Howard.exe quite difficult to analyse, but got lucky by setting a breakpoint on VirtualAlloc and identifying an indirect call to the API.
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
+![WinDbg breakpoint on VirtualAlloc indirect call in Howard.exe at return address 02BA0000](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Untitled%203.png)
 
 The return address of the VirtualAlloc call in this case was `02BA0000` - our memory region where a buffer of memory is to be written to.
 
 Setting a memory write breakpoint on this address, we identify a loop where a payload is being written:
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.25.07.png)
+![WinDbg memory write breakpoint at 02BA0000 showing payload being written in a loop](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.25.07.png)
 
 We can see the full buffer by resuming execution to when the loop completes.
 Within the memory buffer are the magic bytes of a PE:
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.28.13.png)
+![WinDbg memory view showing MZ header magic bytes at start of allocated buffer in Howard.exe](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2014.28.13.png)
 
 To get the next payload, we'll dump this memory region to disk and carve the PE with the following Binary Refinery pipeline:
 
@@ -265,13 +265,13 @@ The decrypted resource is then passed to function `cJ7YglW56B` - which is respon
 
 I'm going to debug and set a breakpoint on `return array3;` so that I can review the decrypted & decompressed payloads being passed through this function.
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20175824.png)
+![DNSpy Locals window showing MZ header byte array 4D 5A in decrypted payload at return array3 breakpoint](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20175824.png)
 
 In the Locals window, we can see an array with an MZ header `4D 5A` - This is likely our next payload - we'll dump this to disk.
 
 I was able to view all decrypted strings by setting a Watch window on the string table as it was loaded:
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Hashtable3.png)
+![DNSpy Watch window showing decrypted Vidar string table loaded from hashtable at runtime](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Hashtable3.png)
 
 ## Final Payload - Vidar Infostealer
 
@@ -294,7 +294,7 @@ Stolen files are staged to `C:\ProgramData\<session_id>` before being POSTed to 
 
 There's a Web Archive hit from 14th Feb 2025 showing the configured Steam dead-drop C2: `95.216.180[.]186`
 
-![Image](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
+![Web Archive snapshot from Feb 2025 showing Vidar C2 IP 95.216.180.186 on Steam dead-drop profile](https://raw.githubusercontent.com/MZHeader/MZHeader.github.io/refs/heads/main/assets/Screenshot%202026-03-15%20at%2018.51.52.png)
 
 **Kill Switch**
 
