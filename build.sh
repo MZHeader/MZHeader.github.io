@@ -247,23 +247,16 @@ for i in $(seq 1 $total_posts); do
       flex: 1;
       max-width: 900px;
       padding: 2rem;
-      padding-top: calc(2rem + 44px);
     }
 
-    /* ── Fixed top nav ── */
+    /* ── Top nav ── */
     .post-nav {
-      position: fixed;
-      top: 0;
-      left: 230px;
-      right: 0;
-      z-index: 90;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.6rem 2rem;
-      background: rgba(19, 19, 26, 0.97);
+      margin-bottom: 2.5rem;
+      padding-bottom: 0.75rem;
       border-bottom: 1px solid #2a2a3a;
-      backdrop-filter: blur(6px);
     }
     .back-link {
       color: #50fa7b;
@@ -309,8 +302,8 @@ for i in $(seq 1 $total_posts); do
     @media (max-width: 900px) {
       body { display: block; }
       #rsrc-sidebar { display: none; }
-      #post-main { margin-left: 0; max-width: 100%; padding: 1rem; padding-top: calc(1rem + 44px); }
-      .post-nav { left: 0; padding: 0.6rem 1rem; }
+      #post-main { margin-left: 0; max-width: 100%; padding: 1rem; }
+      .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
       article h2:first-of-type { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
