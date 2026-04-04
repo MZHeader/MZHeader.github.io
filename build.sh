@@ -1204,19 +1204,21 @@ cat > "_site/index.html" << ENDINDEX
       transition: background 0.1s ease;
       cursor: pointer;
       user-select: none;
+      border-left: 2px solid #5625be;
     }
-    .about-trigger:hover { background: rgba(86, 37, 190, 0.06); }
-    .about-trigger .pe-comment { flex: 1; }
+    .about-trigger:hover { background: rgba(86, 37, 190, 0.10); }
+    .about-trigger .pe-comment { flex: 1; color: #8a8aaa; }
+    .about-trigger.open .pe-comment { color: #8be9fd; }
     .about-toggle {
-      color: #3a3a55;
+      color: #5625be;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.82rem;
-      transition: color 0.15s ease;
+      font-size: 0.75rem;
+      transition: color 0.15s ease, transform 0.25s ease;
       flex-shrink: 0;
       padding-top: 0.15em;
     }
-    .about-trigger:hover .about-toggle,
-    .about-toggle:hover { color: #8be9fd; }
+    .about-trigger:hover .about-toggle { color: #8be9fd; }
+    .about-trigger.open .about-toggle { color: #8be9fd; }
 
     .about-expanded {
       max-height: 0;
@@ -1274,8 +1276,8 @@ cat > "_site/index.html" << ENDINDEX
       </div>
       <div class="about-trigger" id="aboutTrigger" role="button" tabindex="0" aria-expanded="false">
         <span class="pe-gutter">.text:000C</span>
-        <span class="pe-comment">; &rarr; about me</span>
-        <span class="about-toggle" id="aboutToggleIcon">[+]</span>
+        <span class="pe-comment">; &rarr; more about me</span>
+        <span class="about-toggle" id="aboutToggleIcon">&#x25BC;</span>
       </div>
       <div class="about-expanded" id="aboutPanel">
         <div class="pe-disasm-row">
@@ -1284,31 +1286,31 @@ cat > "_site/index.html" << ENDINDEX
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0014</span>
-          <span class="pe-comment">; Security Researcher at CrowdStrike, focused on malware</span>
+          <span class="pe-comment">; Hey! I&apos;m Liam, a Security Researcher at CrowdStrike.</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0018</span>
-          <span class="pe-comment">; reverse engineering and threat intelligence. My primary</span>
+          <span class="pe-comment">; I originally started this blog while working as a security</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:001C</span>
-          <span class="pe-comment">; tools are IDA Pro, WinDbg, and Binary Ninja &mdash; used daily</span>
+          <span class="pe-comment">; analyst, mainly as a way to get into reverse engineering</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0020</span>
-          <span class="pe-comment">; to tear apart commodity infostealers, RATs, loaders, and</span>
+          <span class="pe-comment">; and sharpen my skills. Over time it&apos;s grown into a place</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0024</span>
-          <span class="pe-comment">; whatever multi-stage nastiness lands on my desk. I also</span>
+          <span class="pe-comment">; where I share things I find interesting, from challenges</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0028</span>
-          <span class="pe-comment">; compete in CTF events (Huntress CTF) and write up anything</span>
+          <span class="pe-comment">; to random deep dives. Hoping to keep it growing with</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:002C</span>
-          <span class="pe-comment">; interesting so others can follow along with real samples.</span>
+          <span class="pe-comment">; even more cool stuff!</span>
         </div>
         <div class="pe-disasm-row">
           <span class="pe-gutter">.text:0030</span>
