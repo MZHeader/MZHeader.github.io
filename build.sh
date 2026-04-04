@@ -345,6 +345,35 @@ for i in $(seq 1 $total_posts); do
     }
     article { max-width: 100%; }
 
+    article table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+      border: 1px solid #2a2a3a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    article th {
+      background: #1a1a22;
+      color: #8be9fd;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 2px solid #5625be;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    article td {
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid #1e1e28;
+      color: #c8c8d8;
+      vertical-align: top;
+    }
+    article tr:last-child td { border-bottom: none; }
+    article tr:hover td { background: rgba(86, 37, 190, 0.07); }
+
     /* ── Sidebar toggle ── */
     #rsrc-sidebar {
       transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
