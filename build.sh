@@ -452,6 +452,11 @@ for i in $(seq 1 $total_posts); do
       color: #8be9fd;
       text-decoration: none;
     }
+    .toc-body li a:hover::before {
+      content: "jmp  ";
+      color: #e6db74;
+      font-size: 0.75rem;
+    }
     .toc-category {
       color: #5625be;
       font-size: 0.75rem;
