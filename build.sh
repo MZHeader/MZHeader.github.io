@@ -85,6 +85,9 @@ for post in $(ls _posts/*.md | sort -r); do
     slug="${filename:11}"
 
     formatted_date=$(date -d "$date_str" "+%b %-d, %Y" 2>/dev/null || date -j -f "%Y-%m-%d" "$date_str" "+%b %-d, %Y")
+    epoch=$(date -d "$date_str" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$date_str" +%s)
+    hex_ts=$(printf '0x%08X' "$epoch")
+    short_date=$(date -d "$date_str" "+%-d %b %Y" 2>/dev/null || date -j -f "%Y-%m-%d" "$date_str" "+%-d %b %Y")
     description=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^description:/{sub(/^description: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     tags=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^tags:/{sub(/^tags: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     [ -z "$tags" ] && tags="Analysis"
@@ -126,7 +129,7 @@ for post in $(ls _posts/*.md | sort -r); do
         <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
         <span class=\"rsrc-title-block\">
           <span class=\"rsrc-title\">${title}</span>
-          <span class=\"rsrc-meta\">; ${date_str} &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${badge_class}\">${tags}</span></span>
+          <span class=\"rsrc-meta\">; TimeDateStamp: ${hex_ts} (${short_date}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${badge_class}\">${tags}</span></span>
         </span>
       </a>"
 done
