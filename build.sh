@@ -506,6 +506,7 @@ cat > "_site/index.html" << ENDINDEX
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Reverse Engineering Malware" />
   <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
+  ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
