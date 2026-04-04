@@ -313,6 +313,7 @@ for i in $(seq 1 $total_posts); do
     #post-main {
       margin-left: 230px;
       flex: 1;
+      min-width: 0;
       padding: 2rem;
     }
     .post-nav, article, .post-pagination {
