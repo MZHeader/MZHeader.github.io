@@ -1204,6 +1204,13 @@ cat > "_site/index.html" << ENDINDEX
       text-overflow: ellipsis;
       line-height: 1.5;
     }
+    .rsrc-post-row:hover .rsrc-title::before {
+      content: "call  ";
+      color: #e6db74;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      font-weight: normal;
+    }
     .rsrc-post-row:hover .rsrc-title {
       color: #8be9fd;
       text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
