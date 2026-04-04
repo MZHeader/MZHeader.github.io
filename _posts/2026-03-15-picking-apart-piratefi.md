@@ -312,4 +312,4 @@ After reading the C2 response via InternetReadFile, the very next thing the malw
  0x40338E call  ds:ExitProcess   ; instant termination
 ```
 
-The threat actor responsible for this malware as well as malware embedded in other titles is currently under investigation by the FBI. Additionally, the FBI are seeking victim information - https://forms.fbi.gov/victims/Steam_Malware
+The threat actor responsible for this malware as well as malware embedded in other titles is currently under investigation by the FBI. Additionally, the FBI are seeking victim information - [FBI Victim Report Form](https://forms.fbi.gov/victims/Steam_Malware)
