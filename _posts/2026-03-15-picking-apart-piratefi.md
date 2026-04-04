@@ -300,7 +300,7 @@ There's a Web Archive hit from 14th Feb 2025 showing the configureed Steam dead-
 
 After reading the C2 response via InternetReadFile, the very next thing the malware does is compare it against the string `block`:
 
-```
+```asm
  0x4032B4 call  sub_40D9F0     ; resolve response string pointer
  0x4032B9 push  offset aBlock    ; push “block” to the stack
  0x4032BE push  eax         ; push response string to the stack
