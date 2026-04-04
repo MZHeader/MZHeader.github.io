@@ -387,6 +387,78 @@ for i in $(seq 1 $total_posts); do
       letter-spacing: 0.03em;
     }
 
+    /* ── Table of contents ── */
+    .toc {
+      margin: 1.5rem 0;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
+      overflow: hidden;
+      font-family: "Fira Code", "Consolas", monospace;
+      background: rgba(10, 10, 16, 0.5);
+    }
+    .toc-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1rem;
+      cursor: pointer;
+      user-select: none;
+      background: #161620;
+      transition: background 0.1s;
+    }
+    .toc-trigger:hover { background: rgba(86, 37, 190, 0.1); }
+    .toc-label {
+      font-size: 0.82rem;
+      color: #8be9fd;
+      font-weight: 600;
+    }
+    .toc-toggle {
+      color: #5625be;
+      font-size: 0.75rem;
+      transition: color 0.15s;
+    }
+    .toc-trigger:hover .toc-toggle { color: #8be9fd; }
+    .toc-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .toc-body.open {
+      max-height: 80rem;
+    }
+    .toc-body ul {
+      list-style: none;
+      margin: 0;
+      padding: 0.4rem 1rem 0.6rem;
+    }
+    .toc-body ul ul.toc-sublist {
+      padding: 0 0 0.3rem 1rem;
+    }
+    .toc-body li {
+      padding: 0.2rem 0;
+    }
+    .toc-body li a {
+      color: #999;
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.1s;
+    }
+    .toc-body li a:hover {
+      color: #8be9fd;
+      text-decoration: none;
+    }
+    .toc-category {
+      color: #5625be;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.15rem !important;
+    }
+    .toc-h3 { padding-left: 1rem !important; }
+    .toc-h3 a { font-size: 0.75rem !important; color: #777 !important; }
+    .toc-h3 a:hover { color: #8be9fd !important; }
+
     /* ── Article ── */
     article h1 {
       font-size: 1.9rem;
@@ -636,6 +708,57 @@ ${posts_list_html}
       <h1>${title}</h1>
 ENDHEADER
 
+    # ── Generate TOC ──
+    toc_html=""
+    # Flatten HTML to one line, split on closing h2/h3, extract level|id|text
+    headings=$(tr '\n' ' ' < "/tmp/mzbuild_${slug}.html" | sed 's/<\/h[23]>/\n/g' | sed 's/.*<h\([23]\) id="\([^"]*\)">/\1|\2|/' | grep '^[23]|' | sed 's/<[^>]*>//g' || true)
+
+    if [ -n "$headings" ]; then
+      heading_count=$(echo "$headings" | wc -l | tr -d ' ')
+
+      if [ "$heading_count" -ge 3 ]; then
+        if [ "$tags" = "CTF" ]; then
+          # ── CTF posts: group by category ──
+          toc_inner=""
+          current_cat=""
+          while IFS='|' read -r hlevel hid htxt; do
+            # Parse "ChallengeName | Category emoji | @Author" format
+            if echo "$htxt" | grep -q '|'; then
+              challenge=$(echo "$htxt" | awk -F'|' '{gsub(/^[ *]+|[ *]+$/, "", $1); print $1}')
+              cat_part=$(echo "$htxt" | awk -F'|' '{gsub(/^[ ]+|[ ]+$/, "", $2); print $2}' | sed 's/[^a-zA-Z ]//g' | sed 's/^ *//;s/ *$//')
+            else
+              challenge="$htxt"
+              cat_part=""
+            fi
+            if [ -n "$cat_part" ] && [ "$cat_part" != "$current_cat" ]; then
+              [ -n "$current_cat" ] && toc_inner+="</ul>"
+              current_cat="$cat_part"
+              toc_inner+="<li class=\"toc-category\">${current_cat}</li><ul class=\"toc-sublist\">"
+            fi
+            toc_inner+="<li><a href=\"#${hid}\">${challenge}</a></li>"
+          done <<< "$headings"
+          [ -n "$current_cat" ] && toc_inner+="</ul>"
+          toc_html="<nav class=\"toc\" id=\"toc\"><div class=\"toc-trigger\" id=\"tocTrigger\" role=\"button\" tabindex=\"0\"><span class=\"toc-label\">; table of contents</span><span class=\"toc-toggle\" id=\"tocToggle\">[+]</span></div><div class=\"toc-body\" id=\"tocBody\"><ul>${toc_inner}</ul></div></nav>"
+        else
+          # ── Regular posts: flat list from h2/h3 ──
+          toc_inner=""
+          while IFS='|' read -r hlevel hid htxt; do
+            if [ "$hlevel" = "3" ]; then
+              toc_inner+="<li class=\"toc-h3\"><a href=\"#${hid}\">${htxt}</a></li>"
+            else
+              toc_inner+="<li><a href=\"#${hid}\">${htxt}</a></li>"
+            fi
+          done <<< "$headings"
+          toc_html="<nav class=\"toc\" id=\"toc\"><div class=\"toc-trigger\" id=\"tocTrigger\" role=\"button\" tabindex=\"0\"><span class=\"toc-label\">; table of contents</span><span class=\"toc-toggle\" id=\"tocToggle\">[+]</span></div><div class=\"toc-body\" id=\"tocBody\"><ul>${toc_inner}</ul></div></nav>"
+        fi
+      fi
+    fi
+
+    # Write TOC if generated
+    if [ -n "$toc_html" ]; then
+      printf '%s' "$toc_html" >> "_site/posts/${slug}.html"
+    fi
+
     cat "/tmp/mzbuild_${slug}.html" >> "_site/posts/${slug}.html"
 
     cat >> "_site/posts/${slug}.html" << ENDFOOTER
@@ -688,6 +811,20 @@ ENDHEADER
       var next = !isCollapsed;
       localStorage.setItem("rsrc-sidebar-collapsed", next ? "1" : "0");
       applyCollapsed(next);
+    });
+  }
+
+  // ── TOC toggle ──
+  var tocTrigger = document.getElementById("tocTrigger");
+  var tocBody = document.getElementById("tocBody");
+  var tocToggle = document.getElementById("tocToggle");
+  if (tocTrigger && tocBody && tocToggle) {
+    tocTrigger.addEventListener("click", function() {
+      var open = tocBody.classList.toggle("open");
+      tocToggle.textContent = open ? "[-]" : "[+]";
+    });
+    tocTrigger.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tocTrigger.click(); }
     });
   }
 
