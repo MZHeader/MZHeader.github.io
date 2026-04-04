@@ -606,6 +606,40 @@ cat > "_site/index.html" << ENDINDEX
     <div class="pe-section-body">
 ${posts_list_html}
     </div>
+
+    <!-- Section divider -->
+    <div class="pe-section-divider">
+      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00002000</span>
+    </div>
+
+    <!-- .lnkin section -->
+    <div class="pe-section-toolbar">
+      <span class="pe-section-name">.lnkin</span>
+      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO</span>
+    </div>
+    <div class="pe-section-body">
+      <a class="rsrc-post-row" href="https://www.linkedin.com/in/liam-chugg/" target="_blank" rel="noopener noreferrer">
+        <span class="rsrc-gutter">.lnkin:0000</span>
+        <span class="rsrc-title">linkedin.com/in/liam-chugg</span>
+      </a>
+    </div>
+
+    <!-- Section divider -->
+    <div class="pe-section-divider">
+      <span class="pe-section-divider-label">SECTION_BOUNDARY 0x00003000</span>
+    </div>
+
+    <!-- .gthb section -->
+    <div class="pe-section-toolbar">
+      <span class="pe-section-name">.gthb</span>
+      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO</span>
+    </div>
+    <div class="pe-section-body">
+      <a class="rsrc-post-row" href="https://github.com/MZHeader" target="_blank" rel="noopener noreferrer">
+        <span class="rsrc-gutter">.gthb:0000</span>
+        <span class="rsrc-title">github.com/MZHeader</span>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -703,11 +737,6 @@ ${posts_list_html}
   })();
 </script>
 
-<footer style="margin-top:2rem; text-align:center; font-family:'Fira Code','Consolas',monospace; font-size:0.82rem; color:#3a3a55;">
-  <a href="https://www.linkedin.com/in/liam-chugg/" target="_blank" style="color:#8be9fd; text-decoration:none; margin: 0 1rem;">LinkedIn</a>
-  <span style="color:#252535;">|</span>
-  <a href="https://github.com/MZHeader" target="_blank" style="color:#8be9fd; text-decoration:none; margin: 0 1rem;">GitHub</a>
-</footer>
 
 </body>
 </html>
