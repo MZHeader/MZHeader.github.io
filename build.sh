@@ -1296,6 +1296,23 @@ ${posts_list_html}
         <span class="rsrc-title">github.com/MZHeader</span>
       </a>
     </div>
+
+    <!-- Section divider -->
+    <div class="pe-section-divider">
+      <span class="pe-section-divider-label">Section[4]&nbsp;&nbsp;.xcom&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00008000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
+    </div>
+
+    <!-- .xcom section -->
+    <div class="pe-section-toolbar">
+      <span class="pe-section-name">.xcom</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
+    </div>
+    <div class="pe-section-body">
+      <a class="rsrc-post-row" href="https://x.com/Chuggx00" target="_blank" rel="noopener noreferrer">
+        <span class="rsrc-gutter">.xcom:0000</span>
+        <span class="rsrc-title">x.com/Chuggx00</span>
+      </a>
+    </div>
   </div>
   </div>
 </header>
