@@ -541,7 +541,7 @@ cat > "_site/index.html" << ENDINDEX
     .site-title {
       font-size: 2rem;
       font-family: "Fira Code", "Consolas", monospace;
-      margin-bottom: 0;
+      margin-bottom: 0.8rem;
       position: relative;
       display: inline-block;
     }
@@ -611,16 +611,67 @@ cat > "_site/index.html" << ENDINDEX
     }
     .magnifier-content .title-malware { animation: none; }
 
-    /* Unified PE viewer container */
-    .pe-viewer {
-      text-align: left;
-      margin: 2rem auto 0;
+    /* PE window wrapper — unified container for titlebar + viewer */
+    .pe-window {
       max-width: 900px;
-      font-family: "Fira Code", "Consolas", monospace;
+      margin: 0 auto;
       border: 1px solid #2a2a3a;
       border-radius: 6px;
       overflow: hidden;
       background: rgba(10, 10, 16, 0.7);
+    }
+
+    /* Window titlebar */
+    .pe-window-titlebar {
+      display: flex;
+      align-items: center;
+      padding: 0.4rem 0.75rem;
+      background: #12121a;
+      border-bottom: 1px solid #2a2a3a;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      color: #555;
+      gap: 0.6rem;
+      user-select: none;
+    }
+    .pe-window-dots {
+      display: flex;
+      gap: 5px;
+      margin-right: 0.3rem;
+      flex-shrink: 0;
+    }
+    .pe-window-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .pe-window-dot.dot-close { background: #c62828; box-shadow: 0 0 4px rgba(198,40,40,0.5); }
+    .pe-window-dot.dot-min { background: #555; }
+    .pe-window-dot.dot-max { background: #555; }
+    .pe-window-titlebar .window-title {
+      color: #888;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pe-window-titlebar .window-title .wt-app { color: #5625be; }
+    .pe-window-titlebar .window-title .wt-sep { color: #333; margin: 0 0.3em; }
+    .pe-window-titlebar .window-title .wt-file { color: #c62828; }
+    .pe-window-titlebar .window-title .wt-path { color: #555; }
+    .pe-window-titlebar .window-spacer { flex: 1; }
+    .pe-window-titlebar .window-tag {
+      color: #50fa7b;
+      opacity: 0.55;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Unified PE viewer container */
+    .pe-viewer {
+      text-align: left;
+      font-family: "Fira Code", "Consolas", monospace;
     }
 
     /* Shared toolbar (used by both .text and .rsrc) */
@@ -910,6 +961,8 @@ cat > "_site/index.html" << ENDINDEX
       .pe-gutter { display: none; }
       .rsrc-post-row .rsrc-gutter { display: none; }
       .rsrc-post-row .rsrc-title { white-space: normal; }
+      .pe-window-titlebar .wt-path { display: none; }
+      .pe-window-titlebar .window-tag { display: none; }
     }
 
   </style>
@@ -920,6 +973,17 @@ cat > "_site/index.html" << ENDINDEX
   <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
   <div class="magnifier" id="magnifier"></div>
 
+  <div class="pe-window">
+    <div class="pe-window-titlebar">
+      <div class="pe-window-dots">
+        <span class="pe-window-dot dot-close"></span>
+        <span class="pe-window-dot dot-min"></span>
+        <span class="pe-window-dot dot-max"></span>
+      </div>
+      <span class="window-title"><span class="wt-app">pe-viewer</span><span class="wt-sep">&#8212;</span><span class="wt-path">C:\Samples\</span><span class="wt-file">unknown.exe</span></span>
+      <span class="window-spacer"></span>
+      <span class="window-tag">reverse engineering / malware</span>
+    </div>
   <div class="pe-viewer">
     <!-- .text section -->
     <div class="pe-section-toolbar">
@@ -995,6 +1059,7 @@ ${posts_list_html}
         <span class="rsrc-title">github.com/MZHeader</span>
       </a>
     </div>
+  </div>
   </div>
 </header>
 
