@@ -94,7 +94,7 @@ for post in $(ls _posts/*.md | sort -r); do
     [ -z "$title" ] && title="$slug"
 
     case "$tags" in
-      RATs)        badge_class="rsrc-badge--rats" ;;
+      RAT)         badge_class="rsrc-badge--rats" ;;
       InfoStealer) badge_class="rsrc-badge--infostealer" ;;
       CTF)         badge_class="rsrc-badge--ctf" ;;
       Loader)      badge_class="rsrc-badge--loader" ;;
@@ -1195,11 +1195,10 @@ cat > "_site/index.html" << ENDINDEX
       <div class="filter-bar" id="filterBar">
         <span class="filter-bar-label">; filter:</span>
         <button class="filter-btn active" data-cat="all">ALL</button>
-        <button class="filter-btn" data-cat="trojan">Trojan</button>
+        
         <button class="filter-btn" data-cat="infostealer">InfoStealer</button>
-        <button class="filter-btn" data-cat="rats">RATs</button>
+        <button class="filter-btn" data-cat="rats">RAT</button>
         <button class="filter-btn" data-cat="loader">Loader</button>
-        <button class="filter-btn" data-cat="downloader">Downloader</button>
         <button class="filter-btn" data-cat="ctf">CTF</button>
       </div>
       <div id="postsList">
