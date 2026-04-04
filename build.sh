@@ -142,6 +142,7 @@ for i in $(seq 1 $total_posts); do
     title="${p_titles[$i]}"
     formatted_date="${p_dates[$i]}"
     date_str="${p_date_strs[$i]}"
+    description="${p_descs[$i]}"
 
     cat > "_site/posts/${slug}.html" << ENDHEADER
 <!DOCTYPE html>
