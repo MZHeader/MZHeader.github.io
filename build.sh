@@ -45,7 +45,7 @@ SHARED_CSS='
       font-size: 0.9em;
       border: 1px solid rgba(86, 37, 190, 0.4);
     }
-    img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #3a3a4a; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); }
+    img { max-width: 100%; height: auto; border-radius: 6px; }
     hr { border: none; border-top: 1px solid #2a2a3a; margin: 2rem 0; }
     .back-link {
       display: inline-block;
@@ -384,7 +384,6 @@ for i in $(seq 1 $total_posts); do
       margin-top: 1.5rem;
     }
     article { max-width: 100%; }
-    article img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #3a3a4a; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4); }
     article p { color: #b8b8c8; line-height: 1.75; }
     article li { color: #b8b8c8; line-height: 1.75; }
     article strong { color: #dcdcdc; }
