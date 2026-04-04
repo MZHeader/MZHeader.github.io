@@ -1,4 +1,5 @@
 ---
+tags: Downloader
 description: UPATRE is a lightweight downloader that spreads across systems by replicating itself and removing its original dropper. Our analysis focused on its XOR-based decryption and decompression routines, uncovering how it retrieves and executes second-stage payloads.
 ---
 

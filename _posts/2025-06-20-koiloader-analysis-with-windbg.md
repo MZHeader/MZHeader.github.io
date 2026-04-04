@@ -1,4 +1,5 @@
 ---
+tags: InfoStealer
 description: KoiLoader and its companion KoiStealer are known for complex memory unpacking and anti-VM protections. Using WinDbg, we traced its execution, bypassed its anti-analysis checks, and documented the exact mechanisms it uses to retrieve and execute its payload.
 ---
 

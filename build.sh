@@ -65,7 +65,7 @@ posts_list_html=""
 post_data_js=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -76,14 +76,28 @@ for post in $(ls _posts/*.md | sort -r); do
 
     formatted_date=$(date -d "$date_str" "+%b %-d, %Y" 2>/dev/null || date -j -f "%Y-%m-%d" "$date_str" "+%b %-d, %Y")
     description=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^description:/{sub(/^description: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
+    tags=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^tags:/{sub(/^tags: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
+    [ -z "$tags" ] && tags="Analysis"
     title=$(grep "^## " "$post" | head -1 | sed 's/^## //')
     [ -z "$title" ] && title="$slug"
+
+    case "$tags" in
+      RATs)        badge_class="rsrc-badge--rats" ;;
+      InfoStealer) badge_class="rsrc-badge--infostealer" ;;
+      CTF)         badge_class="rsrc-badge--ctf" ;;
+      Loader)      badge_class="rsrc-badge--loader" ;;
+      Downloader)  badge_class="rsrc-badge--downloader" ;;
+      Trojan)      badge_class="rsrc-badge--trojan" ;;
+      *)           badge_class="rsrc-badge--analysis" ;;
+    esac
 
     p_slugs[$post_idx]="$slug"
     p_titles[$post_idx]="$title"
     p_dates[$post_idx]="$formatted_date"
     p_date_strs[$post_idx]="$date_str"
     p_descs[$post_idx]="$description"
+    p_tags[$post_idx]="$tags"
+    p_badge_classes[$post_idx]="$badge_class"
 
     pandoc "$post" \
         --from markdown+yaml_metadata_block-implicit_figures \
@@ -100,7 +114,10 @@ for post in $(ls _posts/*.md | sort -r); do
     posts_list_html+="
       <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
         <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
-        <span class=\"rsrc-title\">${title}</span>
+        <span class=\"rsrc-title-block\">
+          <span class=\"rsrc-title\">${title}</span>
+          <span class=\"rsrc-meta\">; ${date_str} &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${badge_class}\">${tags}</span></span>
+        </span>
       </a>"
 done
 
@@ -658,8 +675,8 @@ cat > "_site/index.html" << ENDINDEX
     /* .rsrc post rows */
     .rsrc-post-row {
       display: flex;
-      align-items: baseline;
-      padding: 0.5rem 1rem;
+      align-items: flex-start;
+      padding: 0.55rem 1rem;
       line-height: 1.7;
       cursor: pointer;
       text-decoration: none;
@@ -677,21 +694,54 @@ cat > "_site/index.html" << ENDINDEX
       color: #3a3a55;
       font-size: 0.82rem;
       user-select: none;
+      padding-top: 0.15rem;
     }
     .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
+    .rsrc-title-block {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
     .rsrc-post-row .rsrc-title {
-      color: #c0c0c0;
+      color: #e8e8e8;
       font-family: "Segoe UI", "Roboto", sans-serif;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.5;
     }
     .rsrc-post-row:hover .rsrc-title {
       color: #8be9fd;
-      text-shadow: 0 0 8px rgba(255, 121, 198, 0.3);
+      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
     }
+    .rsrc-meta {
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.74rem;
+      color: #555570;
+      letter-spacing: 0.01em;
+      line-height: 1.4;
+    }
+    .rsrc-post-row:hover .rsrc-meta { color: #6e6e90; }
+    .rsrc-badge {
+      display: inline-block;
+      padding: 0.05em 0.45em;
+      border-radius: 2px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      line-height: 1.5;
+    }
+    .rsrc-badge--trojan      { color: #c62828; background: rgba(198, 40,  40,  0.10); }
+    .rsrc-badge--infostealer { color: #8be9fd; background: rgba(139, 233, 253, 0.08); }
+    .rsrc-badge--downloader  { color: #50fa7b; background: rgba( 80, 250, 123, 0.08); }
+    .rsrc-badge--loader      { color: #50fa7b; background: rgba( 80, 250, 123, 0.08); }
+    .rsrc-badge--rats        { color: #bd93f9; background: rgba(189, 147, 249, 0.10); }
+    .rsrc-badge--ctf         { color: #ffb86c; background: rgba(255, 184, 108, 0.10); }
+    .rsrc-badge--analysis    { color: #8a8aaa; background: rgba(138, 138, 170, 0.08); }
 
     /* Right detail panel */
     .pe-detail-panel {
