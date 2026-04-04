@@ -867,6 +867,11 @@ cat > "_site/index.html" << ENDINDEX
       .pe-detail-panel { display: none; }
     }
 
+    /* Hide detail panel on touch/non-hover devices — overrides .active { display: block } */
+    @media (hover: none) {
+      .pe-detail-panel { display: none !important; }
+    }
+
     .status-bar {
       position: fixed;
       bottom: 0;
