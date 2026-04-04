@@ -1011,11 +1011,11 @@ cat > "_site/index.html" << ENDINDEX
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0004</span>
-        <span class="pe-comment">; I enjoy picking apart malware &mdash; everything here is reproducible if you want to follow along</span>
+        <span class="pe-comment">; I enjoy picking apart malware, everything here is reproducible if you want to follow along</span>
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:0008</span>
-        <span class="pe-comment">; focus: unpacking &middot; deobfuscation &middot; disassembly &middot; memory forensics &middot; freely available tools</span>
+        <span class="pe-comment">; Focus: unpacking &middot; deobfuscation &middot; disassembly &middot; memory forensics &middot; freely available tools</span>
       </div>
       <div class="pe-disasm-row">
         <span class="pe-gutter">.text:000C</span>
