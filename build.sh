@@ -85,6 +85,7 @@ HLJS_HEAD='
 
 posts_list_html=""
 post_data_js=""
+itemlist_json=""
 post_idx=0
 
 declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts
@@ -148,6 +149,18 @@ for post in $(ls _posts/*.md | sort -r); do
 
     post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}',readTime:'${read_time} min read'};"
 
+    # Build ItemList entry for homepage structured data
+    il_title=$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    il_desc=$(printf '%s' "$description" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    [ -n "$itemlist_json" ] && itemlist_json+=","
+    itemlist_json+="
+      {
+        \"@type\": \"ListItem\",
+        \"position\": ${post_idx},
+        \"url\": \"https://mzheader.tech/posts/${slug}.html\",
+        \"name\": \"${il_title}\"
+      }"
+
     posts_list_html+="
       <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
         <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
@@ -171,6 +184,10 @@ for i in $(seq 1 $total_posts); do
     word_count="${p_word_counts[$i]}"
     tags="${p_tags[$i]}"
     short_title="${title%%:*}"
+
+    # JSON-escape title and description for structured data
+    json_title=$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    json_desc=$(printf '%s' "$description" | sed 's/\\/\\\\/g; s/"/\\"/g')
 
     # Prev = newer post (lower index), Next = older post (higher index)
     prev_html=""
@@ -566,8 +583,8 @@ for i in $(seq 1 $total_posts); do
   {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": "${title}",
-    "description": "${description}",
+    "headline": "${json_title}",
+    "description": "${json_desc}",
     "datePublished": "${date_str}",
     "dateModified": "${date_str}",
     "author": {
@@ -581,6 +598,7 @@ for i in $(seq 1 $total_posts); do
     },
     "url": "https://mzheader.tech/posts/${slug}.html",
     "mainEntityOfPage": "https://mzheader.tech/posts/${slug}.html",
+    "image": "https://mzheader.tech/assets/og-preview.png",
     "wordCount": "${word_count}",
     "articleSection": "${tags}"
   }
@@ -1298,23 +1316,31 @@ cat > "_site/index.html" << ENDINDEX
 
   </style>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "MZHeader: Reverse Engineering Malware",
-    "description": "Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike.",
-    "url": "https://mzheader.tech/",
-    "author": {
-      "@type": "Person",
-      "name": "Liam Chugg",
-      "jobTitle": "Security Researcher",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "CrowdStrike"
-      },
-      "url": "https://www.linkedin.com/in/liam-chugg/"
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "MZHeader: Reverse Engineering Malware",
+      "description": "Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike.",
+      "url": "https://mzheader.tech/",
+      "author": {
+        "@type": "Person",
+        "name": "Liam Chugg",
+        "jobTitle": "Security Researcher",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "CrowdStrike"
+        },
+        "url": "https://www.linkedin.com/in/liam-chugg/"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [${itemlist_json}
+      ]
     }
-  }
+  ]
   </script>
 </head>
 <body>
