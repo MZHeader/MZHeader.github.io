@@ -457,7 +457,12 @@ for i in $(seq 1 $total_posts); do
       font-weight: 600;
       letter-spacing: 0.04em;
       padding-top: 0.5rem !important;
-      padding-bottom: 0.15rem !important;
+      padding-bottom: 0 !important;
+      list-style: none;
+    }
+    .toc-category > span {
+      display: block;
+      padding-bottom: 0.15rem;
     }
     .toc-h3 { padding-left: 1rem !important; }
     .toc-h3 a { font-size: 0.75rem !important; color: #777 !important; }
@@ -735,13 +740,13 @@ ENDHEADER
               cat_part=""
             fi
             if [ -n "$cat_part" ] && [ "$cat_part" != "$current_cat" ]; then
-              [ -n "$current_cat" ] && toc_inner+="</ul>"
+              [ -n "$current_cat" ] && toc_inner+="</ul></li>"
               current_cat="$cat_part"
-              toc_inner+="<li class=\"toc-category\">${current_cat}</li><ul class=\"toc-sublist\">"
+              toc_inner+="<li class=\"toc-category\"><span>${current_cat}</span><ul class=\"toc-sublist\">"
             fi
             toc_inner+="<li><a href=\"#${hid}\">${challenge}</a></li>"
           done <<< "$headings"
-          [ -n "$current_cat" ] && toc_inner+="</ul>"
+          [ -n "$current_cat" ] && toc_inner+="</ul></li>"
           toc_html="<nav class=\"toc\" id=\"toc\"><div class=\"toc-trigger\" id=\"tocTrigger\" role=\"button\" tabindex=\"0\"><span class=\"toc-label\">; table of contents</span><span class=\"toc-toggle\" id=\"tocToggle\">[+]</span></div><div class=\"toc-body\" id=\"tocBody\"><ul>${toc_inner}</ul></div></nav>"
         else
           # ── Regular posts: flat list from h2/h3 ──
