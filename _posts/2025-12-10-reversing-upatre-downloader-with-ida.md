@@ -243,3 +243,17 @@ LZNT1_Decompress()
 ```
 
 <img width="1214" height="723" alt="image" src="https://github.com/user-attachments/assets/16fe5c1d-48e5-4150-bf4f-df7065d7c3e8" />
+
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `84864d1758432f365aec494cb963158b77c77014db19e5f3990966e147a85235` |
+| `C2` | `california89[.]com` |
+| `URL` | `california89[.]com/wp-content/uploads/2013/05/pdf.enc` |
+| `Dropped File` | `%TEMP%\budha.exe` |
+| `Dropped File` | `kilf.exe` |
+
+## Conclusion
+
+UPATRE is a lightweight C/C++ downloader that begins execution by replicating itself to `%TEMP%\budha.exe` and deleting the original dropper. Once running from the temp path, it contacts its hardcoded C2 domain to download an encrypted payload. The downloaded data is XOR-decrypted with a 4-byte key and, if the `ZZP` magic bytes are present, decompressed using `RtlDecompressBuffer` (LZNT1) before being written to `kilf.exe` and executed. The simplicity of the downloader's design, combined with the replication mechanism, makes it an effective first-stage loader for delivering additional malware.

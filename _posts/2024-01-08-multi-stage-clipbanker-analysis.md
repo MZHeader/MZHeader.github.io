@@ -153,6 +153,19 @@ It doesn't look like it's been too successful so far!
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/8892fc96-43d7-4453-b914-7bd92abc9536)
 
+## IOCs
+
+| Type | Value |
+|---|---|
+| `SHA256` | `e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54` |
+| `SHA256` | `8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a` |
+| `URL` | `hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.jpg?1702591609` |
+| `URL` | `hxxps[://]paste[.]ee/d/U57Ki/0` |
+
+## Conclusion
+
+This sample follows a multi-stage execution chain beginning with an obfuscated JavaScript loader. The initial script reverses a URL string to retrieve a second-stage JavaScript payload, which in turn uses a steganographic technique to embed a Base64-encoded payload inside an image file hosted on a legitimate image sharing site. The chain culminates in a process-hollowing loader that injects the final ClipBanker payload into `AppLaunch.exe`. The final payload monitors the victim's clipboard for cryptocurrency wallet address patterns and silently replaces them with addresses under the attacker's control, targeting multiple cryptocurrency types.
+
 
 
 
