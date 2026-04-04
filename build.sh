@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-mkdir -p _site/posts
+mkdir -p _site/posts _site/css
 
 # Copy static assets
 cp -r assets _site/ 2>/dev/null || true
@@ -55,6 +55,9 @@ SHARED_CSS='
     .post-meta { color: #888; font-size: 0.85rem; margin-bottom: 2rem; }
 '
 
+# Write shared CSS to external file
+printf '%s\n' "$SHARED_CSS" > _site/css/main.css
+
 GA_HEAD='
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-48M02RY99Q"></script>
   <script>
@@ -66,6 +69,7 @@ GA_HEAD='
 '
 
 ASSET_HEAD='
+  <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -189,8 +193,6 @@ for i in $(seq 1 $total_posts); do
   ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
-    ${SHARED_CSS}
-
     /* Override body for sidebar layout */
     body {
       max-width: none;
@@ -677,8 +679,6 @@ cat > "_site/index.html" << ENDINDEX
   ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
-    ${SHARED_CSS}
-
     /* Scanline + vignette as body background layers */
     body {
       background-color: #1e1e1e;
