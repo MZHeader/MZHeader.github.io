@@ -1451,12 +1451,14 @@ cat > "_site/index.html" << ENDINDEX
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.35s ease;
+      border-left: 2px solid #5625be;
+      background: rgba(0, 0, 0, 0.2);
     }
     .about-expanded.open {
       max-height: 25rem;
     }
     .about-expanded .pe-disasm-row {
-      background: rgba(0, 0, 0, 0.15);
+      background: transparent;
     }
     .about-sep {
       color: #2a2a3a !important;
