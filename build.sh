@@ -1451,9 +1451,12 @@ cat > "_site/index.html" << ENDINDEX
     }
     .about-trigger:hover { background: rgba(86, 37, 190, 0.10); }
     .about-trigger:hover .pe-comment::before {
-      content: "call  ";
+      content: "je    ";
       color: #e6db74;
       font-size: 0.82rem;
+    }
+    .about-trigger.open:hover .pe-comment::before {
+      content: "jne   ";
     }
     .about-trigger .pe-comment { flex: 1; color: #a8a8c8; }
     .about-trigger.open .pe-comment { color: #8be9fd; }
