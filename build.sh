@@ -443,16 +443,17 @@ for i in $(seq 1 $total_posts); do
       padding: 0.2rem 0;
     }
     .toc-body li a {
+      display: block;
       color: #999;
       text-decoration: none;
       font-size: 0.8rem;
       transition: color 0.1s;
     }
-    .toc-body li a:hover {
+    .toc-body li:hover > a {
       color: #8be9fd;
       text-decoration: none;
     }
-    .toc-body li a:hover::before {
+    .toc-body li:hover > a::before {
       content: "jmp  ";
       color: #e6db74;
       font-size: 0.75rem;
@@ -472,7 +473,7 @@ for i in $(seq 1 $total_posts); do
     }
     .toc-h3 { padding-left: 1rem !important; }
     .toc-h3 a { font-size: 0.75rem !important; color: #777 !important; }
-    .toc-h3 a:hover { color: #8be9fd !important; }
+    .toc-h3:hover > a { color: #8be9fd !important; }
 
     /* ── Article ── */
     article h1 {
