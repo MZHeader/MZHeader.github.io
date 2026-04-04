@@ -1209,4 +1209,35 @@ Sitemap: https://mzheader.tech/sitemap.xml
 ENDROBOTS
 echo "Built: robots.txt"
 
+# ── 404.html ───────────────────────────────────────────────────────────────
+cat > "_site/404.html" << 'END404'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>404 — Reverse Engineering Malware</title>
+  <script>
+    // Redirect old Jekyll URLs (/posts/slug) to new ones (/posts/slug.html)
+    var path = window.location.pathname;
+    if (path.match(/^\/posts\/[^/]+$/) && !path.endsWith('.html')) {
+      window.location.replace(path + '.html');
+    }
+  </script>
+  <style>
+    body { background:#1e1e1e; color:#dcdcdc; font-family:"Fira Code","Consolas",monospace; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; flex-direction:column; gap:1rem; }
+    .code { color:#c62828; font-size:3rem; font-weight:700; }
+    .msg { color:#555; font-size:0.9rem; }
+    a { color:#8be9fd; text-decoration:none; }
+    a:hover { color:#50fa7b; }
+  </style>
+</head>
+<body>
+  <div class="code">0x404</div>
+  <div class="msg">; address not found</div>
+  <a href="/">← cd ..</a>
+</body>
+</html>
+END404
+echo "Built: 404.html"
+
 echo "Done. Site is in _site/"
