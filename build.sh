@@ -87,7 +87,7 @@ posts_list_html=""
 post_data_js=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -129,11 +129,17 @@ for post in $(ls _posts/*.md | sort -r); do
         --to html \
         --no-highlight > "/tmp/mzbuild_${slug}.html"
 
+    # Strip the first h2 (post title) — we render it as h1 in the template instead
+    # Use awk for cross-platform compatibility (macOS sed differs from GNU sed)
+    awk 'BEGIN{found=0} !found && /<h2/{found=1; next} found && !closed && /<\/h2>/{closed=1; next} {print}' "/tmp/mzbuild_${slug}.html" > "/tmp/mzbuild_${slug}_stripped.html"
+    mv "/tmp/mzbuild_${slug}_stripped.html" "/tmp/mzbuild_${slug}.html"
+
     # Calculate reading time (~200 words per minute)
     word_count=$(sed -e 's/<[^>]*>//g' "/tmp/mzbuild_${slug}.html" | wc -w | tr -d ' ')
     read_time=$(( (word_count + 199) / 200 ))
     [ "$read_time" -lt 1 ] && read_time=1
     p_read_times[$post_idx]="$read_time"
+    p_word_counts[$post_idx]="$word_count"
 
     offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
 
@@ -162,6 +168,8 @@ for i in $(seq 1 $total_posts); do
     date_str="${p_date_strs[$i]}"
     description="${p_descs[$i]}"
     read_time="${p_read_times[$i]}"
+    word_count="${p_word_counts[$i]}"
+    tags="${p_tags[$i]}"
     short_title="${title%%:*}"
 
     # Prev = newer post (lower index), Next = older post (higher index)
@@ -361,7 +369,7 @@ for i in $(seq 1 $total_posts); do
     }
 
     /* ── Article ── */
-    article h2:first-of-type {
+    article h1 {
       font-size: 1.9rem;
       color: #7c4dff;
       text-shadow: 0 0 16px rgba(124, 77, 255, 0.5), 0 0 32px rgba(124, 77, 255, 0.2);
@@ -479,7 +487,7 @@ for i in $(seq 1 $total_posts); do
       #post-main { margin-left: 0; max-width: 100%; padding: 3.5rem 1rem 1rem; }
       .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
       .post-nav .back-link { display: none; }
-      article h2:first-of-type { font-size: 1.4rem; }
+      article h1 { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
       body.sidebar-collapsed #post-main { margin-left: 0; }
@@ -554,6 +562,29 @@ for i in $(seq 1 $total_posts); do
     .pre-wrapper:hover .copy-btn { opacity: 1; }
     .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "${title}",
+    "description": "${description}",
+    "datePublished": "${date_str}",
+    "dateModified": "${date_str}",
+    "author": {
+      "@type": "Person",
+      "name": "Liam Chugg",
+      "url": "https://www.linkedin.com/in/liam-chugg/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Liam Chugg"
+    },
+    "url": "https://mzheader.tech/posts/${slug}.html",
+    "mainEntityOfPage": "https://mzheader.tech/posts/${slug}.html",
+    "wordCount": "${word_count}",
+    "articleSection": "${tags}"
+  }
+  </script>
 </head>
 <body>
 
@@ -582,6 +613,7 @@ ${posts_list_html}
       <span class="post-meta">${formatted_date} &middot; ${read_time} min read</span>
     </div>
     <article>
+      <h1>${title}</h1>
 ENDHEADER
 
     cat "/tmp/mzbuild_${slug}.html" >> "_site/posts/${slug}.html"
@@ -1265,6 +1297,25 @@ cat > "_site/index.html" << ENDINDEX
     }
 
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "MZHeader: Reverse Engineering Malware",
+    "description": "Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike.",
+    "url": "https://mzheader.tech/",
+    "author": {
+      "@type": "Person",
+      "name": "Liam Chugg",
+      "jobTitle": "Security Researcher",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "CrowdStrike"
+      },
+      "url": "https://www.linkedin.com/in/liam-chugg/"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -1610,6 +1661,7 @@ cat > "_site/sitemap.xml" << ENDSITEMAP
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mzheader.tech/</loc>
+    <lastmod>${p_date_strs[1]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>${sitemap_entries}
