@@ -1465,7 +1465,7 @@ cat > "_site/index.html" << ENDINDEX
     .about-trigger.open:hover .pe-comment::before {
       content: "jne   ";
     }
-    .about-trigger .pe-comment { flex: 1; color: #a8a8c8; }
+    .about-trigger .pe-comment { flex: 1; color: #c0c0e0; cursor: pointer; }
     .about-trigger.open .pe-comment { color: #8be9fd; }
     .about-toggle {
       color: #5625be;
