@@ -298,6 +298,56 @@ for i in $(seq 1 $total_posts); do
     }
     article { max-width: 100%; }
 
+    /* ── Sidebar toggle ── */
+    #rsrc-sidebar {
+      transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                  min-width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #rsrc-sidebar.collapsed {
+      width: 32px;
+      min-width: 32px;
+    }
+    #rsrc-sidebar.collapsed .rsrc-section-header,
+    #rsrc-sidebar.collapsed .rsrc-post-list,
+    #rsrc-sidebar.collapsed .rsrc-toolbar-label,
+    #rsrc-sidebar.collapsed .rsrc-toolbar-count,
+    #rsrc-sidebar.collapsed .rsrc-toolbar-dot {
+      display: none;
+    }
+    #rsrc-sidebar.collapsed .rsrc-toolbar {
+      padding: 0;
+      justify-content: center;
+    }
+    #post-main {
+      transition: margin-left 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.sidebar-collapsed #post-main {
+      margin-left: 32px;
+    }
+    .rsrc-toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #3a3a55;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.75rem;
+      line-height: 1;
+      padding: 0.2rem 0.25rem;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: color 0.15s;
+      user-select: none;
+    }
+    .rsrc-toggle-btn:hover { color: #8be9fd; }
+    #rsrc-sidebar.collapsed .rsrc-toggle-btn {
+      margin-left: 0;
+      color: #5625be;
+      padding: 0.55rem 0;
+      width: 32px;
+      text-align: center;
+    }
+    #rsrc-sidebar.collapsed .rsrc-toggle-btn:hover { color: #8be9fd; }
+
     /* ── Mobile ── */
     @media (max-width: 900px) {
       body { display: block; }
@@ -307,6 +357,7 @@ for i in $(seq 1 $total_posts); do
       article h2:first-of-type { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
+      body.sidebar-collapsed #post-main { margin-left: 0; }
     }
   </style>
 </head>
@@ -317,6 +368,7 @@ for i in $(seq 1 $total_posts); do
       <span class="rsrc-toolbar-dot"></span>
       <span class="rsrc-toolbar-label">.rsrc</span>
       <span class="rsrc-toolbar-count" id="rsrc-count"></span>
+      <button class="rsrc-toggle-btn" id="rsrc-toggle" title="Toggle sidebar" aria-label="Toggle sidebar">&#xBB;</button>
     </div>
     <div class="rsrc-section-header">POSTS</div>
     <div class="rsrc-post-list">
@@ -352,6 +404,36 @@ ENDHEADER
   var countEl = document.getElementById("rsrc-count");
   if (countEl) countEl.textContent = rows.length + " entries";
   if (activeRow) setTimeout(function() { activeRow.scrollIntoView({ block: "center", behavior: "instant" }); }, 0);
+
+  // ── Sidebar toggle ──
+  var sidebar = document.getElementById("rsrc-sidebar");
+  var toggleBtn = document.getElementById("rsrc-toggle");
+
+  function applyCollapsed(collapsed) {
+    if (collapsed) {
+      sidebar.classList.add("collapsed");
+      document.body.classList.add("sidebar-collapsed");
+      toggleBtn.innerHTML = "&#xBB;";
+      toggleBtn.title = "Expand sidebar";
+    } else {
+      sidebar.classList.remove("collapsed");
+      document.body.classList.remove("sidebar-collapsed");
+      toggleBtn.innerHTML = "&#xAB;";
+      toggleBtn.title = "Collapse sidebar";
+    }
+  }
+
+  var savedState = localStorage.getItem("rsrc-sidebar-collapsed");
+  applyCollapsed(savedState === "1");
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", function() {
+      var isCollapsed = sidebar.classList.contains("collapsed");
+      var next = !isCollapsed;
+      localStorage.setItem("rsrc-sidebar-collapsed", next ? "1" : "0");
+      applyCollapsed(next);
+    });
+  }
 })();
 </script>
 
