@@ -149,10 +149,12 @@ for i in $(seq 1 $total_posts); do
     prev_i=$((i - 1))
     next_i=$((i + 1))
     if [ $prev_i -ge 1 ]; then
-        prev_html="<a class=\"post-pagination-link\" href=\"/posts/${p_slugs[$prev_i]}.html\">&larr; ${p_titles[$prev_i]}</a>"
+        prev_label="${p_titles[$prev_i]%%:*}"
+        prev_html="<a class=\"post-pagination-link\" href=\"/posts/${p_slugs[$prev_i]}.html\">&larr; ${prev_label}</a>"
     fi
     if [ $next_i -le $total_posts ]; then
-        next_html="<a class=\"post-pagination-link post-pagination-link--right\" href=\"/posts/${p_slugs[$next_i]}.html\">${p_titles[$next_i]} &rarr;</a>"
+        next_label="${p_titles[$next_i]%%:*}"
+        next_html="<a class=\"post-pagination-link post-pagination-link--right\" href=\"/posts/${p_slugs[$next_i]}.html\">${next_label} &rarr;</a>"
     fi
 
     cat > "_site/posts/${slug}.html" << ENDHEADER
@@ -465,10 +467,6 @@ for i in $(seq 1 $total_posts); do
       text-decoration: none;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.82rem;
-      max-width: 45%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     .post-pagination-link--right { margin-left: auto; text-align: right; }
     .post-pagination-link:hover { color: #50fa7b; }
