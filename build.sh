@@ -1055,6 +1055,76 @@ cat > "_site/index.html" << ENDINDEX
       .pe-detail-panel { display: none !important; }
     }
 
+    /* ── Category filter bar ── */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem 0.45rem;
+      border-bottom: 1px solid #1e1e28;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .filter-bar-label {
+      font-size: 0.65rem;
+      color: #3a3a55;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-right: 0.3rem;
+      user-select: none;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid #2a2a3a;
+      color: #555570;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, box-shadow 0.12s;
+      user-select: none;
+    }
+    .filter-btn:hover {
+      border-color: #5625be;
+      color: #8a8aaa;
+    }
+    .filter-btn.active {
+      background: rgba(86, 37, 190, 0.15);
+      border-color: #5625be;
+      color: #8be9fd;
+      box-shadow: 0 0 6px rgba(86, 37, 190, 0.3);
+    }
+    .filter-btn[data-cat="all"].active { color: #8be9fd; border-color: #5625be; }
+    .filter-btn[data-cat="trojan"] { border-color: rgba(198,40,40,0.3); }
+    .filter-btn[data-cat="trojan"]:hover { border-color: #c62828; color: #e07070; }
+    .filter-btn[data-cat="trojan"].active { background: rgba(198,40,40,0.12); border-color: #c62828; color: #e07070; box-shadow: 0 0 6px rgba(198,40,40,0.25); }
+    .filter-btn[data-cat="infostealer"] { border-color: rgba(139,233,253,0.2); }
+    .filter-btn[data-cat="infostealer"]:hover { border-color: #8be9fd; color: #8be9fd; }
+    .filter-btn[data-cat="infostealer"].active { background: rgba(139,233,253,0.08); border-color: #8be9fd; color: #8be9fd; box-shadow: 0 0 6px rgba(139,233,253,0.2); }
+    .filter-btn[data-cat="downloader"] { border-color: rgba(80,250,123,0.2); }
+    .filter-btn[data-cat="downloader"]:hover { border-color: #50fa7b; color: #50fa7b; }
+    .filter-btn[data-cat="downloader"].active { background: rgba(80,250,123,0.08); border-color: #50fa7b; color: #50fa7b; box-shadow: 0 0 6px rgba(80,250,123,0.2); }
+    .filter-btn[data-cat="loader"] { border-color: rgba(80,250,123,0.2); }
+    .filter-btn[data-cat="loader"]:hover { border-color: #50fa7b; color: #50fa7b; }
+    .filter-btn[data-cat="loader"].active { background: rgba(80,250,123,0.08); border-color: #50fa7b; color: #50fa7b; box-shadow: 0 0 6px rgba(80,250,123,0.2); }
+    .filter-btn[data-cat="rats"] { border-color: rgba(189,147,249,0.2); }
+    .filter-btn[data-cat="rats"]:hover { border-color: #bd93f9; color: #bd93f9; }
+    .filter-btn[data-cat="rats"].active { background: rgba(189,147,249,0.08); border-color: #bd93f9; color: #bd93f9; box-shadow: 0 0 6px rgba(189,147,249,0.2); }
+    .filter-btn[data-cat="ctf"] { border-color: rgba(255,184,108,0.2); }
+    .filter-btn[data-cat="ctf"]:hover { border-color: #ffb86c; color: #ffb86c; }
+    .filter-btn[data-cat="ctf"].active { background: rgba(255,184,108,0.08); border-color: #ffb86c; color: #ffb86c; box-shadow: 0 0 6px rgba(255,184,108,0.2); }
+    .filter-btn[data-cat="analysis"] { border-color: rgba(138,138,170,0.2); }
+    .filter-btn[data-cat="analysis"]:hover { border-color: #8a8aaa; color: #8a8aaa; }
+    .filter-btn[data-cat="analysis"].active { background: rgba(138,138,170,0.08); border-color: #8a8aaa; color: #8a8aaa; box-shadow: 0 0 6px rgba(138,138,170,0.2); }
+    .filter-count {
+      font-size: 0.55rem;
+      color: #3a3a55;
+      margin-left: 0.15rem;
+    }
+    .filter-btn.active .filter-count { color: inherit; opacity: 0.7; }
 
     @media (max-width: 600px) {
       body { padding: 1rem; }
@@ -1122,7 +1192,19 @@ cat > "_site/index.html" << ENDINDEX
     <div class="pe-section-meta" style="display:none">
     </div>
     <div class="pe-section-body">
+      <div class="filter-bar" id="filterBar">
+        <span class="filter-bar-label">; filter:</span>
+        <button class="filter-btn active" data-cat="all">ALL</button>
+        <button class="filter-btn" data-cat="trojan">Trojan</button>
+        <button class="filter-btn" data-cat="infostealer">InfoStealer</button>
+        <button class="filter-btn" data-cat="rats">RATs</button>
+        <button class="filter-btn" data-cat="loader">Loader</button>
+        <button class="filter-btn" data-cat="downloader">Downloader</button>
+        <button class="filter-btn" data-cat="ctf">CTF</button>
+      </div>
+      <div id="postsList">
 ${posts_list_html}
+      </div>
     </div>
 
     <!-- Section divider -->
@@ -1242,6 +1324,56 @@ ${posts_list_html}
       clone.style.transform = 'scale(' + zoom + ')';
       clone.style.left = (-x * zoom + magSize/2) + 'px';
       clone.style.top = (-y * zoom + magSize/2) + 'px';
+    });
+  })();
+
+  // ── Category filter ──
+  (function() {
+    var filterBar = document.getElementById('filterBar');
+    var buttons = filterBar.querySelectorAll('.filter-btn');
+    var rows = document.querySelectorAll('#postsList > .rsrc-post-row');
+    var activeCat = 'all';
+
+    // Map badge class suffix to filter category
+    function getRowCat(row) {
+      var badge = row.querySelector('.rsrc-badge');
+      if (!badge) return 'analysis';
+      var cls = badge.className;
+      var m = cls.match(/rsrc-badge--(\w+)/);
+      return m ? m[1] : 'analysis';
+    }
+
+    function applyFilter(cat) {
+      activeCat = cat;
+      var visibleIdx = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var rowCat = getRowCat(rows[i]);
+        var show = (cat === 'all' || rowCat === cat);
+        rows[i].style.display = show ? '' : 'none';
+        if (show) {
+          var gutter = rows[i].querySelector('.rsrc-gutter');
+          if (gutter) {
+            var offset = (visibleIdx * 32).toString(16).toUpperCase();
+            while (offset.length < 4) offset = '0' + offset;
+            gutter.textContent = '.rsrc:' + offset;
+          }
+          visibleIdx++;
+        }
+      }
+      for (var j = 0; j < buttons.length; j++) {
+        buttons[j].classList.toggle('active', buttons[j].getAttribute('data-cat') === cat);
+      }
+    }
+
+    filterBar.addEventListener('click', function(e) {
+      var btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      var cat = btn.getAttribute('data-cat');
+      if (cat === activeCat || cat === 'all') {
+        applyFilter('all');
+      } else {
+        applyFilter(cat);
+      }
     });
   })();
 </script>
