@@ -924,7 +924,7 @@ cat > "_site/index.html" << ENDINDEX
     <!-- .text section -->
     <div class="pe-section-toolbar">
       <span class="pe-section-name">.text</span>
-      <span class="pe-section-flags">IMAGE_SCN_CNT_CODE | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_CODE | IMAGE_SCN_MEM_EXECUTE | IMAGE_SCN_MEM_READ">Characteristics: 0x60000020</span>
     </div>
     <div class="pe-section-meta" style="display:none"></div>
     <div class="pe-section-body">
@@ -954,7 +954,7 @@ cat > "_site/index.html" << ENDINDEX
     <!-- .rsrc section -->
     <div class="pe-section-toolbar">
       <span class="pe-section-name">.rsrc</span>
-      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ">Characteristics: 0x40000040</span>
     </div>
     <div class="pe-section-meta" style="display:none">
     </div>
@@ -970,7 +970,7 @@ ${posts_list_html}
     <!-- .lnkin section -->
     <div class="pe-section-toolbar">
       <span class="pe-section-name">.lnkin</span>
-      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
     </div>
     <div class="pe-section-body">
       <a class="rsrc-post-row" href="https://www.linkedin.com/in/liam-chugg/" target="_blank" rel="noopener noreferrer">
@@ -987,7 +987,7 @@ ${posts_list_html}
     <!-- .gthb section -->
     <div class="pe-section-toolbar">
       <span class="pe-section-name">.gthb</span>
-      <span class="pe-section-flags">IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
     </div>
     <div class="pe-section-body">
       <a class="rsrc-post-row" href="https://github.com/MZHeader" target="_blank" rel="noopener noreferrer">
