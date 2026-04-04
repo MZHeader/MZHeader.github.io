@@ -149,6 +149,7 @@ for i in $(seq 1 $total_posts); do
     formatted_date="${p_dates[$i]}"
     date_str="${p_date_strs[$i]}"
     description="${p_descs[$i]}"
+    short_title="${title%%:*}"
 
     # Prev = newer post (lower index), Next = older post (higher index)
     prev_html=""
@@ -453,16 +454,51 @@ for i in $(seq 1 $total_posts); do
     }
     #rsrc-sidebar.collapsed .rsrc-toggle-btn:hover { color: #8be9fd; }
 
+
+    /* ── Mobile nav bar ── */
+    #mobile-nav { display: none; }
+
     /* ── Mobile ── */
     @media (max-width: 900px) {
       body { display: block; }
       #rsrc-sidebar { display: none; }
-      #post-main { margin-left: 0; max-width: 100%; padding: 1rem; }
+      #post-main { margin-left: 0; max-width: 100%; padding: 3.5rem 1rem 1rem; }
       .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+      .post-nav .back-link { display: none; }
       article h2:first-of-type { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
       body.sidebar-collapsed #post-main { margin-left: 0; }
+      #mobile-nav {
+        display: flex;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 44px;
+        background: #13131a;
+        border-bottom: 1px solid #2a2a3a;
+        align-items: center;
+        padding: 0 1rem;
+        gap: 0.75rem;
+        z-index: 200;
+        font-family: "Fira Code", "Consolas", monospace;
+      }
+      #mobile-nav .mob-back {
+        color: #50fa7b;
+        text-decoration: none;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+      #mobile-nav .mob-back:hover { color: #8be9fd; }
+      #mobile-nav .mob-sep { color: #2a2a3a; font-size: 0.8rem; }
+      #mobile-nav .mob-title {
+        color: #555570;
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+        min-width: 0;
+      }
     }
 
     /* ── Post pagination ── */
@@ -519,6 +555,12 @@ for i in $(seq 1 $total_posts); do
 ${posts_list_html}
     </div>
   </nav>
+
+  <div id="mobile-nav">
+    <a class="mob-back" href="/">&larr; cd ..</a>
+    <span class="mob-sep">/</span>
+    <span class="mob-title">${short_title}</span>
+  </div>
 
   <div id="post-main">
     <div class="post-nav">
