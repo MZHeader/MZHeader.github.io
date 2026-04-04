@@ -943,7 +943,7 @@ cat > "_site/index.html" << ENDINDEX
       flex: 1;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.88rem;
-      color: #6272a4;
+      color: #8888b0;
       line-height: 1.65;
     }
     .pe-comment strong { color: #c62828; font-weight: 600; }
@@ -1207,7 +1207,7 @@ cat > "_site/index.html" << ENDINDEX
       border-left: 2px solid #5625be;
     }
     .about-trigger:hover { background: rgba(86, 37, 190, 0.10); }
-    .about-trigger .pe-comment { flex: 1; color: #8a8aaa; }
+    .about-trigger .pe-comment { flex: 1; color: #a8a8c8; }
     .about-trigger.open .pe-comment { color: #8be9fd; }
     .about-toggle {
       color: #5625be;
