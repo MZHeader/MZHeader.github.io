@@ -763,22 +763,32 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-post-row:hover .rsrc-meta { color: #6e6e90; }
     .rsrc-badge {
       display: inline-block;
-      padding: 0.05em 0.45em;
-      border-radius: 2px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      border: 1px solid currentColor;
-      line-height: 1.5;
+      opacity: 0.65;
     }
-    .rsrc-badge--trojan      { color: #c62828; background: rgba(198, 40,  40,  0.10); }
-    .rsrc-badge--infostealer { color: #8be9fd; background: rgba(139, 233, 253, 0.08); }
-    .rsrc-badge--downloader  { color: #50fa7b; background: rgba( 80, 250, 123, 0.08); }
-    .rsrc-badge--loader      { color: #50fa7b; background: rgba( 80, 250, 123, 0.08); }
-    .rsrc-badge--rats        { color: #bd93f9; background: rgba(189, 147, 249, 0.10); }
-    .rsrc-badge--ctf         { color: #ffb86c; background: rgba(255, 184, 108, 0.10); }
-    .rsrc-badge--analysis    { color: #8a8aaa; background: rgba(138, 138, 170, 0.08); }
+    .rsrc-badge::before {
+      content: '\25CF\00A0';
+      font-size: 0.5em;
+      vertical-align: middle;
+      opacity: 0.9;
+    }
+    .rsrc-badge--trojan      { color: #e07070; }
+    .rsrc-badge--trojan::before      { color: #c62828; }
+    .rsrc-badge--infostealer { color: #8be9fd; }
+    .rsrc-badge--infostealer::before { color: #8be9fd; }
+    .rsrc-badge--downloader  { color: #50fa7b; }
+    .rsrc-badge--downloader::before  { color: #50fa7b; }
+    .rsrc-badge--loader      { color: #50fa7b; }
+    .rsrc-badge--loader::before      { color: #50fa7b; }
+    .rsrc-badge--rats        { color: #bd93f9; }
+    .rsrc-badge--rats::before        { color: #bd93f9; }
+    .rsrc-badge--ctf         { color: #ffb86c; }
+    .rsrc-badge--ctf::before         { color: #ffb86c; }
+    .rsrc-badge--analysis    { color: #8a8aaa; }
+    .rsrc-badge--analysis::before    { color: #8a8aaa; }
 
     /* Right detail panel */
     .pe-detail-panel {
