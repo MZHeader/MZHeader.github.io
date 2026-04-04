@@ -137,6 +137,19 @@ for i in $(seq 1 $total_posts); do
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title} — Reverse Engineering Malware</title>
+  <meta name="description" content="${description}" />
+  <meta name="author" content="Liam Chugg" />
+  <link rel="canonical" href="https://mzheader.tech/posts/${slug}.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${description}" />
+  <meta property="og:url" content="https://mzheader.tech/posts/${slug}.html" />
+  <meta property="og:site_name" content="Reverse Engineering Malware" />
+  <meta property="article:published_time" content="${date_str}" />
+  <meta property="article:author" content="Liam Chugg" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description}" />
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
@@ -471,6 +484,17 @@ cat > "_site/index.html" << ENDINDEX
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reverse Engineering Malware</title>
+  <meta name="description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
+  <meta name="author" content="Liam Chugg" />
+  <link rel="canonical" href="https://mzheader.tech/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Reverse Engineering Malware" />
+  <meta property="og:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
+  <meta property="og:url" content="https://mzheader.tech/" />
+  <meta property="og:site_name" content="Reverse Engineering Malware" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Reverse Engineering Malware" />
+  <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   ${HLJS_HEAD}
   <style>
     ${SHARED_CSS}
@@ -1037,4 +1061,37 @@ ${posts_list_html}
 ENDINDEX
 
 echo "Built: index.html"
+
+# ── sitemap.xml ────────────────────────────────────────────────────────────
+sitemap_entries=""
+for i in $(seq 1 $total_posts); do
+    sitemap_entries+="
+  <url>
+    <loc>https://mzheader.tech/posts/${p_slugs[$i]}.html</loc>
+    <lastmod>${p_date_strs[$i]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>"
+done
+
+cat > "_site/sitemap.xml" << ENDSITEMAP
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mzheader.tech/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>${sitemap_entries}
+</urlset>
+ENDSITEMAP
+echo "Built: sitemap.xml"
+
+# ── robots.txt ─────────────────────────────────────────────────────────────
+cat > "_site/robots.txt" << 'ENDROBOTS'
+User-agent: *
+Allow: /
+Sitemap: https://mzheader.tech/sitemap.xml
+ENDROBOTS
+echo "Built: robots.txt"
+
 echo "Done. Site is in _site/"
