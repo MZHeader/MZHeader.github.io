@@ -462,7 +462,7 @@ for i in $(seq 1 $total_posts); do
 
     /* ── Mobile ── */
     @media (max-width: 900px) {
-      body { display: block; }
+      body { display: block; overflow-x: hidden; }
       #rsrc-sidebar { display: none; }
       #post-main { margin-left: 0; max-width: 100%; padding: 3.5rem 1rem 1rem; }
       .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
