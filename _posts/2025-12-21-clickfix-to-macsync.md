@@ -16,7 +16,7 @@ Domain: hxxps[://]macfilearchive[.]com/s3/
 
 There is also a recent Reddit post on r/MacOS where a user has fallen victim to this specific campaign: https://www.reddit.com/r/MacOS/comments/1pramrh/did_i_mess_upcompromise_my_mac_security_any/
 
-<img width="1007" height="1069" alt="image" src="https://github.com/user-attachments/assets/dab21879-3c91-4020-9ba8-34872b43d6a5" />
+<img width="1007" height="1069" alt="fake macfilearchive.com page showing ClickFix lure with copy-paste command instructions" src="https://github.com/user-attachments/assets/dab21879-3c91-4020-9ba8-34872b43d6a5" />
 
 This legitimate looking domain instructs users to copy and paste the command in the code block. At first glance, it seems harmless as it references Apple's legitimate domain, but the full command is as follows:
 
@@ -717,7 +717,7 @@ end if
 
 Upon execution, the script prompts the user to enter their password, and will repeatedly ask until the correct password is entered, it will then save the password to disk.
 
-<img width="429" height="186" alt="image" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
+<img width="429" height="186" alt="macOS password prompt shown by MacSync stealer requesting the user's system password" src="https://github.com/user-attachments/assets/50026e35-301f-4b95-b21e-e97e910a78b6" />
 
 
 ```
@@ -842,11 +842,11 @@ set writemind to "/tmp/sync" & randomNumber & "/"
 
 The collected information is then compressed into a zip archive located at '/tmp/osalogging.zip', expanded this looks like:
 
-<img width="783" height="277" alt="image" src="https://github.com/user-attachments/assets/5ca34cc9-b285-4755-bbe1-a0589422cbb7" />
+<img width="783" height="277" alt="directory tree showing exfiltrated data structure in /tmp/osalogging.zip with browser and wallet folders" src="https://github.com/user-attachments/assets/5ca34cc9-b285-4755-bbe1-a0589422cbb7" />
 
 A fake compatibility error prompt is then shown to the victim:
 
-<img width="425" height="158" alt="image" src="https://github.com/user-attachments/assets/d0c4a896-5bac-4d0c-81f0-38f4bafa4b0e" />
+<img width="425" height="158" alt="fake macOS compatibility error dialog shown to victim after data exfiltration" src="https://github.com/user-attachments/assets/d0c4a896-5bac-4d0c-81f0-38f4bafa4b0e" />
 
 The zip archive containing all of the users sensitive information is then exfiltrated via a POST request to 'ballfrank[.]today/gate', as was shown in the previous script:
 
@@ -905,7 +905,7 @@ The Trezor Suite application is then replaced with a binary which seemingly has 
 
 This is what the loader page looks like after executing the trojanised Trezor Suite Application:
 
-<img width="1250" height="810" alt="image" src="https://github.com/user-attachments/assets/b5b07d8a-d5b3-46e2-8bbc-57f23f4353ba" />
+<img width="1250" height="810" alt="trojanised Trezor Suite WebView loader page hosted at ballfrank.today prompting for recovery seed" src="https://github.com/user-attachments/assets/b5b07d8a-d5b3-46e2-8bbc-57f23f4353ba" />
 
 Upon entering recovery details, they are sent via a POST request to the '/modules/wallets' endpoint.
 
@@ -936,7 +936,7 @@ Server returns:
 
 A likely fake error message is then returned, despite the recovery seeds being successfully exfiltrated.
 
-<img width="1257" height="803" alt="image" src="https://github.com/user-attachments/assets/9bd5f957-0816-4ed3-a813-20d4f4517983" />
+<img width="1257" height="803" alt="fake error message shown by trojanised Trezor app after recovery seeds are exfiltrated to attacker C2" src="https://github.com/user-attachments/assets/9bd5f957-0816-4ed3-a813-20d4f4517983" />
 
 ## Ledger Backdoor
 
@@ -994,9 +994,9 @@ end if
 
 Upon execution of the backdoored Ledger application, it tells you there was a problem and you need to enter your recovery seed from the hardware wallet.
 
-<img width="1026" height="775" alt="image" src="https://github.com/user-attachments/assets/683114d9-f2b3-4faf-8699-f6f84af5952f" />
+<img width="1026" height="775" alt="backdoored Ledger Wallet app prompting victim to enter hardware wallet recovery seed after fake error" src="https://github.com/user-attachments/assets/683114d9-f2b3-4faf-8699-f6f84af5952f" />
 
-<img width="1029" height="768" alt="image" src="https://github.com/user-attachments/assets/28efc376-203e-444e-bfdf-c103eeef9121" />
+<img width="1029" height="768" alt="backdoored Ledger app recovery step 3 page collecting seed words for exfiltration to ledger-gate.coupons" src="https://github.com/user-attachments/assets/28efc376-203e-444e-bfdf-c103eeef9121" />
 
 Unsurprisingly, the seed is then exfiltrated to an attacker controlled domain, this time, it's: 'main[.]ledger-gate[.]coupons'
 

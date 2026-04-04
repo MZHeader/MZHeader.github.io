@@ -17,17 +17,17 @@ This sample starts off with some batch & PowerShell deobfuscation, revealing a .
 
 This sample starts with an obfuscated batch script which looks like the following:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/15a2ff27-e269-40d7-96fc-586d9093245b)
+![obfuscated batch script with many set variable assignments and commented-out strings](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/15a2ff27-e269-40d7-96fc-586d9093245b)
 
 From the fourth line onward we can see that many set commands are taking place, we also see a lot of commented-out strings which don't seem to make a lot of sense right now, denoted by the ::
 
 Towards the end of the script, it appears that those variables are being called and executed:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/56b8f863-19b1-42db-951a-7bfcd968584e)
+![end of batch script showing variable concatenation and execution](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/56b8f863-19b1-42db-951a-7bfcd968584e)
 
 A quick way to make sense of this script is by commenting out the lines that clear the terminal and exit, and adding `echo` commands before the variables are called.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/be36953d-e183-4e48-9ff8-f861c071a512)
+![modified batch script with echo commands added before variable execution](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/be36953d-e183-4e48-9ff8-f861c071a512)
 
 Now if we execute this new script, we get the following:
 
@@ -125,47 +125,47 @@ Now that we know what the script is doing, we'll search for instances of `::@` i
 
 We see our string starting with `::@`, which is a huge blob of text.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d8d60598-7491-4893-8892-2d4d563c8206)
+![batch script showing the ::@ prefixed base64 encoded AES-encrypted blob](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d8d60598-7491-4893-8892-2d4d563c8206)
 
 We'll take this blob and throw it in CyberChef with the following operators to decode and decrypt the content as the script does.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d45309f5-a055-4251-b051-96766c3050b3)
+![CyberChef recipe removing underscores, base64 decoding, AES-CBC decrypting, and gunzipping the blob](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d45309f5-a055-4251-b051-96766c3050b3)
 
 We are left with an executable file.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b251516-6528-43ff-b54a-ced8d90e169f)
+![CyberChef output showing MZ header of decrypted .NET executable](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b251516-6528-43ff-b54a-ced8d90e169f)
 
 ## .NET Analysis
 
 Detect It Easy tells us that this is a .NET binary, and it has a fairly interesting entropy level, around mid-way but it remains consistent.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c6ef6c1c-b1dd-4fdc-85d8-f9a6ed669266)
+![Detect It Easy showing .NET binary with moderate entropy suggesting a loader](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c6ef6c1c-b1dd-4fdc-85d8-f9a6ed669266)
 
 Loading the executable into DnSpy we can see it is heavily obfuscated, but there are references to `LoadPE`. This, and the level of entropy suggests it's likely a loader and not our final payload.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/23ac0071-6c6b-4f02-b400-45a40b3ab74e)
+![DNSpy showing heavily obfuscated .NET binary with LoadPE reference indicating a loader](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/23ac0071-6c6b-4f02-b400-45a40b3ab74e)
 
 Knowing this, we can set a module breakpoint and try to extract anything interesting that is being loaded in memory.
 
 Head to Module Breakpoints and set a breakpoint for `*` (anything)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31865716-bb47-45d9-aabb-332c2cc0f323)
+![DNSpy module breakpoints dialog with wildcard breakpoint set for all modules](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31865716-bb47-45d9-aabb-332c2cc0f323)
 
 Now we begin to debug the executable, taking note of all loaded modules.
 
 As we step through, there is a very interesting module being loaded which we should interrogate further.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b4c94a3e-5255-4d35-b37c-b36ba64ba74e)
+![DNSpy debugger showing a suspicious unnamed module being loaded in memory](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b4c94a3e-5255-4d35-b37c-b36ba64ba74e)
 
 We can right-click `Load Module` to decompile it in our current DnSpy session.
 
 This module doesn't appear to be obfuscated and we can instantly see where the Settings are stored.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e5f87ea-7e84-4d94-8ad4-16fef0a92b75)
+![DNSpy decompiling the unobfuscated second-stage module showing Settings class](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e5f87ea-7e84-4d94-8ad4-16fef0a92b75)
 
 **Settings:**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9b67b4f1-e3a9-4684-9cc1-009723118aff)
+![DNSpy showing XWorm configuration settings including C2 IP address](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9b67b4f1-e3a9-4684-9cc1-009723118aff)
 
 
 **IOCs:**

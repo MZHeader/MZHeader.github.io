@@ -305,7 +305,7 @@ Obj.Run "PowerShell -ExecutionPolicy RemoteSigned -File " & "%FilePath%", 0
 
 The last, longest, URL-encoded string can be decoded to reveal an executable using the following CyberChef recipe:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e1c81006-928f-4863-956b-1ff2a84187a2)
+![CyberChef recipe URL decoding and gunzipping the payload byte array from the PowerShell script](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/e1c81006-928f-4863-956b-1ff2a84187a2)
 
 We can then download the output to get our executable.
 
@@ -313,35 +313,35 @@ We can then download the output to get our executable.
 
 We can use a tool such as DetectItEasy or PE Detective to learn it is a .NET executable.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31baf012-8484-40ec-8768-8f2f10f2ece8)
+![DetectItEasy identifying the extracted binary as a .NET executable](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/31baf012-8484-40ec-8768-8f2f10f2ece8)
 
 Knowing this - we can use DNSpy to interrogate the binary further, however, after following the entry point we quickly realise that the binary is heavily obfuscated.
 
 This will make our analysis a lot more difficult.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
+![DNSpy showing heavily obfuscated Quasar RAT binary with renamed symbols](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2600994a-708c-44b8-899e-19d766ee6983)
 
 To overcome this, we can use a tool like [De4Dot](https://github.com/de4dot/de4dot), which identifies and "cleans" obfuscated .NET binaries.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/40b9706a-1afc-4417-bcfe-c2089f0bfd04)
+![De4Dot detecting and cleaning the obfuscated Quasar RAT binary](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/40b9706a-1afc-4417-bcfe-c2089f0bfd04)
 
 De4Dot detects that the executable has been obfuscated, cleans it up, and outputs the cleaned version under a new file. We'll load this file back into DNSpy to see the results.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50dbb051-72e2-4c79-950b-356d578f07e8)
+![DNSpy showing de-obfuscated Quasar RAT binary with readable class structure](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50dbb051-72e2-4c79-950b-356d578f07e8)
 
 Thankfully, it worked pretty well, the module and method names don't hold much meaning, but interrogating this binary will be a lot easier with this newer, cleaned version.
 
 Malware typically loads configuration information shortly after the entry point, meaning we're probably not too far away from what we're interested in.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fff0c0c-0ee9-4298-9089-3e544ff872ef)
+![DNSpy showing entry point calling configuration initialisation method shortly after startup](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fff0c0c-0ee9-4298-9089-3e544ff872ef)
 
 When we follow this method and scroll down, we can see that there are strings being defined with Base64 encoded text, which is a good indication that we are looking at configuration-related information. 
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d9b4ff72-d9ea-482a-bea3-507cf4720124)
+![DNSpy showing GClass0 fields containing base64 encoded encrypted configuration strings](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/d9b4ff72-d9ea-482a-bea3-507cf4720124)
 
 As well as the method which is used to decrypt and obtain the data.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ed76a929-6459-44db-a94f-e0ca0703f45d)
+![DNSpy showing smethod_0 decryption method called on all configuration strings](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/ed76a929-6459-44db-a94f-e0ca0703f45d)
 
 **Static Decrypting**
 
@@ -375,27 +375,27 @@ string_9 = "QzXTNaNU0qNKGByM57rH";
 
 Following `GClass.smethod_0`, we can see that the value `QzXTNaNU0qNKGByM57rH` is being passed as a key, and has some operations applied to it.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/852a3607-8303-42c9-a7dd-a6ec2af05546)
+![DNSpy showing Rfc2898DeriveBytes key derivation using the config password value](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/852a3607-8303-42c9-a7dd-a6ec2af05546)
 
 Following `Rfc2898DeriveBytes`, we can see that the strings are named password, salt, and iterations, as well as the SHA1 hashing algorithm.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fe61ec3-64a2-4c6e-ab56-1d2a5e1d85fb)
+![DNSpy showing PBKDF2 parameters: password, salt, 50000 iterations, SHA1](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/5fe61ec3-64a2-4c6e-ab56-1d2a5e1d85fb)
 
 A SHA1 sum is being calculated from the value of key/password (`QzXTNaNU0qNKGByM57rH`), plus a salt, with 50000 iterations.
 
 We can find the salt by following `GClass30.byte2`.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/22eb8275-ac85-4e0a-8a1a-d146acacc313)
+![DNSpy showing GClass30.byte2 field containing the PBKDF2 salt value](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/22eb8275-ac85-4e0a-8a1a-d146acacc313)
 
 The result of this is the key to be used for AES decryption, evident from the use of `GClass.byte0`:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b86c5b66-d8ba-452a-81e6-84a0ced14659)
+![DNSpy showing derived key bytes stored in GClass.byte0 for AES decryption](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b86c5b66-d8ba-452a-81e6-84a0ced14659)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88ccb100-4570-4eb7-9eab-6459d53aa486)
+![DNSpy showing AES decryption routine using the PBKDF2-derived key](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88ccb100-4570-4eb7-9eab-6459d53aa486)
 
 We can create a SHA1 sum using these values by using a Derive PBKDF2 Key operator in CyberChef
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a5728e68-aaac-4db2-8ade-f865a46c1df9)
+![CyberChef PBKDF2 key derivation producing the AES decryption key](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a5728e68-aaac-4db2-8ade-f865a46c1df9)
 
 Output:
 ```
@@ -406,13 +406,13 @@ It should be possible to decrypt the settings with this key. The IV is the first
 
 I find that the easiest way to do this is to do a From Base64 operation on a given encrypted segment, and copy the bytes, it's visible within CyberChef what specific bytes are being highlighted.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6519cdb8-6b92-4086-8650-2d1859aef658)
+![CyberChef highlighting first 48 bytes of decoded config blob to identify hash and IV](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/6519cdb8-6b92-4086-8650-2d1859aef658)
 
 The remaining bytes after the first 48 are our input which we are trying to decrypt.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf2fd424-c995-468b-b1be-0de76e4abb34)
+![CyberChef AES-CBC decryption of Quasar RAT config string using derived key](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/bf2fd424-c995-468b-b1be-0de76e4abb34)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fd07aebb-f26e-4c55-be11-0ed23c0d9be9)
+![CyberChef output revealing decrypted plaintext Quasar RAT configuration value](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/fd07aebb-f26e-4c55-be11-0ed23c0d9be9)
 
 From the encrypted segment we took, we have managed to get the C2 for this RAT: `nathwood23.mysynology[.]net:6750`
 
@@ -420,17 +420,17 @@ From the encrypted segment we took, we have managed to get the C2 for this RAT: 
 
 Set a breakpoint at where the settings are being decrypted:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1d40550-d478-4dc8-b9b7-6f62624a322c)
+![DNSpy breakpoint set at the config decryption method to reveal plaintext values](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b1d40550-d478-4dc8-b9b7-6f62624a322c)
 
 Stepping over these functions we reveal the plaintext values - like the C2 address we previously found.
 
 Stepping further, we get strong indications that this is related to the Quasar RAT.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3223cda0-3619-4bc6-8da6-0d43f1d66b6b)
+![DNSpy debugger showing decrypted string value confirming Quasar RAT identity](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/3223cda0-3619-4bc6-8da6-0d43f1d66b6b)
 
 **All Decoded Strings:**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e0a669d-5817-48bc-b1c5-f89a0b08be49)
+![DNSpy locals window showing all decrypted Quasar RAT configuration strings including C2](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9e0a669d-5817-48bc-b1c5-f89a0b08be49)
 
 ## IOCs
 

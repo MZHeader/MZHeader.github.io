@@ -19,26 +19,26 @@ The main focus of this post is to use WinDbg for binary analysis rather than foc
 Dropping the executable into a disassembler like Ghidra allows us to review any interesting strings or imports to begin our analysis.
 Imports from `KERNEL32.dll` are noted such as `VirtualAlloc` and `VirtualProtect`, which indicate that the binary is going to allocate a space in memory, write to it, and change the permissions preparing for execution.
 
-<img width="350" alt="image" src="https://github.com/user-attachments/assets/c8ae14b9-9581-4e99-9c26-c83e821c9699" />
+<img width="350" alt="Ghidra Symbol Tree showing VirtualAlloc and VirtualProtect imports from KERNEL32.dll" src="https://github.com/user-attachments/assets/c8ae14b9-9581-4e99-9c26-c83e821c9699" />
 
 These imports can be found in Ghidra by viewing the Symbol Tree, an option for which is present on the toolbar at the top of the program. We can then highlight and double click an import to see where it is referenced in the executable.
 
-<img width="1600" alt="image" src="https://github.com/user-attachments/assets/19de60ff-7680-4317-bd0d-fde71fd68654" />
+<img width="1600" alt="Ghidra Symbol Tree with VirtualAlloc selected showing cross-reference listing" src="https://github.com/user-attachments/assets/19de60ff-7680-4317-bd0d-fde71fd68654" />
 
 When we navigate to our import of interest, in this case `VirtualAlloc`, we can review the cross references (XREF) to see how many times `VirtualAlloc` is called, and in what functions.
 
-<img width="1250" alt="image" src="https://github.com/user-attachments/assets/ddac117e-4ba5-4b0a-a2e2-2056cf298c3b" />
+<img width="1250" alt="Ghidra showing XREFs to VirtualAlloc all originating from FUN_00401300" src="https://github.com/user-attachments/assets/ddac117e-4ba5-4b0a-a2e2-2056cf298c3b" />
 
 It appears that `VirtualAlloc` is only present in one function - `FUN_00401300`. We can click this value to navigate to this function and review it in the decompile window on the left.
 We can see on line 37 that `VirtualAlloc` is called with multiple arguments, and the result of which is stored as _Dst.
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/ea55e824-6d2c-4864-98f9-9a53254b6f92" />
+<img width="800" alt="Ghidra decompiler showing VirtualAlloc call in FUN_00401300 with result stored as _Dst" src="https://github.com/user-attachments/assets/ea55e824-6d2c-4864-98f9-9a53254b6f92" />
 
 We can gather context on what these arguments may be by reviewing Microsoft Documentation for `VirtualAlloc`
 
 On line 78 we can see that `VirtualProtect` is being called with `_Dst` being passed to it as the first argument.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/d2c5c39a-57f0-46b8-b689-2e6fb9d4e341" />
+<img width="900" alt="Ghidra decompiler showing VirtualProtect called with _Dst as first argument on line 78" src="https://github.com/user-attachments/assets/d2c5c39a-57f0-46b8-b689-2e6fb9d4e341" />
 
 `VirtualProtect` changes the protection on a region of committed pages in the virtual address space. The first argument that gets passed to it is the address of the starting page of the region of pages whose access protection attributes are to be changed.
 `_Dst` is our area of interest, as it appears very likely that some form of executable code has been written to this address space.
@@ -49,16 +49,16 @@ We'll now move over to a debugger to attempt to locate and interrogate this area
 After loading the executable with WinDbg we use the command `bp $exentry` to set a breakpoint at the entrypoint and `g` to go there.
 Now we're going to set a breakpoint at `VirtualProtect` by using the command `bp VirtualProtect` and `g` to go there.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/61bf8bbc-7ba9-4d41-a678-c68aaddc7c0b" />
+<img width="900" alt="WinDbg breakpoint hit on VirtualProtect showing current instruction pointer" src="https://github.com/user-attachments/assets/61bf8bbc-7ba9-4d41-a678-c68aaddc7c0b" />
 
 We're now at the `VirtualProtect` API call.
 We can review the first argument being passed to `VirtualProtect` (lpAddress) by querying the EAX register.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/c06de256-60e7-48f9-9f69-0ea70a70f6a2" />
+<img width="900" alt="WinDbg registers view showing EAX pointing to 03030000 as the lpAddress argument" src="https://github.com/user-attachments/assets/c06de256-60e7-48f9-9f69-0ea70a70f6a2" />
 
 In my case, EAX is pointing to `03030000`. We navigate to this address in memory by using the Memory view. 
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/1abed962-4baa-4e1e-a732-2073e5aab48c" />
+<img width="900" alt="WinDbg memory view at 03030000 showing MZ and PE header of unpacked second-stage binary" src="https://github.com/user-attachments/assets/1abed962-4baa-4e1e-a732-2073e5aab48c" />
 
 The screenshot above shows the portable executable (PE) file format present at that address in memory. This indicates that a second-stage binary has been unpacked and is going to be executed by our initial binary.
 We can dump this memory by using the `.writemem `command, which requires the arguments FilePath, Base Address, End Address. In my case this is going to be `.writemem C:\Users\User\Desktop\dump.dmp 03030000 0303D000`.
@@ -68,16 +68,16 @@ We can dump this memory by using the `.writemem `command, which requires the arg
 Moving on to the binary we've just unpacked (HASH: `d950f0e4a597416aa8f4cb0682d29707cc8958b2972ab307b9f34316e806ec4d`)
 As this binary was pulled from memory, we need to use a tool like pe_unmapper to realign the PE from virtual to raw addresses.
 
-![image](https://github.com/user-attachments/assets/5e84130b-8f43-40c0-b0ac-ae2f887cb73b)
+![pe_unmapper tool realigning the memory-dumped PE from virtual to raw addresses](https://github.com/user-attachments/assets/5e84130b-8f43-40c0-b0ac-ae2f887cb73b)
 
 Now I'll load the binary into IDA, look at some interesting strings and take it from there.
 Strings can be viewed in IDA by navigating to View > Open subviews > Strings
 
-![image](https://github.com/user-attachments/assets/37cf39d2-4d4c-41a1-98a5-b3b8f8795c98)
+![IDA Pro strings view of the unpacked KoiLoader binary showing notable strings](https://github.com/user-attachments/assets/37cf39d2-4d4c-41a1-98a5-b3b8f8795c98)
 
 The string that caught my eye here was `Jennifer Lopez & Pitbull - On The Floor\r\nBeyonce - Halo`
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/7df464a5-1661-44fe-ab59-bb93135b7a3e" />
+<img width="900" alt="IDA Pro strings view showing suspicious music track names used as anti-analysis decoys" src="https://github.com/user-attachments/assets/7df464a5-1661-44fe-ab59-bb93135b7a3e" />
 
 Similar to Ghidra, we can double click this value and follow the XREF function to see where this string appears in a function. 
 Reviewing the rest of this function it appears that values taken from the host are being compared to strings, and if a value is a match, the program will exit. (This function exists at raw address `0x408A00`)
@@ -85,7 +85,7 @@ This whole function is an anti-analysis / anti-VM /Sandbox check. The program is
 
 Towards the top of the function we can see the following instructions: `0x00408A12`
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/9c53f4df-c6f4-48fc-a68b-372f41341ea5" />
+<img width="900" alt="IDA Pro disassembly at 0x00408A12 showing start of anti-VM check function" src="https://github.com/user-attachments/assets/9c53f4df-c6f4-48fc-a68b-372f41341ea5" />
 
 ## Breaking it down: anti-analysis checks
 
@@ -132,40 +132,40 @@ Now that I know this executable performs various anti-analysis checks, I want to
 Loading the binary into WinDbg I want to set a breakpoint at where the program checks for the `Parallels Display Adapter` string, as this is what my VM is running on and this is likely to result in the application exiting.
 Due to ASLR, we need to re-allign our debugger and our disassembler to the same base address. We can review our entry point address in WinDbg by reviewing this address when we load the executable:
 
-<img width="1250" alt="image" src="https://github.com/user-attachments/assets/317e2a0c-0cb1-48cf-9a79-16f895c1ac4a" />
+<img width="1250" alt="WinDbg showing entry point address when loading the unpacked binary to determine base address" src="https://github.com/user-attachments/assets/317e2a0c-0cb1-48cf-9a79-16f895c1ac4a" />
 
 My base address is `00990000`, which i need to tell IDA, this is done by going to Edit > Segments > Rebase Program
 
-![image](https://github.com/user-attachments/assets/a02cfd71-7adc-4e80-b607-ace59b032579)
+![IDA Pro Rebase Program dialog setting base address to 00990000 to match WinDbg](https://github.com/user-attachments/assets/a02cfd71-7adc-4e80-b607-ace59b032579)
 
 With our addresses re-aligned, I want to set a breakpoint to the Parallels virtualisation check, which is going to be at around `0x00998A7D`
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/bcd94521-096b-474e-9023-efc930ea9ffd" />
+<img width="900" alt="WinDbg breakpoint set at 0x00998A7D for the Parallels display adapter anti-VM check" src="https://github.com/user-attachments/assets/bcd94521-096b-474e-9023-efc930ea9ffd" />
 
 Stepping through the program, I can see that the following instruction pushes my Display Adapter to the EAX register, which is visible by reviewing the address at the EAX register
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/2f19d943-0259-4465-8711-634944494fff" />
+<img width="900" alt="WinDbg disassembly showing EAX being loaded with the display adapter device string" src="https://github.com/user-attachments/assets/2f19d943-0259-4465-8711-634944494fff" />
 
-<img width="350" alt="image" src="https://github.com/user-attachments/assets/dae58b60-5421-4848-bc9b-12d8cf681667" />
+<img width="350" alt="WinDbg memory view showing Parallels Display Adapter string at the EAX address" src="https://github.com/user-attachments/assets/dae58b60-5421-4848-bc9b-12d8cf681667" />
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/a23bba20-e433-45f4-8d85-a0ceab657dbb" />
+<img width="900" alt="WinDbg disassembly showing test eax, eax and jnz to 0x00998b55 after StrStrIW call" src="https://github.com/user-attachments/assets/a23bba20-e433-45f4-8d85-a0ceab657dbb" />
 
 After passing the `test eax, eax` instruction, my Zero Flag is changed to 0 (Visible in the Registers View)
 
-<img width="550" alt="image" src="https://github.com/user-attachments/assets/2dec2267-1dbb-4192-8e2a-e00c4cf202c0" />
+<img width="550" alt="WinDbg registers view showing Zero Flag cleared to 0 after Parallels string found" src="https://github.com/user-attachments/assets/2dec2267-1dbb-4192-8e2a-e00c4cf202c0" />
 
 This means I'm going to qualify for the jnz instruction and jump to address `0x00998b55`:
 
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/08a3ef98-88c7-4f97-83ec-9626f495d929" />
+<img width="600" alt="WinDbg disassembly showing jnz taken to 0x00998b55 due to Parallels VM detection" src="https://github.com/user-attachments/assets/08a3ef98-88c7-4f97-83ec-9626f495d929" />
 
 This jumps me to the end of the function and returns me to the previous function.
 
-<img width="650" alt="image" src="https://github.com/user-attachments/assets/7cdefd5f-bb67-4fd2-bdac-78f767e9271b" />
+<img width="650" alt="WinDbg showing return from anti-VM function with test al, al about to execute" src="https://github.com/user-attachments/assets/7cdefd5f-bb67-4fd2-bdac-78f767e9271b" />
 
 When I'm returned, a test al, al instruction is performed. `al` refers to the lower 8 bits of the EAX register. This is likely another anti-analysis check which is going to fail because I did not complete the previous function, and the process will terminate.
 I can confirm this by jumping to that address in IDA and reviewing the execution flow. This is done by pressing `g` to go to a specific address, in my case it's `0x009992ea`.
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/76482023-d733-4707-b813-f19b9c1ddb87" />
+<img width="800" alt="IDA Pro graph view at 0x009992ea showing ExitProcess called if test al,al fails" src="https://github.com/user-attachments/assets/76482023-d733-4707-b813-f19b9c1ddb87" />
 
 If the `test al,al` instruction fails (ZF=0), it will call `ExitProcess`.
 Otherwise, if it's happy (ZF=1) it looks like we proceed to the main functions of the program.
@@ -176,36 +176,36 @@ This means that we only need to satisfy this one check to be able to execute the
 We can manually change the zero-flag prior to a jnz instruction.
 By using the command `r@zf=1`, I change my zero flag from 0 to 1. Now when I step over the jnz instruction, it does not jump me.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/357b6d6d-b7a8-4423-8d46-ede979555665" />
+<img width="900" alt="WinDbg command r@zf=1 setting Zero Flag to 1 to bypass the jnz anti-VM check" src="https://github.com/user-attachments/assets/357b6d6d-b7a8-4423-8d46-ede979555665" />
 
 I can now continue execution of this program and review the further function calls
 
-<img width="700" alt="image" src="https://github.com/user-attachments/assets/53d99242-a9d9-4182-8c79-577ed02d70f1" />
+<img width="700" alt="WinDbg showing continued execution of the binary after bypassing the anti-VM check" src="https://github.com/user-attachments/assets/53d99242-a9d9-4182-8c79-577ed02d70f1" />
 
 ## Identifying C2 Address
 
 Now that we've overcome the anti-VM checks we can continue to investigate this binary. My goal is to identify a C2 address that the malware calls out to.
 Reviewing Imports, there are some loaded from the `WININET` library of interest:
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/f00e3ad9-e581-4e84-b4e6-8e3af502b9da" />
+<img width="900" alt="IDA Pro imports view showing WININET functions including InternetConnectW and HttpOpenRequestW" src="https://github.com/user-attachments/assets/f00e3ad9-e581-4e84-b4e6-8e3af502b9da" />
 
 Again, we double click on the API of interest and follow the XREF to see the references in a function.
 
-<img width="750" alt="image" src="https://github.com/user-attachments/assets/67e0c546-850c-468d-a9b4-db1cb7a1d2ad" />
+<img width="750" alt="IDA Pro disassembly showing InternetConnectW XREF with remote address pushed via EBP register" src="https://github.com/user-attachments/assets/67e0c546-850c-468d-a9b4-db1cb7a1d2ad" />
 
 Reviewing the documentation for `InternetConnectW` and reviewing the code above, we know that the second argument being passed to the API is our remote address. The value of which appears to be pushed to the EBP register.
 We'll set our breakpoint at the API in a debugger to review this further.
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/6dd2df7a-db57-4dc4-83c9-355b7a7bf82e" />
+<img width="900" alt="WinDbg breakpoint hit at InternetConnectW showing EBP-2C holds the remote address pointer" src="https://github.com/user-attachments/assets/6dd2df7a-db57-4dc4-83c9-355b7a7bf82e" />
 
 I'm now at the API call, reviewing the disassembly, I can see that the address for our remote address used for the `InternetConnectW` API call has been pushed to `ebp-2C`.
 To calculate this value, I need to subtract 2C from our current EBP register address.
 
-<img width="250" alt="image" src="https://github.com/user-attachments/assets/520af37b-e6a7-415a-ad9b-c024ba475857" />
+<img width="250" alt="WinDbg registers showing EBP value 026FFA90 used to calculate the pointer address" src="https://github.com/user-attachments/assets/520af37b-e6a7-415a-ad9b-c024ba475857" />
 
 `026FFA90 - 2C = 26FFA64`
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/8907f70c-25d0-4945-b07e-41744618e4ba" />
+<img width="900" alt="WinDbg memory view at 26FFA64 showing no readable C2 string indicating a pointer is used" src="https://github.com/user-attachments/assets/8907f70c-25d0-4945-b07e-41744618e4ba" />
 
 Reviewing that address in the memory view doesn't reveal anything that resembles a C2 address, so it's instead likely that a pointer has been used.
 
@@ -214,17 +214,17 @@ Reviewing that address in the memory view doesn't reveal anything that resembles
 We need to dereference this pointer to ascertain the memory address from which is being supplied to the API call.
 This is simply done by using the following command: `dd 26FFA64 L1`
 
-<img width="450" alt="image" src="https://github.com/user-attachments/assets/eb8ebc0c-43ba-4718-8488-23a398ff5764" />
+<img width="450" alt="WinDbg dd command dereferencing pointer at 26FFA64 to get address 0723e398" src="https://github.com/user-attachments/assets/eb8ebc0c-43ba-4718-8488-23a398ff5764" />
 
 This returns the address `0723e398`, navigating to this address in memory gives us the C2 IP: `87.121.61[.]55`
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/0e7362d3-7258-4595-a09d-060f025a6041" />
+<img width="900" alt="WinDbg memory view at 0723e398 showing C2 IP address 87.121.61.55 as ASCII string" src="https://github.com/user-attachments/assets/0e7362d3-7258-4595-a09d-060f025a6041" />
 
 ## KoiStealer Assembly
 
 That was the WinDbg element of this post covered, but the main payload to KoiStealer is the followig assmelby which gets downloaded and execution from this function:
 
-<img width="1300" alt="image" src="https://github.com/user-attachments/assets/dcb97fd7-c99c-40e7-ae97-2632a13caa6d" />
+<img width="1300" alt="IDA Pro decompiler showing function that downloads and executes KoiStealer assembly via PowerShell" src="https://github.com/user-attachments/assets/dcb97fd7-c99c-40e7-ae97-2632a13caa6d" />
 
 The routine determines which payload to retrieve based on the presence of the C# compiler (csc.exe, version v4.0.30319). If the compiler is found, it downloads sd4.ps1; otherwise, it downloads sd2.ps1. Both PowerShell scripts are designed to fetch and execute the KoiStealer malware.
 
@@ -263,11 +263,11 @@ The script retrieves the victim machine’s unique GUID from the Windows registr
 
 The C2 server is no longer alive but the contents can be retrieved from VirusTotal:
 
-<img width="694" alt="image" src="https://github.com/user-attachments/assets/30f3209c-e827-4159-83bf-8b5317329c17" />
+<img width="694" alt="VirusTotal showing cached C2 response with XOR key and victim arguments for KoiStealer" src="https://github.com/user-attachments/assets/30f3209c-e827-4159-83bf-8b5317329c17" />
 
 We now have the XOR key `LenKQVy4Bh10vp2vt9AE` and can decrypt the assmebly.
 
-<img width="1213" alt="image" src="https://github.com/user-attachments/assets/80a090b0-0a0d-4ec7-8983-d51cfebbb967" />
+<img width="1213" alt="CyberChef XOR decryption using key LenKQVy4Bh10vp2vt9AE revealing the KoiStealer assembly" src="https://github.com/user-attachments/assets/80a090b0-0a0d-4ec7-8983-d51cfebbb967" />
 
 We can see that the other 2 arguments are passed to the main function:
 
