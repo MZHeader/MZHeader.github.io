@@ -65,6 +65,13 @@ GA_HEAD='
   </script>
 '
 
+ASSET_HEAD='
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+'
+
 HLJS_HEAD='
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" onload="hljs.highlightAll()"></script>
@@ -177,6 +184,7 @@ for i in $(seq 1 $total_posts); do
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
+  ${ASSET_HEAD}
   ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
@@ -305,8 +313,12 @@ for i in $(seq 1 $total_posts); do
     #post-main {
       margin-left: 230px;
       flex: 1;
-      max-width: 900px;
       padding: 2rem;
+    }
+    .post-nav, article, .post-pagination {
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* ── Top nav ── */
@@ -618,6 +630,7 @@ cat > "_site/index.html" << ENDINDEX
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Reverse Engineering Malware" />
   <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
+  ${ASSET_HEAD}
   ${GA_HEAD}
   ${HLJS_HEAD}
   <style>
@@ -1020,7 +1033,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .pe-detail-panel.active .pe-detail-title {
       color: #8be9fd;
-      text-shadow: 0 0 8px rgba(255, 121, 198, 0.2);
+      text-shadow: 0 0 8px rgba(139, 233, 253, 0.2);
     }
     .pe-detail-desc {
       color: #666;

