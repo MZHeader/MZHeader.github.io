@@ -704,14 +704,14 @@ ${posts_list_html}
   </nav>
 
   <div id="mobile-nav">
-    <a class="mob-back" href="/">&larr; cd ..</a>
+    <a class="mob-back" href="/">&larr; ret</a>
     <span class="mob-sep">/</span>
     <span class="mob-title">${short_title}</span>
   </div>
 
   <div id="post-main">
     <div class="post-nav">
-      <a class="back-link" href="/">&larr; cd ..</a>
+      <a class="back-link" href="/">&larr; ret</a>
       <span class="post-meta">${formatted_date} &middot; ${read_time} min read</span>
     </div>
     <article>
@@ -1444,6 +1444,11 @@ cat > "_site/index.html" << ENDINDEX
       border-left: 2px solid #5625be;
     }
     .about-trigger:hover { background: rgba(86, 37, 190, 0.10); }
+    .about-trigger:hover .pe-comment::before {
+      content: "call  ";
+      color: #e6db74;
+      font-size: 0.82rem;
+    }
     .about-trigger .pe-comment { flex: 1; color: #a8a8c8; }
     .about-trigger.open .pe-comment { color: #8be9fd; }
     .about-toggle {
@@ -1917,7 +1922,7 @@ cat > "_site/404.html" << 'END404'
       <div class="code">0x00000404</div>
       <div class="msg">; STATUS_SECTION_NOT_FOUND</div>
       <div class="detail">; the requested section does not exist in the PE header</div>
-      <a href="/">&larr; cd ..</a>
+      <a href="/">&larr; ret</a>
     </div>
   </div>
 </body>
