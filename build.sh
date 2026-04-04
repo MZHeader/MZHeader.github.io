@@ -1218,7 +1218,7 @@ cat > "_site/404.html" << 'END404'
   <title>404 — Reverse Engineering Malware</title>
   <script>
     // Redirect old Jekyll URLs (/posts/slug) to new ones (/posts/slug.html)
-    var path = window.location.pathname;
+    var path = window.location.pathname.replace(/\/$/, '');
     if (path.match(/^\/posts\/[^/]+$/) && !path.endsWith('.html')) {
       window.location.replace(path + '.html');
     }
