@@ -65,25 +65,54 @@ posts_list_html=""
 post_data_js=""
 post_idx=0
 
+declare -a p_slugs p_titles p_dates p_date_strs p_descs
+
+# ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
     post_idx=$((post_idx + 1))
-    idx=$(printf "%03d" $post_idx)
     filename=$(basename "$post" .md)
     date_str="${filename:0:10}"
     slug="${filename:11}"
 
     formatted_date=$(date -d "$date_str" "+%b %-d, %Y" 2>/dev/null || date -j -f "%Y-%m-%d" "$date_str" "+%b %-d, %Y")
-
     description=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^description:/{sub(/^description: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     title=$(grep "^## " "$post" | head -1 | sed 's/^## //')
     [ -z "$title" ] && title="$slug"
 
-    body=$(pandoc "$post" \
+    p_slugs[$post_idx]="$slug"
+    p_titles[$post_idx]="$title"
+    p_dates[$post_idx]="$formatted_date"
+    p_date_strs[$post_idx]="$date_str"
+    p_descs[$post_idx]="$description"
+
+    pandoc "$post" \
         --from markdown+yaml_metadata_block-implicit_figures \
         --to html \
-        --no-highlight)
+        --no-highlight > "/tmp/mzbuild_${slug}.html"
 
-    # Write post header (variables expanded)
+    offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
+
+    js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
+    js_desc=$(printf '%s' "$description" | sed "s/'/\\\\'/g")
+
+    post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}'};"
+
+    posts_list_html+="
+      <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
+        <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
+        <span class=\"rsrc-title\">${title}</span>
+      </a>"
+done
+
+total_posts=$post_idx
+
+# ── Pass 2: write each post HTML with full sidebar ─────────────────────────
+for i in $(seq 1 $total_posts); do
+    slug="${p_slugs[$i]}"
+    title="${p_titles[$i]}"
+    formatted_date="${p_dates[$i]}"
+    date_str="${p_date_strs[$i]}"
+
     cat > "_site/posts/${slug}.html" << ENDHEADER
 <!DOCTYPE html>
 <html lang="en">
@@ -95,8 +124,14 @@ for post in $(ls _posts/*.md | sort -r); do
   <style>
     ${SHARED_CSS}
 
-    /* Scanline + vignette as body background layers */
+    /* Override body for sidebar layout */
     body {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
       background-color: #1e1e1e;
       background-image:
         radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%),
@@ -109,21 +144,135 @@ for post in $(ls _posts/*.md | sort -r); do
         );
     }
 
+    /* ── Sidebar ── */
+    #rsrc-sidebar {
+      width: 230px;
+      min-width: 230px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #13131a;
+      border-right: 1px solid #2a2a3a;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    #rsrc-sidebar::-webkit-scrollbar { width: 4px; }
+    #rsrc-sidebar::-webkit-scrollbar-track { background: #13131a; }
+    #rsrc-sidebar::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+    .rsrc-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.75rem;
+      background: #1a1a22;
+      border-bottom: 1px solid #2a2a3a;
+      position: sticky;
+      top: 0;
+      z-index: 101;
+    }
+    .rsrc-toolbar-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #5625be;
+      box-shadow: 0 0 4px #5625be88;
+      flex-shrink: 0;
+    }
+    .rsrc-toolbar-label {
+      font-size: 0.7rem;
+      color: #8be9fd;
+      letter-spacing: 0.08em;
+      flex: 1;
+    }
+    .rsrc-toolbar-count {
+      font-size: 0.65rem;
+      color: #3a3a55;
+    }
+    .rsrc-section-header {
+      font-size: 0.62rem;
+      color: #3a3a55;
+      letter-spacing: 0.1em;
+      padding: 0.5rem 0.75rem 0.3rem;
+      border-bottom: 1px solid #1e1e28;
+    }
+    .rsrc-post-list { flex: 1; }
+
+    /* Sidebar post rows — reuse rsrc-post-row but override widths */
+    #rsrc-sidebar a.rsrc-post-row {
+      display: block;
+      padding: 0.45rem 0.75rem;
+      border-left: 2px solid transparent;
+      border-bottom: 1px solid #1a1a22;
+      text-decoration: none;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    #rsrc-sidebar a.rsrc-post-row:hover {
+      background: rgba(86, 37, 190, 0.1);
+      border-left-color: #5625be;
+    }
+    #rsrc-sidebar a.rsrc-post-row.active {
+      background: rgba(139, 233, 253, 0.05);
+      border-left-color: #8be9fd;
+    }
+    #rsrc-sidebar .rsrc-gutter {
+      display: block;
+      font-size: 0.6rem;
+      color: #3a3a55;
+      margin-bottom: 0.1rem;
+      width: auto;
+    }
+    #rsrc-sidebar a.rsrc-post-row.active .rsrc-gutter { color: #5625be; }
+    #rsrc-sidebar .rsrc-title {
+      display: block;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.75rem;
+      color: #888;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      line-height: 1.35;
+    }
+    #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #c0c0c0; }
+    #rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
+
+    /* ── Main content ── */
+    #post-main {
+      margin-left: 230px;
+      flex: 1;
+      max-width: 900px;
+      padding: 2rem;
+      padding-top: calc(2rem + 44px);
+    }
+
+    /* ── Fixed top nav ── */
     .post-nav {
+      position: fixed;
+      top: 0;
+      left: 230px;
+      right: 0;
+      z-index: 90;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 2.5rem;
-      padding-bottom: 0.75rem;
+      padding: 0.6rem 2rem;
+      background: rgba(19, 19, 26, 0.97);
       border-bottom: 1px solid #2a2a3a;
+      backdrop-filter: blur(6px);
     }
     .back-link {
       color: #50fa7b;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.85rem;
       text-shadow: 0 0 6px rgba(80, 250, 123, 0.3);
+      text-decoration: none;
     }
-    .back-link:hover { text-decoration: none; text-shadow: 0 0 10px rgba(80, 250, 123, 0.6); }
+    .back-link:hover { text-shadow: 0 0 10px rgba(80, 250, 123, 0.6); }
     .post-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.78rem;
@@ -131,7 +280,7 @@ for post in $(ls _posts/*.md | sort -r); do
       letter-spacing: 0.03em;
     }
 
-    /* Post title - first h2 */
+    /* ── Article ── */
     article h2:first-of-type {
       font-size: 1.9rem;
       color: #7c4dff;
@@ -140,7 +289,6 @@ for post in $(ls _posts/*.md | sort -r); do
       padding-bottom: 0.5rem;
       margin-bottom: 1.5rem;
     }
-    /* Section headings */
     article h2 {
       font-size: 1.2rem;
       color: #8be9fd;
@@ -155,12 +303,14 @@ for post in $(ls _posts/*.md | sort -r); do
       padding-left: 0.6rem;
       margin-top: 1.5rem;
     }
-
     article { max-width: 100%; }
 
-    @media (max-width: 600px) {
-      body { padding: 1rem; }
-      .post-nav { padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      body { display: block; }
+      #rsrc-sidebar { display: none; }
+      #post-main { margin-left: 0; max-width: 100%; padding: 1rem; padding-top: calc(1rem + 44px); }
+      .post-nav { left: 0; padding: 0.6rem 1rem; }
       article h2:first-of-type { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
@@ -168,36 +318,53 @@ for post in $(ls _posts/*.md | sort -r); do
   </style>
 </head>
 <body>
-  <div class="post-nav">
-    <a class="back-link" href="/">&larr; cd ..</a>
-    <span class="post-meta">${formatted_date}</span>
-  </div>
-  <article>
+
+  <nav id="rsrc-sidebar">
+    <div class="rsrc-toolbar">
+      <span class="rsrc-toolbar-dot"></span>
+      <span class="rsrc-toolbar-label">.rsrc</span>
+      <span class="rsrc-toolbar-count" id="rsrc-count"></span>
+    </div>
+    <div class="rsrc-section-header">POSTS</div>
+    <div class="rsrc-post-list">
+${posts_list_html}
+    </div>
+  </nav>
+
+  <div id="post-main">
+    <div class="post-nav">
+      <a class="back-link" href="/">&larr; cd ..</a>
+      <span class="post-meta">${formatted_date}</span>
+    </div>
+    <article>
 ENDHEADER
 
-    # Append body safely (no variable expansion on content)
-    printf '%s\n' "$body" >> "_site/posts/${slug}.html"
+    cat "/tmp/mzbuild_${slug}.html" >> "_site/posts/${slug}.html"
 
-    # Append footer
-    cat >> "_site/posts/${slug}.html" << 'ENDFOOTER'
-  </article>
+    cat >> "_site/posts/${slug}.html" << ENDFOOTER
+    </article>
+  </div>
+
+<script>
+(function() {
+  var currentSlug = "${slug}";
+  var rows = document.querySelectorAll("#rsrc-sidebar a.rsrc-post-row");
+  var activeRow = null;
+  rows.forEach(function(row) {
+    if (row.getAttribute("href") && row.getAttribute("href").indexOf("/" + currentSlug + ".html") !== -1) {
+      row.classList.add("active");
+      activeRow = row;
+    }
+  });
+  var countEl = document.getElementById("rsrc-count");
+  if (countEl) countEl.textContent = rows.length + " entries";
+  if (activeRow) setTimeout(function() { activeRow.scrollIntoView({ block: "center", behavior: "instant" }); }, 0);
+})();
+</script>
+
 </body>
 </html>
 ENDFOOTER
-
-    offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
-
-    # Escape single quotes for JS string
-    js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
-    js_desc=$(printf '%s' "$description" | sed "s/'/\\\\'/g")
-
-    post_data_js+="postData['post-${post_idx}']={slug:'/posts/${slug}.html',title:'${js_title}',desc:'${js_desc}',date:'${date_str}'};"
-
-    posts_list_html+="
-      <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
-        <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
-        <span class=\"rsrc-title\">${title}</span>
-      </a>"
 
     echo "Built: posts/${slug}.html"
 done
