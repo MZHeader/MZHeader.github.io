@@ -133,20 +133,11 @@ for post in $(ls _posts/*.md | sort -r); do
         --no-highlight > "/tmp/mzbuild_${slug}.html"
 
     # Strip the first h2 (post title) — we render it as h1 in the template instead
-    # Add loading="lazy" to all images except the first
     python3 - <<'PYSTRIP' "/tmp/mzbuild_${slug}.html"
 import sys, re
 path = sys.argv[1]
 content = open(path).read()
 content = re.sub(r'<h2[^>]*>.*?</h2>', '', content, count=1, flags=re.DOTALL)
-count = [0]
-def lazy_img(m):
-    count[0] += 1
-    tag = m.group(0)
-    if count[0] == 1 or 'loading=' in tag:
-        return tag
-    return tag.replace('<img', '<img loading="lazy"', 1)
-content = re.sub(r'<img\b[^>]*/?>', lazy_img, content, flags=re.DOTALL)
 open(path, 'w').write(content)
 PYSTRIP
 
