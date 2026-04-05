@@ -2024,9 +2024,6 @@ cat > "_site/404.html" << 'END404'
     a { color:#50fa7b; text-decoration:none; font-size:0.82rem; text-shadow:0 0 6px rgba(80,250,123,0.3); transition: text-shadow 0.15s; }
     a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
     a:focus-visible { outline:2px solid #5625be; outline-offset:2px; }
-    .home-link { margin-top:1.2rem; font-size:0.78rem; color:#5a5a7a; }
-    .home-link a { color:#8be9fd; font-size:0.78rem; text-shadow:none; }
-    .home-link a:hover { text-shadow:0 0 8px rgba(139,233,253,0.4); }
   </style>
 </head>
 <body>
@@ -2050,11 +2047,10 @@ cat > "_site/404.html" << 'END404'
         </div>
         <div class="disasm-row"><span class="gutter">:000D</span><span class="instr">call</span><span class="operand" style="color:#e6db74">RaiseException</span></div>
         <div class="disasm-row"><span class="gutter">:0012</span><span class="instr">xor</span><span class="operand">eax, eax</span></div>
-        <div class="disasm-row"><span class="gutter">:0014</span><span class="instr">jmp</span><span class="operand"><a href="/">__entry_point</a></span></div>
+        <div class="disasm-row"><span class="gutter">:0014</span><span class="instr">ret</span><span class="comment">; <a href="/">back to posts</a></span></div>
       </div>
     </div>
   </div>
-  <div class="home-link">; <a href="/">back to posts</a></div>
 </body>
 </html>
 END404
