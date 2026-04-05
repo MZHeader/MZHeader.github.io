@@ -1899,6 +1899,15 @@ ${posts_list_html}
         buttons[j].classList.toggle('active', isActive);
         buttons[j].setAttribute('aria-pressed', isActive ? 'true' : 'false');
       }
+      // Clear animation after stagger completes
+      if (!prefersRM) {
+        var filterDelay = visibleIdx * 35 + 200;
+        setTimeout(function() {
+          for (var i = 0; i < rows.length; i++) {
+            rows[i].style.animation = 'none';
+          }
+        }, filterDelay);
+      }
     }
 
     filterBar.addEventListener('click', function(e) {
@@ -1917,6 +1926,13 @@ ${posts_list_html}
       for (var k = 0; k < rows.length; k++) {
         rows[k].style.animationDelay = (k * 35) + 'ms';
       }
+      // Clear animation after all rows have entered so it doesn't replay
+      var lastDelay = rows.length * 35 + 200;
+      setTimeout(function() {
+        for (var k = 0; k < rows.length; k++) {
+          rows[k].style.animation = 'none';
+        }
+      }, lastDelay);
     }
 
     // Scroll-aware gutter highlight — row nearest viewport center glows
