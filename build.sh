@@ -1138,7 +1138,7 @@ cat > "_site/index.html" << ENDINDEX
     .pe-gutter {
       width: 7em;
       flex-shrink: 0;
-      color: #3a3a55;
+      color: #5a5a7a;
       font-size: 0.82rem;
       user-select: none;
       padding-top: 0.15em;
@@ -1188,15 +1188,29 @@ cat > "_site/index.html" << ENDINDEX
       border-left: 2px solid transparent;
       transition: background 0.12s ease, border-left-color 0.12s ease;
     }
-    .rsrc-post-row:hover {
+    .rsrc-post-row:hover,
+    .rsrc-post-row:focus-visible {
       background: rgba(86, 37, 190, 0.10);
       border-left-color: #5625be;
       text-decoration: none;
     }
+    .rsrc-post-row:focus-visible .rsrc-gutter { color: #5625be; }
+    .rsrc-post-row:focus-visible .rsrc-title {
+      color: #8be9fd;
+      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
+    }
+    .rsrc-post-row:focus-visible .rsrc-title::before {
+      content: "call  ";
+      color: #e6db74;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      font-weight: normal;
+    }
+    .rsrc-post-row:focus-visible .rsrc-meta { color: #6e6e90; }
     .rsrc-post-row .rsrc-gutter {
       width: 7em;
       flex-shrink: 0;
-      color: #3a3a55;
+      color: #5a5a7a;
       font-size: 0.82rem;
       user-select: none;
       padding-top: 0.15rem;
@@ -1231,7 +1245,7 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.74rem;
-      color: #555570;
+      color: #7a7a99;
       letter-spacing: 0.01em;
       line-height: 1.4;
     }
@@ -1425,6 +1439,34 @@ cat > "_site/index.html" << ENDINDEX
       margin-left: 0.15rem;
     }
     .filter-btn.active .filter-count { color: inherit; opacity: 0.7; }
+    .filter-btn:focus-visible {
+      outline: 2px solid #5625be;
+      outline-offset: 1px;
+    }
+
+    /* Skip-to-content link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: #5625be;
+      color: #fff;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.8rem;
+      border-radius: 0 0 4px 4px;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* General focus-visible for interactive elements */
+    .about-trigger:focus-visible {
+      outline: 2px solid #5625be;
+      outline-offset: -2px;
+    }
 
     @media (max-width: 600px) {
       body { padding: 1rem; }
@@ -1436,7 +1478,7 @@ cat > "_site/index.html" << ENDINDEX
       .rsrc-post-row .rsrc-title { white-space: normal; }
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
-      .about-toggle { display: none; }
+      .about-toggle { font-size: 0.6rem; }
     }
 
     /* Reduced motion preference */
@@ -1526,6 +1568,8 @@ cat > "_site/index.html" << ENDINDEX
 </head>
 <body>
 
+<a href="#postsList" class="skip-link">Skip to posts</a>
+
 <header>
   <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
   <div class="magnifier" id="magnifier"></div>
@@ -1597,12 +1641,12 @@ cat > "_site/index.html" << ENDINDEX
     <div class="pe-section-body">
       <div class="filter-bar" id="filterBar">
         <span class="filter-bar-label">; filter:</span>
-        <button class="filter-btn active" data-cat="all">ALL</button>
-        
-        <button class="filter-btn" data-cat="infostealer">InfoStealer</button>
-        <button class="filter-btn" data-cat="rats">RAT</button>
-        <button class="filter-btn" data-cat="loader">Loader</button>
-        <button class="filter-btn" data-cat="ctf">CTF</button>
+        <button class="filter-btn active" data-cat="all" aria-pressed="true">ALL</button>
+
+        <button class="filter-btn" data-cat="infostealer" aria-pressed="false">InfoStealer</button>
+        <button class="filter-btn" data-cat="rats" aria-pressed="false">RAT</button>
+        <button class="filter-btn" data-cat="loader" aria-pressed="false">Loader</button>
+        <button class="filter-btn" data-cat="ctf" aria-pressed="false">CTF</button>
       </div>
       <div id="postsList">
 ${posts_list_html}
@@ -1682,21 +1726,24 @@ ${posts_list_html}
   const postData = {};
   ${post_data_js}
 
+  function showDetail(row) {
+    const data = postData[row.id];
+    if (data) {
+      panel.classList.add('active');
+      detailBody.innerHTML =
+        '<div class="pe-detail-title">' + data.title + '</div>' +
+        '<div class="pe-detail-desc">' + data.desc + '</div>' +
+        '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
+        '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
+    }
+  }
+  function hideDetail() { panel.classList.remove('active'); }
+
   document.querySelectorAll('.rsrc-post-row').forEach(row => {
-    row.addEventListener('mouseenter', () => {
-      const data = postData[row.id];
-      if (data) {
-        panel.classList.add('active');
-        detailBody.innerHTML =
-          '<div class="pe-detail-title">' + data.title + '</div>' +
-          '<div class="pe-detail-desc">' + data.desc + '</div>' +
-          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
-          '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
-      }
-    });
-    row.addEventListener('mouseleave', () => {
-      panel.classList.remove('active');
-    });
+    row.addEventListener('mouseenter', () => showDetail(row));
+    row.addEventListener('mouseleave', hideDetail);
+    row.addEventListener('focus', () => showDetail(row));
+    row.addEventListener('blur', hideDetail);
   });
 
   (function() {
@@ -1786,7 +1833,9 @@ ${posts_list_html}
         }
       }
       for (var j = 0; j < buttons.length; j++) {
-        buttons[j].classList.toggle('active', buttons[j].getAttribute('data-cat') === cat);
+        var isActive = buttons[j].getAttribute('data-cat') === cat;
+        buttons[j].classList.toggle('active', isActive);
+        buttons[j].setAttribute('aria-pressed', isActive ? 'true' : 'false');
       }
     }
 
