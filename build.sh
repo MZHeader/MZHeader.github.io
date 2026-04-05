@@ -2031,12 +2031,13 @@ cat > "_site/404.html" << 'END404'
         <div class="disasm-row"><span class="gutter">:0000</span><span class="comment">; <strong>STATUS_SECTION_NOT_FOUND</strong></span></div>
         <div class="disasm-row"><span class="gutter">:0004</span><span class="comment">; the requested RVA does not map to any section</span></div>
         <div class="sep">&nbsp;</div>
-        <div class="disasm-row"><span class="gutter">:0008</span><span class="instr">mov</span><span class="operand">eax, <span style="color:#c62828">0x00000404</span></span></div>
+        <div class="disasm-row"><span class="gutter">:0008</span><span class="instr">push</span><span class="operand"><span style="color:#c62828">0x194</span></span></div>
         <div style="text-align:center;padding:0.3rem 0;">
-          <div class="code">0x00000404</div>
+          <div class="code">0x00000194</div>
         </div>
-        <div class="disasm-row"><span class="gutter">:000C</span><span class="instr">xor</span><span class="operand">edx, edx</span></div>
-        <div class="disasm-row"><span class="gutter">:0010</span><span class="instr">jmp</span><span class="operand"><a href="/">__entry_point</a></span></div>
+        <div class="disasm-row"><span class="gutter">:000D</span><span class="instr">call</span><span class="operand" style="color:#e6db74">RaiseException</span></div>
+        <div class="disasm-row"><span class="gutter">:0012</span><span class="instr">xor</span><span class="operand">eax, eax</span></div>
+        <div class="disasm-row"><span class="gutter">:0014</span><span class="instr">jmp</span><span class="operand"><a href="/">__entry_point</a></span></div>
       </div>
     </div>
   </div>
