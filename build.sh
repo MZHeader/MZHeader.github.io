@@ -78,7 +78,6 @@ ASSET_HEAD='
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" as="style" />
 '
 
 HLJS_HEAD='
@@ -251,8 +250,8 @@ for i in $(seq 1 $total_posts); do
           0deg,
           transparent,
           transparent 2px,
-          rgba(0, 0, 0, 0.06) 2px,
-          rgba(0, 0, 0, 0.06) 4px
+          rgba(0, 0, 0, 0.09) 2px,
+          rgba(0, 0, 0, 0.09) 4px
         );
     }
 
@@ -352,13 +351,16 @@ for i in $(seq 1 $total_posts); do
       line-height: 1.35;
     }
     #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #c0c0c0; }
-    #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title::before {
+    #rsrc-sidebar .rsrc-title::before {
       content: "call  ";
       color: #e6db74;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.65rem;
       font-weight: normal;
+      opacity: 0;
+      transition: opacity 0.15s ease;
     }
+    #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title::before { opacity: 1; }
     #rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
     #rsrc-sidebar .rsrc-meta { display: none; }
 
@@ -456,14 +458,19 @@ for i in $(seq 1 $total_posts); do
       font-size: 0.8rem;
       transition: color 0.1s;
     }
+    .toc-body li a::before {
+      content: "jmp  ";
+      color: #e6db74;
+      font-size: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
     .toc-body li:hover > a {
       color: #8be9fd;
       text-decoration: none;
     }
     .toc-body li:hover > a::before {
-      content: "jmp  ";
-      color: #e6db74;
-      font-size: 0.75rem;
+      opacity: 1;
     }
     .toc-category {
       color: #5625be;
@@ -481,6 +488,15 @@ for i in $(seq 1 $total_posts); do
     .toc-h3 { padding-left: 1rem !important; }
     .toc-h3 a { font-size: 0.75rem !important; color: #777 !important; }
     .toc-h3:hover > a { color: #8be9fd !important; }
+    .toc-body li a.toc-active {
+      color: #8be9fd;
+    }
+    .toc-body li a.toc-active::before {
+      content: "► ";
+      color: #5625be;
+      font-size: 0.65rem;
+    }
+    .toc-h3 a.toc-active { color: #8be9fd !important; }
 
     /* ── Article ── */
     article h1 {
@@ -506,7 +522,7 @@ for i in $(seq 1 $total_posts); do
       margin-top: 1.5rem;
     }
     article { max-width: 100%; }
-    article p { color: #b8b8c8; line-height: 1.75; }
+    article p { color: #b8b8c8; line-height: 1.75; max-width: 65ch; }
     article li { color: #b8b8c8; line-height: 1.75; }
     article strong { color: #dcdcdc; }
 
@@ -851,6 +867,38 @@ ENDHEADER
     });
   }
 
+  // ── Scroll-spy for TOC ──
+  if (tocBody) {
+    var tocLinks = tocBody.querySelectorAll("a[href^='#']");
+    var headingEls = [];
+    tocLinks.forEach(function(link) {
+      var id = link.getAttribute("href").slice(1);
+      var el = document.getElementById(id);
+      if (el) headingEls.push({ el: el, link: link });
+    });
+    if (headingEls.length > 0) {
+      var spyActive = null;
+      function updateSpy() {
+        var scrollY = window.scrollY || document.documentElement.scrollTop;
+        var current = null;
+        for (var i = 0; i < headingEls.length; i++) {
+          if (headingEls[i].el.offsetTop - 120 <= scrollY) current = i;
+        }
+        if (current !== spyActive) {
+          if (spyActive !== null) headingEls[spyActive].link.classList.remove("toc-active");
+          if (current !== null) headingEls[current].link.classList.add("toc-active");
+          spyActive = current;
+        }
+      }
+      var spyTimer;
+      window.addEventListener("scroll", function() {
+        if (spyTimer) return;
+        spyTimer = requestAnimationFrame(function() { updateSpy(); spyTimer = null; });
+      });
+      updateSpy();
+    }
+  }
+
   // ── Copy buttons on code blocks ──
   document.querySelectorAll("pre").forEach(function(pre) {
     var wrapper = document.createElement("div");
@@ -914,8 +962,8 @@ cat > "_site/index.html" << ENDINDEX
           0deg,
           transparent,
           transparent 2px,
-          rgba(0, 0, 0, 0.06) 2px,
-          rgba(0, 0, 0, 0.06) 4px
+          rgba(0, 0, 0, 0.09) 2px,
+          rgba(0, 0, 0, 0.09) 4px
         );
     }
 
@@ -1199,13 +1247,6 @@ cat > "_site/index.html" << ENDINDEX
       color: #8be9fd;
       text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
     }
-    .rsrc-post-row:focus-visible .rsrc-title::before {
-      content: "call  ";
-      color: #e6db74;
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.82rem;
-      font-weight: normal;
-    }
     .rsrc-post-row:focus-visible .rsrc-meta { color: #6e6e90; }
     .rsrc-post-row .rsrc-gutter {
       width: 7em;
@@ -1231,12 +1272,18 @@ cat > "_site/index.html" << ENDINDEX
       text-overflow: ellipsis;
       line-height: 1.5;
     }
-    .rsrc-post-row:hover .rsrc-title::before {
+    .rsrc-post-row .rsrc-title::before {
       content: "call  ";
       color: #e6db74;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.82rem;
       font-weight: normal;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .rsrc-post-row:hover .rsrc-title::before,
+    .rsrc-post-row:focus-visible .rsrc-title::before {
+      opacity: 1;
     }
     .rsrc-post-row:hover .rsrc-title {
       color: #8be9fd;
@@ -1655,51 +1702,25 @@ ${posts_list_html}
 
     <!-- Section divider -->
     <div class="pe-section-divider">
-      <span class="pe-section-divider-label">Section[2]&nbsp;&nbsp;.lnkin&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00006000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
+      <span class="pe-section-divider-label">Section[2]&nbsp;&nbsp;.idata&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00006000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000600&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x40000040</span>
     </div>
 
-    <!-- .lnkin section -->
+    <!-- .idata section — external links -->
     <div class="pe-section-toolbar">
-      <span class="pe-section-name">.lnkin</span>
-      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
+      <span class="pe-section-name">.idata</span>
+      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ">Characteristics: 0x40000040</span>
     </div>
     <div class="pe-section-body">
       <a class="rsrc-post-row" href="https://www.linkedin.com/in/liam-chugg/" target="_blank" rel="noopener noreferrer">
-        <span class="rsrc-gutter">.lnkin:0000</span>
+        <span class="rsrc-gutter">.idata:0000</span>
         <span class="rsrc-title">linkedin.com/in/liam-chugg</span>
       </a>
-    </div>
-
-    <!-- Section divider -->
-    <div class="pe-section-divider">
-      <span class="pe-section-divider-label">Section[3]&nbsp;&nbsp;.gthb&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00007000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
-    </div>
-
-    <!-- .gthb section -->
-    <div class="pe-section-toolbar">
-      <span class="pe-section-name">.gthb</span>
-      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
-    </div>
-    <div class="pe-section-body">
       <a class="rsrc-post-row" href="https://github.com/MZHeader" target="_blank" rel="noopener noreferrer">
-        <span class="rsrc-gutter">.gthb:0000</span>
+        <span class="rsrc-gutter">.idata:0020</span>
         <span class="rsrc-title">github.com/MZHeader</span>
       </a>
-    </div>
-
-    <!-- Section divider -->
-    <div class="pe-section-divider">
-      <span class="pe-section-divider-label">Section[4]&nbsp;&nbsp;.xcom&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00008000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x00000200</span>
-    </div>
-
-    <!-- .xcom section -->
-    <div class="pe-section-toolbar">
-      <span class="pe-section-name">.xcom</span>
-      <span class="pe-section-flags" title="IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_READ | IMAGE_SCN_LNK_INFO">Characteristics: 0x00000200</span>
-    </div>
-    <div class="pe-section-body">
       <a class="rsrc-post-row" href="https://x.com/Chuggx00" target="_blank" rel="noopener noreferrer">
-        <span class="rsrc-gutter">.xcom:0000</span>
+        <span class="rsrc-gutter">.idata:0040</span>
         <span class="rsrc-title">x.com/Chuggx00</span>
       </a>
     </div>
@@ -1960,17 +1981,38 @@ cat > "_site/404.html" << 'END404'
     }
   </script>
   <style>
-    body { background:#1e1e1e; color:#dcdcdc; font-family:"Fira Code","Consolas",monospace; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; flex-direction:column; gap:0; }
-    .pe-box { border:1px solid #2a2a3a; border-radius:6px; overflow:hidden; background:rgba(10,10,16,0.7); max-width:420px; width:90%; }
+    body {
+      background-color:#1e1e1e;
+      background-image:
+        radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.09) 2px, rgba(0,0,0,0.09) 4px);
+      color:#dcdcdc; font-family:"Fira Code","Consolas",monospace; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; flex-direction:column; gap:0;
+    }
+    .pe-box { border:1px solid #2a2a3a; border-radius:6px; overflow:hidden; background:rgba(10,10,16,0.7); max-width:480px; width:90%; }
     .pe-titlebar { display:flex; align-items:center; padding:0.4rem 0.75rem; background:#12121a; border-bottom:1px solid #2a2a3a; font-size:0.72rem; color:#666; gap:0.6rem; }
     .pe-dots { display:flex; gap:5px; margin-right:0.3rem; }
     .pe-dot { width:7px; height:7px; border-radius:50%; background:#555; }
     .pe-dot.close { background:#c62828; box-shadow:0 0 4px rgba(198,40,40,0.5); }
-    .pe-body { padding:1.2rem 1rem; }
-    .code { color:#c62828; font-size:2.4rem; font-weight:700; text-shadow:0 0 8px rgba(198,40,40,0.4); margin-bottom:0.6rem; }
-    .msg { color:#777; font-size:0.82rem; margin-bottom:0.3rem; }
-    .detail { color:#4a4a6a; font-size:0.72rem; margin-bottom:1.2rem; }
-    a { color:#50fa7b; text-decoration:none; font-size:0.85rem; text-shadow:0 0 6px rgba(80,250,123,0.3); }
+    .pe-body { padding:0; }
+    .code { color:#c62828; font-size:2.4rem; font-weight:700; text-shadow:0 0 8px rgba(198,40,40,0.4); margin-bottom:0.4rem; animation: glitch 6s infinite; }
+    @keyframes glitch {
+      0%,88%,100% { text-shadow:0 0 8px rgba(198,40,40,0.4); transform:translate(0); }
+      90% { text-shadow:-2px 0 #8be9fd, 2px 0 #8be9fd; transform:translate(-2px,0); }
+      92% { text-shadow:2px 0 #8be9fd, -2px 0 #8be9fd; transform:translate(2px,0); }
+      94% { text-shadow:-1px 0 #c62828, 1px 0 #8be9fd; transform:translate(-1px,-1px); }
+      96% { text-shadow:0 0 8px rgba(198,40,40,0.4); transform:translate(0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .code { animation:none; } }
+    .disasm { padding:0.8rem 1rem; }
+    .disasm-row { display:flex; padding:0.25rem 0; line-height:1.7; }
+    .gutter { width:6em; flex-shrink:0; color:#5a5a7a; font-size:0.78rem; user-select:none; }
+    .instr { color:#5625be; width:3em; flex-shrink:0; font-size:0.82rem; }
+    .operand { color:#e4e4e4; font-size:0.82rem; }
+    .comment { color:#8888b0; font-size:0.82rem; }
+    .comment strong { color:#c62828; font-weight:600; }
+    .sep { color:#2a2a3a; padding:0.1rem 0; font-size:0.78rem; }
+    .ret-row { padding:0.6rem 1rem 0.8rem; border-top:1px solid #1e1e28; }
+    a { color:#50fa7b; text-decoration:none; font-size:0.82rem; text-shadow:0 0 6px rgba(80,250,123,0.3); transition: text-shadow 0.15s; }
     a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
   </style>
 </head>
@@ -1982,13 +2024,20 @@ cat > "_site/404.html" << 'END404'
         <span class="pe-dot"></span>
         <span class="pe-dot"></span>
       </div>
-      <span>pe-viewer &#8212; exception</span>
+      <span style="color:#c62828">pe-viewer</span><span style="color:#333;margin:0 0.3em">&#8212;</span><span>exception handler</span>
     </div>
     <div class="pe-body">
-      <div class="code">0x00000404</div>
-      <div class="msg">; STATUS_SECTION_NOT_FOUND</div>
-      <div class="detail">; the requested section does not exist in the PE header</div>
-      <a href="/">&larr; ret</a>
+      <div class="disasm">
+        <div class="disasm-row"><span class="gutter">:0000</span><span class="comment">; <strong>STATUS_SECTION_NOT_FOUND</strong></span></div>
+        <div class="disasm-row"><span class="gutter">:0004</span><span class="comment">; the requested RVA does not map to any section</span></div>
+        <div class="sep">&nbsp;</div>
+        <div class="disasm-row"><span class="gutter">:0008</span><span class="instr">mov</span><span class="operand">eax, <span style="color:#c62828">0x00000404</span></span></div>
+        <div style="text-align:center;padding:0.3rem 0;">
+          <div class="code">0x00000404</div>
+        </div>
+        <div class="disasm-row"><span class="gutter">:000C</span><span class="instr">xor</span><span class="operand">edx, edx</span></div>
+        <div class="disasm-row"><span class="gutter">:0010</span><span class="instr">jmp</span><span class="operand"><a href="/">__entry_point</a></span></div>
+      </div>
     </div>
   </div>
 </body>
