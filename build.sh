@@ -1164,9 +1164,13 @@ cat > "_site/index.html" << ENDINDEX
       background: rgba(13, 13, 20, 0.85);
       border-top: 1px solid #1e1e28;
       border-bottom: 1px solid #1e1e28;
+      border-left: 3px solid transparent;
       white-space: nowrap;
       overflow: hidden;
     }
+    .pe-section-divider--text { border-left-color: #5625be; }
+    .pe-section-divider--rsrc { border-left-color: #8be9fd; }
+    .pe-section-divider--idata { border-left-color: #50fa7b; }
     .pe-section-divider-label {
       font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
       font-size: 0.72rem;
@@ -1257,6 +1261,25 @@ cat > "_site/index.html" << ENDINDEX
       text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
     }
     .rsrc-post-row:focus-visible .rsrc-meta { color: #6e6e90; }
+    /* Staggered entrance animation for post rows */
+    @keyframes row-enter {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .rsrc-post-row {
+      animation: row-enter 0.2s ease both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .rsrc-post-row { animation: none; }
+    }
+
+    /* Scroll-aware gutter highlight */
+    .rsrc-post-row .rsrc-gutter.gutter-near {
+      color: #8be9fd;
+      text-shadow: 0 0 6px rgba(139, 233, 253, 0.25);
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+
     .rsrc-post-row .rsrc-gutter {
       width: 7em;
       flex-shrink: 0;
@@ -1264,6 +1287,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.82rem;
       user-select: none;
       padding-top: 0.15rem;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
     }
     .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
     .rsrc-title-block {
@@ -1683,7 +1707,7 @@ cat > "_site/index.html" << ENDINDEX
     </div>
 
     <!-- Section divider -->
-    <div class="pe-section-divider">
+    <div class="pe-section-divider pe-section-divider--rsrc">
       <span class="pe-section-divider-label">Section[1]&nbsp;&nbsp;.rsrc&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00004000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00001200&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x40000040</span>
     </div>
 
@@ -1710,7 +1734,7 @@ ${posts_list_html}
     </div>
 
     <!-- Section divider -->
-    <div class="pe-section-divider">
+    <div class="pe-section-divider pe-section-divider--idata">
       <span class="pe-section-divider-label">Section[2]&nbsp;&nbsp;.idata&nbsp;&nbsp;<span class="pe-divider-detail">VirtualAddress:&nbsp;0x00006000&nbsp;&nbsp;&nbsp;VirtualSize:&nbsp;0x00000600&nbsp;&nbsp;&nbsp;</span>Characteristics:&nbsp;0x40000040</span>
     </div>
 
@@ -1845,6 +1869,8 @@ ${posts_list_html}
       return m ? m[1] : 'analysis';
     }
 
+    var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function applyFilter(cat) {
       activeCat = cat;
       var visibleIdx = 0;
@@ -1858,6 +1884,12 @@ ${posts_list_html}
             var offset = (visibleIdx * 32).toString(16).toUpperCase();
             while (offset.length < 4) offset = '0' + offset;
             gutter.textContent = '.rsrc:' + offset;
+          }
+          if (!prefersRM) {
+            rows[i].style.animation = 'none';
+            rows[i].offsetHeight;
+            rows[i].style.animation = '';
+            rows[i].style.animationDelay = (visibleIdx * 35) + 'ms';
           }
           visibleIdx++;
         }
@@ -1879,6 +1911,37 @@ ${posts_list_html}
         applyFilter(cat);
       }
     });
+
+    // Initial stagger on page load
+    if (!prefersRM) {
+      for (var k = 0; k < rows.length; k++) {
+        rows[k].style.animationDelay = (k * 35) + 'ms';
+      }
+    }
+
+    // Scroll-aware gutter highlight — row nearest viewport center glows
+    var gutterTimer;
+    function updateGutterHighlight() {
+      var viewMid = window.innerHeight / 2;
+      var closest = null;
+      var closestDist = Infinity;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].style.display === 'none') continue;
+        var rect = rows[i].getBoundingClientRect();
+        var rowMid = rect.top + rect.height / 2;
+        var dist = Math.abs(rowMid - viewMid);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      }
+      for (var i = 0; i < rows.length; i++) {
+        var g = rows[i].querySelector('.rsrc-gutter');
+        if (g) g.classList.toggle('gutter-near', i === closest);
+      }
+    }
+    window.addEventListener('scroll', function() {
+      if (gutterTimer) return;
+      gutterTimer = requestAnimationFrame(function() { updateGutterHighlight(); gutterTimer = null; });
+    });
+    updateGutterHighlight();
   })();
 </script>
 
