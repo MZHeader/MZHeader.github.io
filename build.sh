@@ -133,11 +133,20 @@ for post in $(ls _posts/*.md | sort -r); do
         --no-highlight > "/tmp/mzbuild_${slug}.html"
 
     # Strip the first h2 (post title) — we render it as h1 in the template instead
+    # Add loading="lazy" to all images except the first
     python3 - <<'PYSTRIP' "/tmp/mzbuild_${slug}.html"
 import sys, re
 path = sys.argv[1]
 content = open(path).read()
 content = re.sub(r'<h2[^>]*>.*?</h2>', '', content, count=1, flags=re.DOTALL)
+count = [0]
+def lazy_img(m):
+    count[0] += 1
+    tag = m.group(0)
+    if count[0] == 1 or 'loading=' in tag:
+        return tag
+    return tag.replace('<img', '<img loading="lazy"', 1)
+content = re.sub(r'<img\b[^>]*/?>', lazy_img, content, flags=re.DOTALL)
 open(path, 'w').write(content)
 PYSTRIP
 
@@ -323,10 +332,13 @@ for i in $(seq 1 $total_posts); do
       text-decoration: none;
       transition: background 0.1s, border-color 0.1s;
     }
-    #rsrc-sidebar a.rsrc-post-row:hover {
+    #rsrc-sidebar a.rsrc-post-row:hover,
+    #rsrc-sidebar a.rsrc-post-row:focus-visible {
       background: rgba(86, 37, 190, 0.1);
       border-left-color: #5625be;
     }
+    #rsrc-sidebar a.rsrc-post-row:focus-visible .rsrc-title { color: #c0c0c0; }
+    #rsrc-sidebar a.rsrc-post-row:focus-visible .rsrc-title::before { opacity: 1; }
     #rsrc-sidebar a.rsrc-post-row.active {
       background: rgba(139, 233, 253, 0.05);
       border-left-color: #8be9fd;
@@ -523,7 +535,7 @@ for i in $(seq 1 $total_posts); do
     }
     article { max-width: 100%; }
     article p { color: #b8b8c8; line-height: 1.75; max-width: 65ch; }
-    article li { color: #b8b8c8; line-height: 1.75; }
+    article li { color: #b8b8c8; line-height: 1.75; max-width: 65ch; }
     article strong { color: #dcdcdc; }
 
     article table {
@@ -643,7 +655,7 @@ for i in $(seq 1 $total_posts); do
       #mobile-nav .mob-back:hover { color: #8be9fd; }
       #mobile-nav .mob-sep { color: #2a2a3a; font-size: 0.8rem; }
       #mobile-nav .mob-title {
-        color: #555570;
+        color: #7a7a99;
         font-size: 0.75rem;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -670,7 +682,9 @@ for i in $(seq 1 $total_posts); do
       font-size: 0.82rem;
     }
     .post-pagination-link--right { margin-left: auto; text-align: right; }
-    .post-pagination-link:hover { color: #50fa7b; }
+    .post-pagination-link:hover,
+    .post-pagination-link:focus-visible { color: #50fa7b; }
+    .post-pagination-link:focus-visible { outline: 2px solid #5625be; outline-offset: 3px; }
 
     /* ── Copy button on code blocks ── */
     .pre-wrapper { position: relative; }
@@ -689,7 +703,11 @@ for i in $(seq 1 $total_posts); do
       opacity: 0;
       transition: opacity 0.15s;
     }
-    .pre-wrapper:hover .copy-btn { opacity: 1; }
+    .pre-wrapper:hover .copy-btn,
+    .pre-wrapper:focus-within .copy-btn,
+    .copy-btn:focus-visible { opacity: 1; }
+    .copy-btn:focus-visible { outline: 2px solid #5625be; outline-offset: 1px; }
+    @media (hover: none) { .copy-btn { opacity: 1; } }
     .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
   </style>
   <script type="application/ld+json">
@@ -2014,6 +2032,10 @@ cat > "_site/404.html" << 'END404'
     .ret-row { padding:0.6rem 1rem 0.8rem; border-top:1px solid #1e1e28; }
     a { color:#50fa7b; text-decoration:none; font-size:0.82rem; text-shadow:0 0 6px rgba(80,250,123,0.3); transition: text-shadow 0.15s; }
     a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
+    a:focus-visible { outline:2px solid #5625be; outline-offset:2px; }
+    .home-link { margin-top:1.2rem; font-size:0.78rem; color:#5a5a7a; }
+    .home-link a { color:#8be9fd; font-size:0.78rem; text-shadow:none; }
+    .home-link a:hover { text-shadow:0 0 8px rgba(139,233,253,0.4); }
   </style>
 </head>
 <body>
@@ -2041,6 +2063,7 @@ cat > "_site/404.html" << 'END404'
       </div>
     </div>
   </div>
+  <div class="home-link">; <a href="/">back to posts</a></div>
 </body>
 </html>
 END404
