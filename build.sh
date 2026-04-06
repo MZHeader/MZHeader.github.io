@@ -1816,7 +1816,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .series-header .rsrc-title-block { flex: 1; min-width: 0; }
     .series-toggle { color: #5625be; }
-    .series-label { color: #6a6a88; }
+    .series-label { color: #3a8a4a; }
     .series-header .rsrc-title::before {
       content: "je    ";
       color: #e6db74;
