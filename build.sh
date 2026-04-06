@@ -48,7 +48,7 @@ SHARED_CSS='
       border: 1px solid rgba(86, 37, 190, 0.4);
     }
     img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #2a2a3a; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4); }
-    pre { position: relative; border-top: 2px solid #5625be; }
+    pre { position: relative; border-top: 2px solid #5625be; border-radius: 6px; overflow: hidden; }
     blockquote { border-left: 3px solid #5625be; padding-left: 1rem; color: #aaa; margin: 1.5rem 0; }
     hr { border: none; border-top: 1px solid #2a2a3a; margin: 2rem 0; }
     .back-link {
