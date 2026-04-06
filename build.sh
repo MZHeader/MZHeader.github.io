@@ -2175,16 +2175,6 @@ Sitemap: https://mzheader.tech/sitemap.xml
 ENDROBOTS
 echo "Built: robots.txt"
 
-# ── .well-known/security.txt ──────────────────────────────────────────────
-mkdir -p _site/.well-known
-cat > "_site/.well-known/security.txt" << 'ENDSECURITY'
-Contact: https://www.linkedin.com/in/liam-chugg/
-Contact: https://x.com/Chuggx00
-Expires: 2027-04-06T00:00:00.000Z
-Preferred-Languages: en
-Canonical: https://mzheader.tech/.well-known/security.txt
-ENDSECURITY
-echo "Built: .well-known/security.txt"
 
 # ── manifest.json ─────────────────────────────────────────────────────────
 cat > "_site/manifest.json" << 'ENDMANIFEST'
