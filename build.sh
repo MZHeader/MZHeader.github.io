@@ -11,7 +11,6 @@ cp -r samples _site/ 2>/dev/null || true
 cp favicon.ico _site/ 2>/dev/null || true
 cp CNAME _site/ 2>/dev/null || true
 cp -r fonts _site/ 2>/dev/null || true
-cp a6aa0e481a0a4c6ca369190ec48fb47e.txt _site/ 2>/dev/null || true
 
 SHARED_CSS='
     * { box-sizing: border-box; }
