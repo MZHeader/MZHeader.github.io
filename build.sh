@@ -202,6 +202,7 @@ total_posts=$post_idx
 # ── Build posts_list_html with series grouping ───────────────────────────
 # Track which series we've already emitted (pipe-delimited string for bash 3 compat)
 _series_emitted="|"
+visible_row=0
 for i in $(seq 1 $total_posts); do
     series="${p_series[$i]}"
     if [ -n "$series" ]; then
@@ -211,13 +212,11 @@ for i in $(seq 1 $total_posts); do
             # Find all posts in this series (in current sorted order)
             series_count=0
             series_children=""
-            series_newest_date=""
             series_tag=""
             series_badge=""
             for j in $(seq 1 $total_posts); do
                 if [ "${p_series[$j]}" = "$series" ]; then
                     series_count=$((series_count + 1))
-                    [ -z "$series_newest_date" ] && series_newest_date="${p_short_dates[$j]}"
                     [ -z "$series_tag" ] && series_tag="${p_tags[$j]}"
                     [ -z "$series_badge" ] && series_badge="${p_badge_classes[$j]}"
                     series_children+="
@@ -230,15 +229,17 @@ for i in $(seq 1 $total_posts); do
               </a>"
                 fi
             done
-            # Emit collapsible series group
+            # Emit collapsible series group — header looks like a normal row
             series_id=$(printf '%s' "$series" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+            header_offset=$(printf '%04X' $(( visible_row * 32 )) )
+            visible_row=$((visible_row + 1))
             posts_list_html+="
           <div class=\"series-group\" data-series=\"${series_id}\" data-tag=\"${series_tag}\">
             <div class=\"series-header\" onclick=\"toggleSeries('${series_id}')\">
-              <span class=\"rsrc-gutter\"><span class=\"series-toggle\" id=\"toggle-${series_id}\">&#9654;</span></span>
+              <span class=\"rsrc-gutter\">.rsrc:${header_offset}</span>
               <span class=\"rsrc-title-block\">
                 <span class=\"rsrc-title\">${series}</span>
-                <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span></span>
+                <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span> &nbsp;<span class=\"series-toggle\" id=\"toggle-${series_id}\">[+]</span></span>
               </span>
             </div>
             <div class=\"series-children\" id=\"children-${series_id}\" style=\"display:none;\">
@@ -249,6 +250,7 @@ for i in $(seq 1 $total_posts); do
         # Skip — already emitted as part of series group
     else
         # Standalone post (no series)
+        visible_row=$((visible_row + 1))
         posts_list_html+="
       <a class=\"rsrc-post-row\" id=\"post-${i}\" href=\"/posts/${p_slugs[$i]}.html\">
         <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$i]}</span>
@@ -1791,9 +1793,7 @@ cat > "_site/index.html" << ENDINDEX
     }
 
     /* Series group collapsible styling */
-    .series-group {
-      margin: 0;
-    }
+    .series-group { margin: 0; }
     .series-header {
       display: flex;
       align-items: flex-start;
@@ -1808,39 +1808,15 @@ cat > "_site/index.html" << ENDINDEX
       background: rgba(86, 37, 190, 0.10);
       border-left-color: #5625be;
     }
-    .series-header .rsrc-title {
-      color: #8be9fd;
-    }
-    .series-header .rsrc-title-block {
-      flex: 1;
-      min-width: 0;
-    }
-    .series-header .rsrc-meta {
-      color: #6a6a88;
-    }
-    .series-toggle {
-      display: inline-block;
+    .series-header .rsrc-gutter {
       width: 7em;
       flex-shrink: 0;
-      font-size: 0.55rem;
-      line-height: 1.7;
-      padding-top: 0.2em;
-      transition: transform 0.2s ease;
-      color: #5625be;
+      color: #5a5a7a;
+      font-size: 0.82rem;
+      user-select: none;
     }
-    .series-toggle.open {
-      transform: rotate(90deg);
-    }
-    .series-children {
-      border-left: 2px solid rgba(86, 37, 190, 0.3);
-      margin-left: 0.5rem;
-    }
-    .series-children .rsrc-post-row {
-      padding-left: 0.75rem;
-    }
-    .series-children .rsrc-post-row:hover {
-      border-left-color: transparent;
-    }
+    .series-header .rsrc-title-block { flex: 1; min-width: 0; }
+    .series-toggle { color: #5625be; }
 
     @media (max-width: 600px) {
       body { padding: 1rem; }
@@ -1849,7 +1825,7 @@ cat > "_site/index.html" << ENDINDEX
       .pe-section-flags { display: none; }
       .pe-gutter { display: none; }
       .rsrc-post-row .rsrc-gutter { display: none; }
-      .series-toggle { width: auto; margin-right: 0.5rem; }
+      .series-header .rsrc-gutter { display: none; }
       .rsrc-post-row .rsrc-title { white-space: normal; }
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
@@ -2180,7 +2156,7 @@ ${posts_list_html}
       if (!children || !toggle) return;
       var isOpen = children.style.display !== 'none';
       children.style.display = isOpen ? 'none' : '';
-      toggle.classList.toggle('open', !isOpen);
+      toggle.textContent = isOpen ? '[+]' : '[-]';
     };
 
     var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
