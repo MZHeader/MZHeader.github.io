@@ -5,8 +5,6 @@ mkdir -p _site/posts _site/css
 
 # Copy static assets
 cp -r assets _site/ 2>/dev/null || true
-cp -r css _site/ 2>/dev/null || true
-cp -r js _site/ 2>/dev/null || true
 cp -r samples _site/ 2>/dev/null || true
 cp favicon.ico _site/ 2>/dev/null || true
 cp CNAME _site/ 2>/dev/null || true
