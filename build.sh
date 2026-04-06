@@ -1817,6 +1817,10 @@ cat > "_site/index.html" << ENDINDEX
     }
     .series-header .rsrc-title-block { flex: 1; min-width: 0; }
     .series-toggle { color: #5625be; }
+    .series-children {
+      margin-left: 1.2rem;
+      border-left: 1px solid rgba(86, 37, 190, 0.25);
+    }
 
     @media (max-width: 600px) {
       body { padding: 1rem; }
