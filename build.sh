@@ -236,7 +236,7 @@ for i in $(seq 1 $total_posts); do
             posts_list_html+="
           <div class=\"series-group\" data-series=\"${series_id}\" data-tag=\"${series_tag}\">
             <div class=\"series-header\" onclick=\"toggleSeries('${series_id}')\">
-              <span class=\"rsrc-gutter\"><span class=\"series-jmp\" id=\"jmp-${series_id}\">jne</span></span>
+              <span class=\"rsrc-gutter\">.rsrc:${header_offset}</span>
               <span class=\"rsrc-title-block\">
                 <span class=\"rsrc-title\"><span class=\"series-label\">Series:</span> ${series}</span>
                 <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span> &nbsp;<span class=\"series-toggle\" id=\"toggle-${series_id}\">[+]</span></span>
@@ -1818,7 +1818,20 @@ cat > "_site/index.html" << ENDINDEX
     .series-header .rsrc-title-block { flex: 1; min-width: 0; }
     .series-toggle { color: #5625be; }
     .series-label { color: #6a6a88; }
-    .series-jmp { color: #e6db74; font-size: 0.75rem; }
+    .series-header .rsrc-title::before {
+      content: "je    ";
+      color: #e6db74;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      font-weight: normal;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .series-header:hover .rsrc-title::before { opacity: 1; }
+    .series-header:hover .rsrc-gutter { color: #5625be; }
+    .series-group.open .series-header .rsrc-title::before {
+      content: "jne   ";
+    }
     .series-children {
       margin-left: 2rem;
       border-left: 1px solid rgba(86, 37, 190, 0.35);
@@ -2159,12 +2172,12 @@ ${posts_list_html}
     window.toggleSeries = function(seriesId) {
       var children = document.getElementById('children-' + seriesId);
       var toggle = document.getElementById('toggle-' + seriesId);
-      var jmp = document.getElementById('jmp-' + seriesId);
+      var group = children ? children.parentElement : null;
       if (!children || !toggle) return;
       var isOpen = children.style.display !== 'none';
       children.style.display = isOpen ? 'none' : '';
       toggle.textContent = isOpen ? '[+]' : '[-]';
-      if (jmp) jmp.textContent = isOpen ? 'jne' : 'je';
+      if (group) group.classList.toggle('open', !isOpen);
     };
 
     var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
