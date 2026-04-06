@@ -164,7 +164,7 @@ PYSTRIP
     if [ -n "$first_img" ]; then
       p_og_images[$post_idx]="$first_img"
     else
-      p_og_images[$post_idx]="https://mzheader.tech/assets/og-preview.png"
+      p_og_images[$post_idx]="https://mzheader.tech/assets/img/og-preview.png"
     fi
 
     # Get last modified date from git history for dateModified
@@ -1134,11 +1134,11 @@ cat > "_site/index.html" << ENDINDEX
   <meta property="og:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   <meta property="og:url" content="https://mzheader.tech/" />
   <meta property="og:site_name" content="Reverse Engineering Malware" />
-  <meta property="og:image" content="https://mzheader.tech/assets/og-preview.png" />
+  <meta property="og:image" content="https://mzheader.tech/assets/img/og-preview.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@Chuggx00" />
   <meta name="twitter:creator" content="@Chuggx00" />
-  <meta name="twitter:image" content="https://mzheader.tech/assets/og-preview.png" />
+  <meta name="twitter:image" content="https://mzheader.tech/assets/img/og-preview.png" />
   <meta name="twitter:title" content="Reverse Engineering Malware" />
   <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   ${ASSET_HEAD}
