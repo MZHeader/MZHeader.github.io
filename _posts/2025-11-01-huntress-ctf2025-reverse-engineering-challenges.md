@@ -1,5 +1,6 @@
 ---
 tags: CTF
+series: Huntress CTF
 description: Write-ups for the Huntress 2025 CTF's reverse engineering challenges.
 ---
 

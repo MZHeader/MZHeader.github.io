@@ -100,7 +100,7 @@ post_data_js=""
 itemlist_json=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_offsets p_hex_ts p_short_dates
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -116,6 +116,7 @@ for post in $(ls _posts/*.md | sort -r); do
     description=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^description:/{sub(/^description: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     tags=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^tags:/{sub(/^tags: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     [ -z "$tags" ] && tags="Analysis"
+    series=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^series:/{sub(/^series: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     title=$(grep "^## " "$post" | head -1 | sed 's/^## //')
     [ -z "$title" ] && title="$slug"
 
@@ -136,6 +137,7 @@ for post in $(ls _posts/*.md | sort -r); do
     p_descs[$post_idx]="$description"
     p_tags[$post_idx]="$tags"
     p_badge_classes[$post_idx]="$badge_class"
+    p_series[$post_idx]="$series"
 
     pandoc "$post" \
         --from markdown+yaml_metadata_block-implicit_figures \
@@ -189,17 +191,74 @@ PYSTRIP
         \"name\": \"${il_title}\"
       }"
 
-    posts_list_html+="
-      <a class=\"rsrc-post-row\" id=\"post-${post_idx}\" href=\"/posts/${slug}.html\">
-        <span class=\"rsrc-gutter\">.rsrc:${offset}</span>
-        <span class=\"rsrc-title-block\">
-          <span class=\"rsrc-title\">${title}</span>
-          <span class=\"rsrc-meta\">; TimeDateStamp: ${hex_ts} (${short_date}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${badge_class}\">${tags}</span></span>
-        </span>
-      </a>"
+    # Store per-post row data for series grouping (built after loop)
+    p_offsets[$post_idx]="$offset"
+    p_hex_ts[$post_idx]="$hex_ts"
+    p_short_dates[$post_idx]="$short_date"
 done
 
 total_posts=$post_idx
+
+# ── Build posts_list_html with series grouping ───────────────────────────
+# Track which series we've already emitted (pipe-delimited string for bash 3 compat)
+_series_emitted="|"
+for i in $(seq 1 $total_posts); do
+    series="${p_series[$i]}"
+    if [ -n "$series" ]; then
+        # Part of a series — check if we already emitted the group header
+        if [[ "$_series_emitted" != *"|${series}|"* ]]; then
+            _series_emitted="${_series_emitted}${series}|"
+            # Find all posts in this series (in current sorted order)
+            series_count=0
+            series_children=""
+            series_newest_date=""
+            series_tag=""
+            series_badge=""
+            for j in $(seq 1 $total_posts); do
+                if [ "${p_series[$j]}" = "$series" ]; then
+                    series_count=$((series_count + 1))
+                    [ -z "$series_newest_date" ] && series_newest_date="${p_short_dates[$j]}"
+                    [ -z "$series_tag" ] && series_tag="${p_tags[$j]}"
+                    [ -z "$series_badge" ] && series_badge="${p_badge_classes[$j]}"
+                    series_children+="
+              <a class=\"rsrc-post-row series-child\" id=\"post-${j}\" href=\"/posts/${p_slugs[$j]}.html\">
+                <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$j]}</span>
+                <span class=\"rsrc-title-block\">
+                  <span class=\"rsrc-title\">${p_titles[$j]}</span>
+                  <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span></span>
+                </span>
+              </a>"
+                fi
+            done
+            # Emit collapsible series group
+            series_id=$(printf '%s' "$series" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+            posts_list_html+="
+          <div class=\"series-group\" data-series=\"${series_id}\" data-tag=\"${series_tag}\">
+            <div class=\"series-header\" onclick=\"toggleSeries('${series_id}')\">
+              <span class=\"rsrc-gutter\"><span class=\"series-toggle\" id=\"toggle-${series_id}\">&#9654;</span></span>
+              <span class=\"rsrc-title-block\">
+                <span class=\"rsrc-title\">${series}</span>
+                <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span></span>
+              </span>
+            </div>
+            <div class=\"series-children\" id=\"children-${series_id}\" style=\"display:none;\">
+              ${series_children}
+            </div>
+          </div>"
+        fi
+        # Skip — already emitted as part of series group
+    else
+        # Standalone post (no series)
+        posts_list_html+="
+      <a class=\"rsrc-post-row\" id=\"post-${i}\" href=\"/posts/${p_slugs[$i]}.html\">
+        <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$i]}</span>
+        <span class=\"rsrc-title-block\">
+          <span class=\"rsrc-title\">${p_titles[$i]}</span>
+          <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span></span>
+        </span>
+      </a>"
+    fi
+done
 
 # ── Pass 2: write each post HTML with full sidebar ─────────────────────────
 for i in $(seq 1 $total_posts); do
@@ -1448,11 +1507,11 @@ cat > "_site/index.html" << ENDINDEX
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .rsrc-post-row {
+    .rsrc-post-row, .series-group {
       animation: row-enter 0.2s ease both;
     }
     @media (prefers-reduced-motion: reduce) {
-      .rsrc-post-row { animation: none; }
+      .rsrc-post-row, .series-group { animation: none; }
     }
 
     /* Scroll-aware gutter highlight */
@@ -1731,6 +1790,58 @@ cat > "_site/index.html" << ENDINDEX
       outline-offset: -2px;
     }
 
+    /* Series group collapsible styling */
+    .series-group {
+      margin: 0;
+    }
+    .series-header {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.55rem 1rem;
+      line-height: 1.7;
+      cursor: pointer;
+      user-select: none;
+      border-left: 2px solid transparent;
+      transition: background 0.12s ease, border-left-color 0.12s ease;
+    }
+    .series-header:hover {
+      background: rgba(86, 37, 190, 0.10);
+      border-left-color: #5625be;
+    }
+    .series-header .rsrc-title {
+      color: #8be9fd;
+    }
+    .series-header .rsrc-title-block {
+      flex: 1;
+      min-width: 0;
+    }
+    .series-header .rsrc-meta {
+      color: #6a6a88;
+    }
+    .series-toggle {
+      display: inline-block;
+      width: 7em;
+      flex-shrink: 0;
+      font-size: 0.55rem;
+      line-height: 1.7;
+      padding-top: 0.2em;
+      transition: transform 0.2s ease;
+      color: #5625be;
+    }
+    .series-toggle.open {
+      transform: rotate(90deg);
+    }
+    .series-children {
+      border-left: 2px solid rgba(86, 37, 190, 0.3);
+      margin-left: 0.5rem;
+    }
+    .series-children .rsrc-post-row {
+      padding-left: 0.75rem;
+    }
+    .series-children .rsrc-post-row:hover {
+      border-left-color: transparent;
+    }
+
     @media (max-width: 600px) {
       body { padding: 1rem; }
       .title-malware { font-size: 1.8rem; }
@@ -1738,6 +1849,7 @@ cat > "_site/index.html" << ENDINDEX
       .pe-section-flags { display: none; }
       .pe-gutter { display: none; }
       .rsrc-post-row .rsrc-gutter { display: none; }
+      .series-toggle { width: auto; margin-right: 0.5rem; }
       .rsrc-post-row .rsrc-title { white-space: normal; }
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
@@ -2049,17 +2161,27 @@ ${posts_list_html}
   (function() {
     var filterBar = document.getElementById('filterBar');
     var buttons = filterBar.querySelectorAll('.filter-btn');
-    var rows = document.querySelectorAll('#postsList > .rsrc-post-row');
+    var rows = document.querySelectorAll('#postsList > .rsrc-post-row, #postsList > .series-group');
     var activeCat = 'all';
 
     // Map badge class suffix to filter category
-    function getRowCat(row) {
-      var badge = row.querySelector('.rsrc-badge');
+    function getRowCat(el) {
+      var badge = el.querySelector('.rsrc-badge');
       if (!badge) return 'analysis';
       var cls = badge.className;
       var m = cls.match(/rsrc-badge--(\w+)/);
       return m ? m[1] : 'analysis';
     }
+
+    // Series toggle function (global so onclick can reach it)
+    window.toggleSeries = function(seriesId) {
+      var children = document.getElementById('children-' + seriesId);
+      var toggle = document.getElementById('toggle-' + seriesId);
+      if (!children || !toggle) return;
+      var isOpen = children.style.display !== 'none';
+      children.style.display = isOpen ? 'none' : '';
+      toggle.classList.toggle('open', !isOpen);
+    };
 
     var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -2067,21 +2189,32 @@ ${posts_list_html}
       activeCat = cat;
       var visibleIdx = 0;
       for (var i = 0; i < rows.length; i++) {
-        var rowCat = getRowCat(rows[i]);
-        var show = (cat === 'all' || rowCat === cat);
-        rows[i].style.display = show ? '' : 'none';
+        var el = rows[i];
+        var isSeries = el.classList.contains('series-group');
+        var elCat = isSeries ? el.getAttribute('data-tag').toLowerCase() : getRowCat(el);
+        var show = (cat === 'all' || elCat === cat);
+        el.style.display = show ? '' : 'none';
         if (show) {
-          var gutter = rows[i].querySelector('.rsrc-gutter');
-          if (gutter) {
-            var offset = (visibleIdx * 32).toString(16).toUpperCase();
-            while (offset.length < 4) offset = '0' + offset;
-            gutter.textContent = '.rsrc:' + offset;
+          if (isSeries) {
+            // Update gutter on series header
+            var hdrGutter = el.querySelector('.series-header .rsrc-gutter .series-toggle');
+            if (!hdrGutter) {
+              var g = el.querySelector('.series-header .rsrc-gutter');
+              // Series header gutter is the toggle icon, skip offset renumbering
+            }
+          } else {
+            var gutter = el.querySelector('.rsrc-gutter');
+            if (gutter) {
+              var offset = (visibleIdx * 32).toString(16).toUpperCase();
+              while (offset.length < 4) offset = '0' + offset;
+              gutter.textContent = '.rsrc:' + offset;
+            }
           }
           if (!prefersRM) {
-            rows[i].style.animation = 'none';
-            rows[i].offsetHeight;
-            rows[i].style.animation = '';
-            rows[i].style.animationDelay = (visibleIdx * 35) + 'ms';
+            el.style.animation = 'none';
+            el.offsetHeight;
+            el.style.animation = '';
+            el.style.animationDelay = (visibleIdx * 35) + 'ms';
           }
           visibleIdx++;
         }
