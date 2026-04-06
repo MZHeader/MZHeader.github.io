@@ -443,7 +443,7 @@ This second sample is executed as an assembly in memory and stems from an LNK fi
 
 The file is delivered to the victim via email, which prompts them to download and open the following file:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/a0451615-f6eb-40e0-85fd-891396665494)
+![image](/assets/img/a0451615-f6eb-40e0-85fd-891396665494.png)
 
 A Zip archive is downloaded, which contains a Lnk file, masquerading with a PDF icon.
 
@@ -458,7 +458,7 @@ Upon execution, MsiExec would execute with the argument to download and execute 
 
 This downloaded a file called `42WiseAnyConnect.msi`, which we can extract a PowerShell script from using lessmsi:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/76fd615d-1298-47ac-bf25-a9e719da17d3)
+![image](/assets/img/76fd615d-1298-47ac-bf25-a9e719da17d3.png)
 
 ## PowerShell Deobfuscation
 
@@ -501,9 +501,9 @@ Remove-Item -Path $PSCommandPath -Force
 
 We can work out the variables using a similar method, we'll echo the `join[char]` string, and convert the output from decimal to ASCII.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/116468c3-948a-4dee-bb3d-bf702d0ee877)
+![image](/assets/img/116468c3-948a-4dee-bb3d-bf702d0ee877.png)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/f33f098b-ad0c-4fb0-9e85-f624dd3db7e5)
+![image](/assets/img/f33f098b-ad0c-4fb0-9e85-f624dd3db7e5.png)
 
 
 
@@ -594,13 +594,13 @@ The values are as follows:
 
 We know that the first value is the XOR key, so we can use this to retrieve the binary from the byte array using CyberChef.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/50343d38-5655-4491-b786-f72712eb31ee)
+![image](/assets/img/50343d38-5655-4491-b786-f72712eb31ee.png)
 
 ## Binary Analysis
 
 The binary can be reviewed in DNSpy as it is a .NET binary, however, it is extremely obfuscated as it has been protected with ConfuserEx.
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c2fa5c5d-54e7-4874-a240-20168cd6fbc8)
+![image](/assets/img/c2fa5c5d-54e7-4874-a240-20168cd6fbc8.png)
 
 We can use a [Confuser Unpacker](https://github.com/XenocodeRCE/ConfuserEx-Unpacker/tree/master) to make this code a lot easier to read.
 
@@ -614,46 +614,46 @@ Instantly, we can see the two arguments being passed from the previous web reque
 
 (buildID = `ezzcAvVW` and URL = `hxxp[://]45.129.199[.]204/index.php`)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca)
+![image](/assets/img/2cc1b5a0-0b00-4a0e-b6de-44a0cde031ca.png)
 
 There are some interesting conditions that will prevent execution of the malware:
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/70993992-814f-4f40-8078-2d618ce5b2aa)
+![image](/assets/img/70993992-814f-4f40-8078-2d618ce5b2aa.png)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/b0e6e74e-cf6f-4a42-a01e-914e9d859dc7)
+![image](/assets/img/b0e6e74e-cf6f-4a42-a01e-914e9d859dc7.png)
 
 
 There are lots of functions typical of info-stealing malware, described below:
 
 **Finding and stealing sensitive browser information**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/13e30051-0c28-443e-af05-d412cdbea19b)
+![image](/assets/img/13e30051-0c28-443e-af05-d412cdbea19b.png)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/68c2bf01-3f44-4c89-ad43-189df3d437fc)
+![image](/assets/img/68c2bf01-3f44-4c89-ad43-189df3d437fc.png)
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/88e34856-1b24-4578-b749-a67c7a5eeee9)
+![image](/assets/img/88e34856-1b24-4578-b749-a67c7a5eeee9.png)
 
 
 **Crypto Wallet Paths being defined**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/49ad2d13-5946-4182-8ac7-f16d75f77be1)
+![image](/assets/img/49ad2d13-5946-4182-8ac7-f16d75f77be1.png)
 
 **Screenshot functionality**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/9dc09b92-a8f7-435f-a888-37dcc6ed3a9a)
+![image](/assets/img/9dc09b92-a8f7-435f-a888-37dcc6ed3a9a.png)
 
 **Collecting System information**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/c5304ba0-b812-480e-a604-10e13d5f125f)
+![image](/assets/img/c5304ba0-b812-480e-a604-10e13d5f125f.png)
 
 **Function detailing how the information is exfiltrated**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/dae44a37-1622-4016-aa7d-69039d2dae1d)
+![image](/assets/img/dae44a37-1622-4016-aa7d-69039d2dae1d.png)
 
 
 **Full List of interesting function names**
 
-![image](https://github.com/MZHeader/MZHeader.github.io/assets/151963631/0b7588e0-e338-4895-8ad3-b2dac3ddbd2e)
+![image](/assets/img/0b7588e0-e338-4895-8ad3-b2dac3ddbd2e.png)
 
 ## IOCs
 
