@@ -236,9 +236,9 @@ for i in $(seq 1 $total_posts); do
             posts_list_html+="
           <div class=\"series-group\" data-series=\"${series_id}\" data-tag=\"${series_tag}\">
             <div class=\"series-header\" onclick=\"toggleSeries('${series_id}')\">
-              <span class=\"rsrc-gutter\">.rsrc:${header_offset}</span>
+              <span class=\"rsrc-gutter\">.series:</span>
               <span class=\"rsrc-title-block\">
-                <span class=\"rsrc-title\">${series}</span>
+                <span class=\"rsrc-title\">Series: ${series}</span>
                 <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span> &nbsp;<span class=\"series-toggle\" id=\"toggle-${series_id}\">[+]</span></span>
               </span>
             </div>
@@ -1818,8 +1818,8 @@ cat > "_site/index.html" << ENDINDEX
     .series-header .rsrc-title-block { flex: 1; min-width: 0; }
     .series-toggle { color: #5625be; }
     .series-children {
-      margin-left: 1.2rem;
-      border-left: 1px solid rgba(86, 37, 190, 0.25);
+      margin-left: 2rem;
+      border-left: 1px solid rgba(86, 37, 190, 0.35);
     }
 
     @media (max-width: 600px) {
