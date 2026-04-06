@@ -160,7 +160,7 @@ There is then an if statement as follows:
 if ( !v17 || v14[1] != 90 || v14[2] != 80 || v14[3] )
 ```
 
-<img width="472" height="141" alt="IDA Pro showing if statement checking for ZZP magic bytes in the downloaded UPATRE payload" src="https://github.com/user-attachments/assets/a0171419-6409-461e-9c3c-366278f31157" />
+<img width="472" height="141" alt="IDA Pro showing if statement checking for ZZP magic bytes in the downloaded UPATRE payload" src="/assets/img/a0171419-6409-461e-9c3c-366278f31157.png" />
 
 The code is checking the header of the downloaded payload for the presence of 3 bytes `ZZP` (90h = Z, 80h = P)
 
@@ -242,7 +242,7 @@ XOR({'option':'Hex','string':'78 56 34 12'},'Standard',false)
 LZNT1_Decompress()
 ```
 
-<img width="1214" height="723" alt="CyberChef recipe decrypting the UPATRE payload with XOR key 78563412 and LZNT1 decompression" src="https://github.com/user-attachments/assets/16fe5c1d-48e5-4150-bf4f-df7065d7c3e8" />
+<img width="1214" height="723" alt="CyberChef recipe decrypting the UPATRE payload with XOR key 78563412 and LZNT1 decompression" src="/assets/img/16fe5c1d-48e5-4150-bf4f-df7065d7c3e8.png" />
 
 ## IOCs
 

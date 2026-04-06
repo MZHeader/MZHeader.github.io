@@ -5,7 +5,7 @@ description: Write-ups for the Huntress 2025 CTF's reverse engineering challenge
 
 ## Huntress CTF: 2025 - Reverse Engineering Challenge Writeups
 
-<img width="793" height="609" alt="Huntress CTF 2025 banner" src="https://github.com/user-attachments/assets/489faf9b-6966-4b09-9f74-5cfe4478b390" />
+<img width="793" height="609" alt="Huntress CTF 2025 banner" src="/assets/img/489faf9b-6966-4b09-9f74-5cfe4478b390.png" />
 
 I try my best to explain how I solve the 4 RE challenges from this years CTF, some of it relied on trial and error / recognising patterns and therefore may not be as technically accurate as i'd like
 
@@ -20,16 +20,16 @@ Main > NimMain > NimMainInner > NimMainModule > main__crackme_u20
 
 **Dynamic Approach:**
 Set a breakpoint at `140012c6b`, step over the function call, review the data in the `R11` register
-<img width="623" height="124" alt="x64dbg breakpoint at 140012c6b showing R11 register after xorStrings call in NimCrackMe1" src="https://github.com/user-attachments/assets/750e1ad3-9023-45a4-9502-1d9851d03151" />
+<img width="623" height="124" alt="x64dbg breakpoint at 140012c6b showing R11 register after xorStrings call in NimCrackMe1" src="/assets/img/750e1ad3-9023-45a4-9502-1d9851d03151.png" />
 
-<img width="322" height="29" alt="x64dbg R11 register value pointing to the decrypted NimCrackMe1 flag string" src="https://github.com/user-attachments/assets/afb0ae38-18ad-45a8-8bec-e0b2ce78f7fa" />
+<img width="322" height="29" alt="x64dbg R11 register value pointing to the decrypted NimCrackMe1 flag string" src="/assets/img/afb0ae38-18ad-45a8-8bec-e0b2ce78f7fa.png" />
 
-<img width="623" height="91" alt="x64dbg dump view showing decrypted NimCrackMe1 flag bytes in R11" src="https://github.com/user-attachments/assets/71d6d329-0854-4f72-b9ca-7d5b17ceee66" />
+<img width="623" height="91" alt="x64dbg dump view showing decrypted NimCrackMe1 flag bytes in R11" src="/assets/img/71d6d329-0854-4f72-b9ca-7d5b17ceee66.png" />
 
 **Static Approach:**
 The `_buildEncodedFlag__crackme_u18_` function builds a Nim String of 0x26 (38) bytes in length.
 
-<img width="393" height="68" alt="IDA Pro decompiler showing _buildEncodedFlag function allocating 38-byte Nim string" src="https://github.com/user-attachments/assets/adb8d0b0-c8f0-4b3b-961d-d28774f9d7a8" />
+<img width="393" height="68" alt="IDA Pro decompiler showing _buildEncodedFlag function allocating 38-byte Nim string" src="/assets/img/adb8d0b0-c8f0-4b3b-961d-d28774f9d7a8.png" />
 
 The, one byte is written at a time, resulting in the hexadecimal code: 
 `0x28, 0x05, 0x0C, 0x47, 0x12, 0x4B, 0x15, 0x5C, 0x09, 0x12, 0x17, 0x55,
@@ -39,18 +39,18 @@ The, one byte is written at a time, resulting in the hexadecimal code:
 
 This result is stored in `var_28`
 
-<img width="621" height="300" alt="IDA Pro showing byte-by-byte construction of the encoded flag stored in var_28" src="https://github.com/user-attachments/assets/f8d3fc86-6bb0-46dd-b1fe-6139d03e16a7" />
+<img width="621" height="300" alt="IDA Pro showing byte-by-byte construction of the encoded flag stored in var_28" src="/assets/img/f8d3fc86-6bb0-46dd-b1fe-6139d03e16a7.png" />
 
 And soon, `var_98`, which is passed to `_xorStrings__crackme_u3_` as the 2nd argument.
 
-<img width="626" height="133" alt="IDA Pro showing var_98 passed as 2nd argument to _xorStrings__crackme_u3_ function" src="https://github.com/user-attachments/assets/1a9a4b9e-9e4a-45a0-9f40-2f2a7cad0d11" />
+<img width="626" height="133" alt="IDA Pro showing var_98 passed as 2nd argument to _xorStrings__crackme_u3_ function" src="/assets/img/1a9a4b9e-9e4a-45a0-9f40-2f2a7cad0d11.png" />
 
 The first argument is the result, the second is the encoded flag, and the third is the XOR key (length (`var_a8`) and key (`var0_1`))
 
 var_a0_1 = `&TM__cGo7QGde1ZstH4i7xlaOag_4`
 `TM__cGo7QGde1ZstH4i7xlaOag_4` is a global variable for `Nim is not for malware!`
 
-<img width="685" height="285" alt="IDA Pro showing global variable TM__cGo7QGde1ZstH4i7xlaOag_4 resolving to XOR key string" src="https://github.com/user-attachments/assets/d7fd8a50-6b66-427f-a263-ab96acee1430" />
+<img width="685" height="285" alt="IDA Pro showing global variable TM__cGo7QGde1ZstH4i7xlaOag_4 resolving to XOR key string" src="/assets/img/d7fd8a50-6b66-427f-a263-ab96acee1430.png" />
 
 ## Rust Tickler
 
@@ -61,19 +61,19 @@ Entry point > FUN_140005424 > FUN_140001790 > FUN_1400011f0
 
 Towards the end of this large function is an undefined function `sub_140001740`.
 
-<img width="624" height="76" alt="IDA Pro showing call to undefined sub_140001740 at end of FUN_1400011f0 in Rust Tickler" src="https://github.com/user-attachments/assets/ea5575f0-6577-4f33-87d1-422c2ab94231" />
+<img width="624" height="76" alt="IDA Pro showing call to undefined sub_140001740 at end of FUN_1400011f0 in Rust Tickler" src="/assets/img/ea5575f0-6577-4f33-87d1-422c2ab94231.png" />
 
-<img width="627" height="42" alt="IDA Pro decompiler showing sub_140001740 function body with XOR operation" src="https://github.com/user-attachments/assets/fb00a4e7-f5e3-41c9-9c45-5f77f4552e34" />
+<img width="627" height="42" alt="IDA Pro decompiler showing sub_140001740 function body with XOR operation" src="/assets/img/fb00a4e7-f5e3-41c9-9c45-5f77f4552e34.png" />
 
-<img width="626" height="161" alt="IDA Pro disassembly showing string bytes being XORd with 0x51 in Rust Tickler" src="https://github.com/user-attachments/assets/3e0d4b6e-9f65-46b0-b2ce-c9e9b6dd314d" />
+<img width="626" height="161" alt="IDA Pro disassembly showing string bytes being XORd with 0x51 in Rust Tickler" src="/assets/img/3e0d4b6e-9f65-46b0-b2ce-c9e9b6dd314d.png" />
 
 We can see a string being XOR’d with 0x51
 
 Replicating this will result in the flag
 
-<img width="613" height="301" alt="CyberChef XOR with 0x51 revealing the Rust Tickler flag" src="https://github.com/user-attachments/assets/efd75e81-8362-413f-b6bb-82b9ac3b7cad" />
+<img width="613" height="301" alt="CyberChef XOR with 0x51 revealing the Rust Tickler flag" src="/assets/img/efd75e81-8362-413f-b6bb-82b9ac3b7cad.png" />
 
-<img width="701" height="112" alt="Rust Tickler flag output after XOR decryption with key 0x51" src="https://github.com/user-attachments/assets/d0feea29-44f1-47db-b34b-e38bb79fc07a" />
+<img width="701" height="112" alt="Rust Tickler flag output after XOR decryption with key 0x51" src="/assets/img/d0feea29-44f1-47db-b34b-e38bb79fc07a.png" />
 
 ## Rust Tickler 2
 
@@ -81,89 +81,89 @@ SHA 256: `47d7fa30cfeeba6cc42e75e97382ab05002a6cd0ebb4d622156a6af84fda7d5e`
 
 Main > 0x140001350
 
-<img width="625" height="101" alt="IDA Pro showing main function entry point at 0x140001350 for Rust Tickler 2" src="https://github.com/user-attachments/assets/b3cb12e3-cc22-4809-8c5b-c7adaac5d5cf" />
+<img width="625" height="101" alt="IDA Pro showing main function entry point at 0x140001350 for Rust Tickler 2" src="/assets/img/b3cb12e3-cc22-4809-8c5b-c7adaac5d5cf.png" />
 
 Set a breakpoint for this address in x64dbg:
 
-<img width="625" height="250" alt="x64dbg breakpoint set at 0x140001350 with disassembly visible" src="https://github.com/user-attachments/assets/bf807eb2-f6fd-44ab-89b7-05158e255089" />
+<img width="625" height="250" alt="x64dbg breakpoint set at 0x140001350 with disassembly visible" src="/assets/img/bf807eb2-f6fd-44ab-89b7-05158e255089.png" />
 
 A few instructions into this function, data gets moved to RDX, and the length of data is moved into RAX
 
-<img width="626" height="94" alt="x64dbg disassembly showing data moved into RDX and length into RAX" src="https://github.com/user-attachments/assets/12c78e24-d558-4171-86fa-1fdb090db1fe" />
+<img width="626" height="94" alt="x64dbg disassembly showing data moved into RDX and length into RAX" src="/assets/img/12c78e24-d558-4171-86fa-1fdb090db1fe.png" />
 
 Jump over this instruction in a debugger and right click the RDX register > Follow in dump to see the data
 
-<img width="622" height="62" alt="x64dbg RDX register value shown before following in dump" src="https://github.com/user-attachments/assets/5dd9c3e4-81e6-4f69-bdda-4a9641f908dd" />
+<img width="622" height="62" alt="x64dbg RDX register value shown before following in dump" src="/assets/img/5dd9c3e4-81e6-4f69-bdda-4a9641f908dd.png" />
 
-<img width="624" height="251" alt="x64dbg dump view showing encrypted HNTS data in RDX before XOR decryption" src="https://github.com/user-attachments/assets/b4b8b094-a41a-417c-8fe7-ca32caf5291c" />
+<img width="624" height="251" alt="x64dbg dump view showing encrypted HNTS data in RDX before XOR decryption" src="/assets/img/b4b8b094-a41a-417c-8fe7-ca32caf5291c.png" />
 
 At `1400013ae`, an XOR key is moved into `XMM0`
 
-<img width="626" height="25" alt="x64dbg disassembly showing XOR key being loaded into XMM0 at 1400013ae" src="https://github.com/user-attachments/assets/71f97bda-9f11-4018-9ec1-c8d6dd5379d7" />
+<img width="626" height="25" alt="x64dbg disassembly showing XOR key being loaded into XMM0 at 1400013ae" src="/assets/img/71f97bda-9f11-4018-9ec1-c8d6dd5379d7.png" />
 
 An XOR operation then occurs using this key towards `i_3` (The data in RDX)
 
-<img width="623" height="178" alt="x64dbg disassembly showing XOR operation applied to i_3 data using XMM0 key" src="https://github.com/user-attachments/assets/3d9bdce2-3447-45fd-b967-8944cb287600" />
+<img width="623" height="178" alt="x64dbg disassembly showing XOR operation applied to i_3 data using XMM0 key" src="/assets/img/3d9bdce2-3447-45fd-b967-8944cb287600.png" />
 
 This XOR operation is performed in the following loop:
 
-<img width="626" height="106" alt="x64dbg disassembly showing XOR decryption loop iterating over the data buffer" src="https://github.com/user-attachments/assets/25d9b3e7-f014-45d5-aeeb-b72fd3c974b6" />
+<img width="626" height="106" alt="x64dbg disassembly showing XOR decryption loop iterating over the data buffer" src="/assets/img/25d9b3e7-f014-45d5-aeeb-b72fd3c974b6.png" />
 
 Partial decrypted data in RDX after the first iteration shows a HNTS header:
 
-<img width="625" height="249" alt="x64dbg dump view showing HNTS magic bytes appearing in RDX after first XOR loop pass" src="https://github.com/user-attachments/assets/7f9b3fd4-bb4b-4479-b74e-86abdd41d8f5" />
+<img width="625" height="249" alt="x64dbg dump view showing HNTS magic bytes appearing in RDX after first XOR loop pass" src="/assets/img/7f9b3fd4-bb4b-4479-b74e-86abdd41d8f5.png" />
 
 Set a breakpoint at `1400013E5` and hit it to complete the decryption loop, revealing the decrypted data structure in RDX
 
-<img width="627" height="255" alt="x64dbg dump at 1400013E5 showing fully decrypted HNTS data structure in RDX" src="https://github.com/user-attachments/assets/8f83541e-24b7-463c-b7d8-1e085714f748" />
+<img width="627" height="255" alt="x64dbg dump at 1400013E5 showing fully decrypted HNTS data structure in RDX" src="/assets/img/8f83541e-24b7-463c-b7d8-1e085714f748.png" />
 
 This decrypted data structure gets passed to function `140003ea0`
 
-<img width="618" height="33" alt="x64dbg disassembly showing decrypted RDX passed to HNTS parser function 140003ea0" src="https://github.com/user-attachments/assets/475b90a0-8153-4eee-a505-6e82bfb21018" />
+<img width="618" height="33" alt="x64dbg disassembly showing decrypted RDX passed to HNTS parser function 140003ea0" src="/assets/img/475b90a0-8153-4eee-a505-6e82bfb21018.png" />
 
 This function is essentially the HNTS data parser, it checks that the data is as expected by checking the magic bytes and creates an indexed array for later lookup
 
 The parsed data structure is moved into the RDX prior to the call to function `140003de0`
 
-<img width="628" height="33" alt="x64dbg disassembly showing parsed HNTS structure moved into RDX before call to 140003de0" src="https://github.com/user-attachments/assets/908b952c-3087-48c5-ac99-ec62f0ebe38b" />
+<img width="628" height="33" alt="x64dbg disassembly showing parsed HNTS structure moved into RDX before call to 140003de0" src="/assets/img/908b952c-3087-48c5-ac99-ec62f0ebe38b.png" />
 
-<img width="630" height="274" alt="x64dbg dump showing parsed HNTS indexed structure in RDX ready for lookup function" src="https://github.com/user-attachments/assets/91d84671-eacd-4b30-8339-84011bc1e143" />
+<img width="630" height="274" alt="x64dbg dump showing parsed HNTS indexed structure in RDX ready for lookup function" src="/assets/img/91d84671-eacd-4b30-8339-84011bc1e143.png" />
 
 `0xAAAAAAAA` is then moved into the R8 register
 
-<img width="623" height="34" alt="x64dbg disassembly showing 0xAAAAAAAA moved into R8 as ID for HNTS lookup" src="https://github.com/user-attachments/assets/85cb975e-4630-4eff-9960-2470ff526a20" />
+<img width="623" height="34" alt="x64dbg disassembly showing 0xAAAAAAAA moved into R8 as ID for HNTS lookup" src="/assets/img/85cb975e-4630-4eff-9960-2470ff526a20.png" />
 
 These values are used as arguments for the call to function `140003de0`
 
-<img width="623" height="37" alt="x64dbg disassembly showing call to 140003de0 with HNTS structure and 0xAAAAAAAA ID" src="https://github.com/user-attachments/assets/8327678b-e395-481b-8bf6-0d14924c3d58" />
+<img width="623" height="37" alt="x64dbg disassembly showing call to 140003de0 with HNTS structure and 0xAAAAAAAA ID" src="/assets/img/8327678b-e395-481b-8bf6-0d14924c3d58.png" />
 
 After passing this function in a debugger, a string is returned:
 
-<img width="606" height="32" alt="x64dbg showing string returned by 140003de0 for ID 0xAAAAAAAA" src="https://github.com/user-attachments/assets/df56de85-0779-4712-b568-fad3cff3f487" />
+<img width="606" height="32" alt="x64dbg showing string returned by 140003de0 for ID 0xAAAAAAAA" src="/assets/img/df56de85-0779-4712-b568-fad3cff3f487.png" />
 
 A similar set up occurs later, where `0xAAAA` is moved into R8 and returns another string after a call to `140003de0`
 
-<img width="426" height="56" alt="x64dbg showing 0xAAAA loaded into R8 for second HNTS lookup call" src="https://github.com/user-attachments/assets/e03ef126-f4f7-4b75-946e-e67628dff0a0" />
+<img width="426" height="56" alt="x64dbg showing 0xAAAA loaded into R8 for second HNTS lookup call" src="/assets/img/e03ef126-f4f7-4b75-946e-e67628dff0a0.png" />
 
 Which returns the string Bingus
 
-<img width="379" height="32" alt="x64dbg showing string Bingus returned by 140003de0 for ID 0xAAAA" src="https://github.com/user-attachments/assets/b8709b72-3f49-4a0f-86d2-91797e59a169" />
+<img width="379" height="32" alt="x64dbg showing string Bingus returned by 140003de0 for ID 0xAAAA" src="/assets/img/b8709b72-3f49-4a0f-86d2-91797e59a169.png" />
 
 So the values being moved to `R8` prior to the function call return different strings. They are acting as IDs within the HNTS data structure and return different output depending on the ID provided.
 
 Looking at the HNTS data structure, the IDs are formatted in a pretty recognisable way:
 
-<img width="622" height="252" alt="hex view of decrypted HNTS structure showing ID fields and their offsets" src="https://github.com/user-attachments/assets/4e10e0fe-9d67-42f6-bedb-25c46502a038" />
+<img width="622" height="252" alt="hex view of decrypted HNTS structure showing ID fields and their offsets" src="/assets/img/4e10e0fe-9d67-42f6-bedb-25c46502a038.png" />
 
 We already know that `AAAAAAAA` and `AAAA` are valid IDs, `AAAAA` is also later called in the code. The rest of the IDs highlighted in this zone are also valid due to their offsets within the structure.
 
 Modifying the `R8` register to one of these IDs prior to the function call changes the result
 
-<img width="288" height="224" alt="x64dbg R8 register modified to various HNTS IDs showing different strings returned" src="https://github.com/user-attachments/assets/87aa9746-1886-43fe-8999-2d9b1bebe761" />
+<img width="288" height="224" alt="x64dbg R8 register modified to various HNTS IDs showing different strings returned" src="/assets/img/87aa9746-1886-43fe-8999-2d9b1bebe761.png" />
 
 The 7F structure ID will return the flag:
 
-<img width="627" height="36" alt="x64dbg showing flag string returned when R8 is set to the 7F HNTS ID" src="https://github.com/user-attachments/assets/1faf784e-ca1e-4b5c-94a3-ca7394f7b7bc" />
+<img width="627" height="36" alt="x64dbg showing flag string returned when R8 is set to the 7F HNTS ID" src="/assets/img/1faf784e-ca1e-4b5c-94a3-ca7394f7b7bc.png" />
 
 ## Rust Tickler 3
 
@@ -173,33 +173,33 @@ Main function of interest: `1400011f0`
 
 This challenge initially follows a similar format to Rust Tickler 2 where an ID is moved into `R8` prior to a function call which results in a different string being returned, for example:
 
-<img width="623" height="61" alt="x64dbg disassembly showing HNTS ID being moved into R8 for lookup in Rust Tickler 3" src="https://github.com/user-attachments/assets/2cbedc0c-7d7b-444a-92d8-ed3bf05d049e" />
+<img width="623" height="61" alt="x64dbg disassembly showing HNTS ID being moved into R8 for lookup in Rust Tickler 3" src="/assets/img/2cbedc0c-7d7b-444a-92d8-ed3bf05d049e.png" />
 
 This results in:
 
-<img width="499" height="34" alt="x64dbg showing string returned from HNTS lookup for the given ID" src="https://github.com/user-attachments/assets/41f005f0-dcb0-40b6-8774-01a4aad9defe" />
+<img width="499" height="34" alt="x64dbg showing string returned from HNTS lookup for the given ID" src="/assets/img/41f005f0-dcb0-40b6-8774-01a4aad9defe.png" />
 
 When we get to `​​1400013C2`, there is a conditional jump, where either ID `1338` or `1339` is used
 
-<img width="620" height="33" alt="x64dbg disassembly at 1400013C2 showing conditional jump choosing ID 1338 or 1339" src="https://github.com/user-attachments/assets/830b2a25-2497-4198-801d-291f6ae1d027" />
+<img width="620" height="33" alt="x64dbg disassembly at 1400013C2 showing conditional jump choosing ID 1338 or 1339" src="/assets/img/830b2a25-2497-4198-801d-291f6ae1d027.png" />
 
-<img width="551" height="31" alt="x64dbg disassembly showing the alternative branch using ID 1339 as the success path" src="https://github.com/user-attachments/assets/821033c8-d577-4ffe-b253-31bda54f77d5" />
+<img width="551" height="31" alt="x64dbg disassembly showing the alternative branch using ID 1339 as the success path" src="/assets/img/821033c8-d577-4ffe-b253-31bda54f77d5.png" />
 
 Trial and error tells us that `1338` is the failure, and `1339` is the success, so we’ll set our RIP / patch the ZF / binary to follow that execution path.
 
 Failure / success is determined based on if the provided input is equal to the result of ID `133A`
 
-<img width="463" height="221" alt="x64dbg disassembly showing memcmp comparing user input against result of HNTS ID 133A" src="https://github.com/user-attachments/assets/f779a206-45da-43cb-b9f1-62cc7d552a20" />
+<img width="463" height="221" alt="x64dbg disassembly showing memcmp comparing user input against result of HNTS ID 133A" src="/assets/img/f779a206-45da-43cb-b9f1-62cc7d552a20.png" />
 
 Modifying one of the IDs in `R8` prior to the `1423ED7D0` function call will reveal the answer:
 
-<img width="622" height="111" alt="x64dbg showing answer string returned after changing R8 to ID 133A before the lookup call" src="https://github.com/user-attachments/assets/de609d1c-831c-42e8-b0ce-7c9801389e17" />
+<img width="622" height="111" alt="x64dbg showing answer string returned after changing R8 to ID 133A before the lookup call" src="/assets/img/de609d1c-831c-42e8-b0ce-7c9801389e17.png" />
 
 Continuing to follow execution, we see a path being built: (`ID 1348 = Exodus`)
 
-<img width="577" height="481" alt="x64dbg dump showing Exodus directory path being built using HNTS ID 1348 lookup" src="https://github.com/user-attachments/assets/4bd8f38c-27db-40f1-add7-316182ff82a7" />
+<img width="577" height="481" alt="x64dbg dump showing Exodus directory path being built using HNTS ID 1348 lookup" src="/assets/img/4bd8f38c-27db-40f1-add7-316182ff82a7.png" />
 
-<img width="607" height="33" alt="x64dbg showing constructed Exodus directory path string used for existence check" src="https://github.com/user-attachments/assets/9c8c0a8e-d8c3-4b87-af72-9ade57d13a73" />
+<img width="607" height="33" alt="x64dbg showing constructed Exodus directory path string used for existence check" src="/assets/img/9c8c0a8e-d8c3-4b87-af72-9ade57d13a73.png" />
 
 The binary will terminate shortly after this is seen if this directory doesn’t exist.
 
@@ -207,23 +207,23 @@ If the correct answer is provided and the above path exists, a file (filename cr
 
 So all we need to do is create this directory and supply the hash when prompted by the executable.
 
-<img width="616" height="185" alt="Rust Tickler 3 binary accepting correct input and proceeding past stage 1 check" src="https://github.com/user-attachments/assets/5755b794-85c3-4560-8074-33f3510cf21a" />
+<img width="616" height="185" alt="Rust Tickler 3 binary accepting correct input and proceeding past stage 1 check" src="/assets/img/5755b794-85c3-4560-8074-33f3510cf21a.png" />
 
 Stage 2 performs a memcmp to compare supplied input to a known value and if that value matches, the success path is executed.
 
 However, patching the binary to get a success just reveals the message:
 
-<img width="623" height="50" alt="Rust Tickler 3 terminal output after patching stage 2 memcmp showing partial progress message" src="https://github.com/user-attachments/assets/abb16692-fccb-491c-9673-361453342dbe" />
+<img width="623" height="50" alt="Rust Tickler 3 terminal output after patching stage 2 memcmp showing partial progress message" src="/assets/img/abb16692-fccb-491c-9673-361453342dbe.png" />
 
 And there is not much change in execution flow as seen:
 
-<img width="622" height="252" alt="x64dbg execution flow after patching stage 2 showing no new code path reached" src="https://github.com/user-attachments/assets/f2f239fc-0b3b-4055-b0b3-b63661ef4929" />
+<img width="622" height="252" alt="x64dbg execution flow after patching stage 2 showing no new code path reached" src="/assets/img/f2f239fc-0b3b-4055-b0b3-b63661ef4929.png" />
 
 The answer lies between `140001354` and `1400013c3`. This is AES ciphertext, AES key, and AES IV. 
 
-<img width="760" height="282" alt="IDA Pro showing AES ciphertext, key, and IV data variables between 140001354 and 1400013c3" src="https://github.com/user-attachments/assets/d123333d-0f59-480a-adf6-35601d2050b7" />
+<img width="760" height="282" alt="IDA Pro showing AES ciphertext, key, and IV data variables between 140001354 and 1400013c3" src="/assets/img/d123333d-0f59-480a-adf6-35601d2050b7.png" />
 
-<img width="595" height="198" alt="IDA Pro showing AES 256 ciphertext, 32-byte key, and 16-byte IV data values in Rust Tickler 3" src="https://github.com/user-attachments/assets/e8735424-2987-4ddc-90c0-bcdca8b90035" />
+<img width="595" height="198" alt="IDA Pro showing AES 256 ciphertext, 32-byte key, and 16-byte IV data values in Rust Tickler 3" src="/assets/img/e8735424-2987-4ddc-90c0-bcdca8b90035.png" />
 
 I believe this data is then passed through further cryptographic functions prior to being used by the memcmp function.
 
@@ -235,7 +235,7 @@ Data_14037d148 = `539fb31e1cc13442420d039397e91777`
 
 These data variables follow that of AES 256, where the cipher is 48 bytes, followed by a 32 byte key and 16 byte IV.
 
-<img width="697" height="254" alt="CyberChef AES-256 decryption of the Rust Tickler 3 ciphertext using extracted key and IV" src="https://github.com/user-attachments/assets/48ffca8f-3c18-4829-9c5f-a49937537370" />
+<img width="697" height="254" alt="CyberChef AES-256 decryption of the Rust Tickler 3 ciphertext using extracted key and IV" src="/assets/img/48ffca8f-3c18-4829-9c5f-a49937537370.png" />
 
 
 

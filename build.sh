@@ -719,6 +719,40 @@ for i in $(seq 1 $total_posts); do
       }
     }
 
+    /* ── Related posts ── */
+    .related-posts {
+      max-width: 860px;
+      margin: 2.5rem auto 0;
+      padding: 1rem;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
+      background: rgba(10, 10, 16, 0.5);
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .related-label {
+      display: block;
+      font-size: 0.72rem;
+      color: #8be9fd;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.6rem;
+    }
+    .related-post-link {
+      display: block;
+      color: #999;
+      text-decoration: none;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+      border-left: 2px solid transparent;
+      transition: color 0.12s, border-color 0.12s, background 0.12s;
+    }
+    .related-post-link:hover {
+      color: #8be9fd;
+      border-left-color: #5625be;
+      background: rgba(86, 37, 190, 0.08);
+    }
+
     /* ── Post pagination ── */
     .post-pagination {
       display: flex;
@@ -739,6 +773,20 @@ for i in $(seq 1 $total_posts); do
     .post-pagination-link:hover,
     .post-pagination-link:focus-visible { color: #50fa7b; }
     .post-pagination-link:focus-visible { outline: 2px solid #5625be; outline-offset: 3px; }
+
+    /* ── Reading progress bar ── */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #5625be;
+      box-shadow: 0 0 6px rgba(86, 37, 190, 0.4);
+      z-index: 999;
+      transition: width 0.1s linear;
+    }
+    @media (max-width: 900px) { .reading-progress { top: 44px; } }
 
     /* ── Copy button on code blocks ── */
     .pre-wrapper { position: relative; }
@@ -815,6 +863,8 @@ for i in $(seq 1 $total_posts); do
   </script>
 </head>
 <body>
+
+<div class="reading-progress" id="readingProgress"></div>
 
   <nav id="rsrc-sidebar">
     <div class="rsrc-toolbar">
@@ -897,8 +947,25 @@ ENDHEADER
 
     cat "/tmp/mzbuild_${slug}.html" >> "_site/posts/${slug}.html"
 
+    # ── Build related posts by matching tag ──
+    related_html=""
+    related_count=0
+    for ri in $(seq 1 $total_posts); do
+      [ "$ri" -eq "$i" ] && continue
+      [ "$related_count" -ge 3 ] && break
+      if [ "${p_tags[$ri]}" = "${tags}" ]; then
+        related_html+="<a class=\"related-post-link\" href=\"/posts/${p_slugs[$ri]}.html\">${p_titles[$ri]}</a>"
+        related_count=$((related_count + 1))
+      fi
+    done
+    related_section=""
+    if [ -n "$related_html" ]; then
+      related_section="<div class=\"related-posts\"><span class=\"related-label\">; related ${tags} posts</span>${related_html}</div>"
+    fi
+
     cat >> "_site/posts/${slug}.html" << ENDFOOTER
     </article>
+    ${related_section}
     <nav class="post-pagination">
       ${prev_html}
       ${next_html}
@@ -1018,17 +1085,25 @@ ENDHEADER
     wrapper.appendChild(btn);
   });
 
-  // ── Scroll-to-top button ──
+  // ── Reading progress bar + Scroll-to-top button ──
+  var progressBar = document.getElementById('readingProgress');
   var scrollBtn = document.getElementById('scrollTopBtn');
-  if (scrollBtn) {
-    var scrollTimer;
-    window.addEventListener('scroll', function() {
-      if (scrollTimer) return;
-      scrollTimer = requestAnimationFrame(function() {
-        scrollBtn.classList.toggle('visible', window.scrollY > window.innerHeight);
-        scrollTimer = null;
-      });
+  var scrollTimer2;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer2) return;
+    scrollTimer2 = requestAnimationFrame(function() {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressBar && docHeight > 0) {
+        progressBar.style.width = Math.min(100, (scrollTop / docHeight) * 100) + '%';
+      }
+      if (scrollBtn) {
+        scrollBtn.classList.toggle('visible', scrollTop > window.innerHeight);
+      }
+      scrollTimer2 = null;
     });
+  });
+  if (scrollBtn) {
     scrollBtn.addEventListener('click', function() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -1869,6 +1944,10 @@ ${posts_list_html}
       <a class="rsrc-post-row" href="https://x.com/Chuggx00" target="_blank" rel="noopener noreferrer">
         <span class="rsrc-gutter">.idata:0040</span>
         <span class="rsrc-title">x.com/Chuggx00</span>
+      </a>
+      <a class="rsrc-post-row" href="/atom.xml" target="_blank" rel="noopener noreferrer">
+        <span class="rsrc-gutter">.idata:0060</span>
+        <span class="rsrc-title">atom.xml (RSS feed)</span>
       </a>
     </div>
   </div>
