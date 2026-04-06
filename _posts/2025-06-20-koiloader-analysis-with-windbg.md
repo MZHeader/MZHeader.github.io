@@ -91,7 +91,7 @@ Towards the top of the function we can see the following instructions: `0x00408A
 
 Initially we can see that `EnumDisplayDevicesW` is called, this is a Windows API that is going to enumerate display devices on the host.
 
-```asm
+```x86asm
 mov     [ebp+DisplayDevice.cb], 348h
 push    esi             ; dwFlags
 push    eax             ; lpDisplayDevice
@@ -101,7 +101,7 @@ call    edi ; EnumDisplayDevicesW
 ```
 
 The code then pushes the string `Hypver-V` and the device string `DisplayDevice.DeviceString` onto the stack:
-```asm
+```x86asm
 push    offset aHyperV  ; "Hyper-V"
 lea     eax, [ebp+DisplayDevice.DeviceString]
 StrStrIW is then called, which is a function that is going to search for / compare the two strings:
@@ -114,7 +114,7 @@ If `StrStrIW` does not find the substring, EAX will be 0.
 
 
 Next, the code performs a bitwise AND operation between EAX and itself.
-```asm
+```x86asm
 test    eax, eax
 ```
 If EAX is non-zero (if the substring was found) then the Zero Flag (ZF) will be cleared (ZF=0).
@@ -122,7 +122,7 @@ If EAX is zero (if the substring was not found) then the Zero Flag will be set (
 
 
 Next, the zero flag is checked. If ZF=0 (Hyper-V was found) then the program will jump to `0x408B55`, otherwise, the jnz instruction will not jump and the program will continue to execute the next instruction.
-```asm
+```x86asm
 jnz     loc_408B55
 ```
 
