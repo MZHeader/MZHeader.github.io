@@ -959,7 +959,7 @@ ENDHEADER
     done
     related_section=""
     if [ -n "$related_html" ]; then
-      related_section="<div class=\"related-posts\"><span class=\"related-label\">; related ${tags} posts</span>${related_html}</div>"
+      related_section="<div class=\"related-posts\"><span class=\"related-label\">; other ${tags} posts</span>${related_html}</div>"
     fi
 
     cat >> "_site/posts/${slug}.html" << ENDFOOTER
