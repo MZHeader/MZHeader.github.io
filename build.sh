@@ -11,6 +11,7 @@ cp -r samples _site/ 2>/dev/null || true
 cp favicon.ico _site/ 2>/dev/null || true
 cp CNAME _site/ 2>/dev/null || true
 cp -r fonts _site/ 2>/dev/null || true
+cp a6aa0e481a0a4c6ca369190ec48fb47e.txt _site/ 2>/dev/null || true
 
 SHARED_CSS='
     * { box-sizing: border-box; }
@@ -76,6 +77,8 @@ GA_HEAD='
 ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#5625be" />
   <link rel="alternate" type="application/atom+xml" title="MZHeader RSS Feed" href="/atom.xml" />
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
   <style>
@@ -221,15 +224,20 @@ for i in $(seq 1 $total_posts); do
     # Prev = newer post (lower index), Next = older post (higher index)
     prev_html=""
     next_html=""
+    prefetch_links=""
     prev_i=$((i - 1))
     next_i=$((i + 1))
     if [ $prev_i -ge 1 ]; then
         prev_label="${p_titles[$prev_i]%%:*}"
         prev_html="<a class=\"post-pagination-link\" href=\"/posts/${p_slugs[$prev_i]}.html\">&larr; ${prev_label}</a>"
+        prefetch_links+="
+  <link rel=\"prefetch\" href=\"/posts/${p_slugs[$prev_i]}.html\" />"
     fi
     if [ $next_i -le $total_posts ]; then
         next_label="${p_titles[$next_i]%%:*}"
         next_html="<a class=\"post-pagination-link post-pagination-link--right\" href=\"/posts/${p_slugs[$next_i]}.html\">${next_label} &rarr;</a>"
+        prefetch_links+="
+  <link rel=\"prefetch\" href=\"/posts/${p_slugs[$next_i]}.html\" />"
     fi
 
     cat > "_site/posts/${slug}.html" << ENDHEADER
@@ -258,7 +266,7 @@ for i in $(seq 1 $total_posts); do
   <meta name="twitter:creator" content="@Chuggx00" />
   <meta name="twitter:image" content="${og_image}" />
   <meta name="twitter:title" content="${title}" />
-  <meta name="twitter:description" content="${description}" />
+  <meta name="twitter:description" content="${description}" />${prefetch_links}
   ${ASSET_HEAD}
   ${GA_HEAD}
   ${HLJS_HEAD}
@@ -768,7 +776,12 @@ for i in $(seq 1 $total_posts); do
     "author": {
       "@type": "Person",
       "name": "Liam Chugg",
-      "url": "https://www.linkedin.com/in/liam-chugg/"
+      "url": "https://www.linkedin.com/in/liam-chugg/",
+      "sameAs": [
+        "https://x.com/Chuggx00",
+        "https://github.com/MZHeader",
+        "https://www.linkedin.com/in/liam-chugg/"
+      ]
     },
     "publisher": {
       "@type": "Person",
@@ -1731,7 +1744,12 @@ cat > "_site/index.html" << ENDINDEX
           "@type": "Organization",
           "name": "CrowdStrike"
         },
-        "url": "https://www.linkedin.com/in/liam-chugg/"
+        "url": "https://www.linkedin.com/in/liam-chugg/",
+        "sameAs": [
+          "https://x.com/Chuggx00",
+          "https://github.com/MZHeader",
+          "https://www.linkedin.com/in/liam-chugg/"
+        ]
       }
     },
     {
@@ -2156,6 +2174,38 @@ Allow: /
 Sitemap: https://mzheader.tech/sitemap.xml
 ENDROBOTS
 echo "Built: robots.txt"
+
+# ── .well-known/security.txt ──────────────────────────────────────────────
+mkdir -p _site/.well-known
+cat > "_site/.well-known/security.txt" << 'ENDSECURITY'
+Contact: https://www.linkedin.com/in/liam-chugg/
+Contact: https://x.com/Chuggx00
+Expires: 2027-04-06T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://mzheader.tech/.well-known/security.txt
+ENDSECURITY
+echo "Built: .well-known/security.txt"
+
+# ── manifest.json ─────────────────────────────────────────────────────────
+cat > "_site/manifest.json" << 'ENDMANIFEST'
+{
+  "name": "MZHeader: Reverse Engineering Malware",
+  "short_name": "MZHeader",
+  "description": "Malware analysis blog by Liam Chugg",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#5625be",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
+ENDMANIFEST
+echo "Built: manifest.json"
 
 # ── 404.html ───────────────────────────────────────────────────────────────
 cat > "_site/404.html" << 'END404'
