@@ -100,7 +100,7 @@ post_data_js=""
 itemlist_json=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_offsets p_hex_ts p_short_dates
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_series_descs p_offsets p_hex_ts p_short_dates
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -117,6 +117,7 @@ for post in $(ls _posts/*.md | sort -r); do
     tags=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^tags:/{sub(/^tags: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     [ -z "$tags" ] && tags="Analysis"
     series=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^series:/{sub(/^series: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
+    series_desc=$(awk 'BEGIN{f=0} /^---/{f++; next} f==1 && /^series_desc:/{sub(/^series_desc: */, ""); gsub(/^"|"$/, ""); print; exit}' "$post")
     title=$(grep "^## " "$post" | head -1 | sed 's/^## //')
     [ -z "$title" ] && title="$slug"
 
@@ -138,6 +139,7 @@ for post in $(ls _posts/*.md | sort -r); do
     p_tags[$post_idx]="$tags"
     p_badge_classes[$post_idx]="$badge_class"
     p_series[$post_idx]="$series"
+    p_series_descs[$post_idx]="$series_desc"
 
     pandoc "$post" \
         --from markdown+yaml_metadata_block-implicit_figures \
@@ -214,11 +216,13 @@ for i in $(seq 1 $total_posts); do
             series_children=""
             series_tag=""
             series_badge=""
+            series_sdesc=""
             for j in $(seq 1 $total_posts); do
                 if [ "${p_series[$j]}" = "$series" ]; then
                     series_count=$((series_count + 1))
                     [ -z "$series_tag" ] && series_tag="${p_tags[$j]}"
                     [ -z "$series_badge" ] && series_badge="${p_badge_classes[$j]}"
+                    [ -z "$series_sdesc" ] && series_sdesc="${p_series_descs[$j]}"
                     series_children+="
               <a class=\"rsrc-post-row series-child\" id=\"post-${j}\" href=\"/posts/${p_slugs[$j]}.html\">
                 <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$j]}</span>
@@ -233,9 +237,15 @@ for i in $(seq 1 $total_posts); do
             series_id=$(printf '%s' "$series" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
             header_offset=$(printf '%04X' $(( visible_row * 32 )) )
             visible_row=$((visible_row + 1))
+
+            # Add series to detail panel hover data
+            js_stitle=$(printf '%s' "$series" | sed "s/'/\\\\'/g")
+            js_sdesc=$(printf '%s' "$series_sdesc" | sed "s/'/\\\\'/g")
+            post_data_js+="postData['series-${series_id}']={title:'${js_stitle}',desc:'${js_sdesc}',series:true,count:${series_count}};"
+
             posts_list_html+="
           <div class=\"series-group\" data-series=\"${series_id}\" data-tag=\"${series_tag}\">
-            <div class=\"series-header\" onclick=\"toggleSeries('${series_id}')\">
+            <div class=\"series-header\" id=\"series-${series_id}\" onclick=\"toggleSeries('${series_id}')\">
               <span class=\"rsrc-gutter\">.rsrc:${header_offset}</span>
               <span class=\"rsrc-title-block\">
                 <span class=\"rsrc-title\"><span class=\"series-label\">Series:</span> ${series}</span>
@@ -2082,16 +2092,23 @@ ${posts_list_html}
     const data = postData[row.id];
     if (data) {
       panel.classList.add('active');
-      detailBody.innerHTML =
-        '<div class="pe-detail-title">' + data.title + '</div>' +
-        '<div class="pe-detail-desc">' + data.desc + '</div>' +
-        '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
-        '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
+      if (data.series) {
+        detailBody.innerHTML =
+          '<div class="pe-detail-title">' + data.title + '</div>' +
+          '<div class="pe-detail-desc">' + data.desc + '</div>' +
+          '<div class="pe-detail-date"><span class="meta-label">Posts:</span> <span class="meta-value">' + data.count + '</span></div>';
+      } else {
+        detailBody.innerHTML =
+          '<div class="pe-detail-title">' + data.title + '</div>' +
+          '<div class="pe-detail-desc">' + data.desc + '</div>' +
+          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
+          '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
+      }
     }
   }
   function hideDetail() { panel.classList.remove('active'); }
 
-  document.querySelectorAll('.rsrc-post-row').forEach(row => {
+  document.querySelectorAll('.rsrc-post-row, .series-header').forEach(row => {
     row.addEventListener('mouseenter', () => showDetail(row));
     row.addEventListener('mouseleave', hideDetail);
     row.addEventListener('focus', () => showDetail(row));
