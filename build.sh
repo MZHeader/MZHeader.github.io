@@ -10,6 +10,7 @@ cp -r js _site/ 2>/dev/null || true
 cp -r samples _site/ 2>/dev/null || true
 cp favicon.ico _site/ 2>/dev/null || true
 cp CNAME _site/ 2>/dev/null || true
+cp -r fonts _site/ 2>/dev/null || true
 
 SHARED_CSS='
     * { box-sizing: border-box; }
@@ -46,7 +47,9 @@ SHARED_CSS='
       font-size: 0.9em;
       border: 1px solid rgba(86, 37, 190, 0.4);
     }
-    img { max-width: 100%; height: auto; border-radius: 6px; }
+    img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #2a2a3a; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4); }
+    pre { position: relative; border-top: 2px solid #5625be; }
+    blockquote { border-left: 3px solid #5625be; padding-left: 1rem; color: #aaa; margin: 1.5rem 0; }
     hr { border: none; border-top: 1px solid #2a2a3a; margin: 2rem 0; }
     .back-link {
       display: inline-block;
@@ -74,10 +77,16 @@ ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="alternate" type="application/atom+xml" title="MZHeader RSS Feed" href="/atom.xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: "Fira Code";
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url("/fonts/FiraCode-latin.woff2") format("woff2");
+    }
+  </style>
 '
 
 HLJS_HEAD='
@@ -90,7 +99,7 @@ post_data_js=""
 itemlist_json=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -148,6 +157,18 @@ PYSTRIP
     p_read_times[$post_idx]="$read_time"
     p_word_counts[$post_idx]="$word_count"
 
+    # Extract first image URL from rendered HTML for per-post OG image
+    first_img=$(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${slug}.html" | head -1 | sed 's/.*src="//;s/".*//' || true)
+    if [ -n "$first_img" ]; then
+      p_og_images[$post_idx]="$first_img"
+    else
+      p_og_images[$post_idx]="https://mzheader.tech/assets/og-preview.png"
+    fi
+
+    # Get last modified date from git history for dateModified
+    git_modified=$(git log -1 --format="%cs" -- "$post" 2>/dev/null || echo "$date_str")
+    p_date_modifieds[$post_idx]="$git_modified"
+
     offset=$(printf '%04X' $(( (post_idx - 1) * 32 )) )
 
     js_title=$(printf '%s' "$title" | sed "s/'/\\\\'/g")
@@ -189,6 +210,8 @@ for i in $(seq 1 $total_posts); do
     read_time="${p_read_times[$i]}"
     word_count="${p_word_counts[$i]}"
     tags="${p_tags[$i]}"
+    og_image="${p_og_images[$i]}"
+    date_modified="${p_date_modifieds[$i]}"
     short_title="${title%%:*}"
 
     # JSON-escape title and description for structured data
@@ -224,11 +247,16 @@ for i in $(seq 1 $total_posts); do
   <meta property="og:description" content="${description}" />
   <meta property="og:url" content="https://mzheader.tech/posts/${slug}.html" />
   <meta property="og:site_name" content="Reverse Engineering Malware" />
-  <meta property="og:image" content="https://mzheader.tech/assets/og-preview.png" />
+  <meta property="og:image" content="${og_image}" />
   <meta property="article:published_time" content="${date_str}" />
+  <meta property="article:modified_time" content="${date_modified}" />
   <meta property="article:author" content="Liam Chugg" />
+  <meta property="article:section" content="Malware Analysis" />
+  <meta property="article:tag" content="${tags}" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://mzheader.tech/assets/og-preview.png" />
+  <meta name="twitter:site" content="@Chuggx00" />
+  <meta name="twitter:creator" content="@Chuggx00" />
+  <meta name="twitter:image" content="${og_image}" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
   ${ASSET_HEAD}
@@ -375,7 +403,7 @@ for i in $(seq 1 $total_posts); do
       padding: 2rem 4rem;
     }
     .post-nav, article, .post-pagination {
-      max-width: 800px;
+      max-width: 860px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -556,7 +584,35 @@ for i in $(seq 1 $total_posts); do
       vertical-align: top;
     }
     article tr:last-child td { border-bottom: none; }
+    article tr:nth-child(even) td { background: rgba(30, 30, 42, 0.5); }
     article tr:hover td { background: rgba(86, 37, 190, 0.07); }
+
+    /* ── Scroll-to-top ── */
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 36px;
+      height: 36px;
+      background: rgba(16, 16, 22, 0.9);
+      border: 1px solid #2a2a3a;
+      border-radius: 4px;
+      color: #5625be;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, color 0.15s, border-color 0.15s;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scroll-top-btn.visible { opacity: 1; pointer-events: auto; }
+    .scroll-top-btn:hover { color: #8be9fd; border-color: #5625be; }
+    .scroll-top-btn:focus-visible { outline: 2px solid #5625be; outline-offset: 2px; }
+    @media (max-width: 900px) { .scroll-top-btn { bottom: 1rem; right: 1rem; } }
 
     /* ── Sidebar toggle ── */
     #rsrc-sidebar {
@@ -708,7 +764,7 @@ for i in $(seq 1 $total_posts); do
     "headline": "${json_title}",
     "description": "${json_desc}",
     "datePublished": "${date_str}",
-    "dateModified": "${date_str}",
+    "dateModified": "${date_modified}",
     "author": {
       "@type": "Person",
       "name": "Liam Chugg",
@@ -720,9 +776,29 @@ for i in $(seq 1 $total_posts); do
     },
     "url": "https://mzheader.tech/posts/${slug}.html",
     "mainEntityOfPage": "https://mzheader.tech/posts/${slug}.html",
-    "image": "https://mzheader.tech/assets/og-preview.png",
+    "image": "${og_image}",
     "wordCount": "${word_count}",
     "articleSection": "${tags}"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://mzheader.tech/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "${json_title}",
+        "item": "https://mzheader.tech/posts/${slug}.html"
+      }
+    ]
   }
   </script>
 </head>
@@ -816,6 +892,8 @@ ENDHEADER
       ${next_html}
     </nav>
   </div>
+
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="0x0000">^</button>
 
 <script>
 (function() {
@@ -927,6 +1005,22 @@ ENDHEADER
     });
     wrapper.appendChild(btn);
   });
+
+  // ── Scroll-to-top button ──
+  var scrollBtn = document.getElementById('scrollTopBtn');
+  if (scrollBtn) {
+    var scrollTimer;
+    window.addEventListener('scroll', function() {
+      if (scrollTimer) return;
+      scrollTimer = requestAnimationFrame(function() {
+        scrollBtn.classList.toggle('visible', window.scrollY > window.innerHeight);
+        scrollTimer = null;
+      });
+    });
+    scrollBtn.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 })();
 </script>
 
@@ -955,6 +1049,8 @@ cat > "_site/index.html" << ENDINDEX
   <meta property="og:site_name" content="Reverse Engineering Malware" />
   <meta property="og:image" content="https://mzheader.tech/assets/og-preview.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@Chuggx00" />
+  <meta name="twitter:creator" content="@Chuggx00" />
   <meta name="twitter:image" content="https://mzheader.tech/assets/og-preview.png" />
   <meta name="twitter:title" content="Reverse Engineering Malware" />
   <meta name="twitter:description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
@@ -1478,7 +1574,7 @@ cat > "_site/index.html" << ENDINDEX
       padding: 0.2rem 0.55rem;
       border-radius: 2px;
       cursor: pointer;
-      transition: background 0.12s, color 0.12s, border-color 0.12s, box-shadow 0.12s;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, box-shadow 0.12s, transform 0.12s;
       user-select: none;
     }
     .filter-btn:hover {
@@ -1490,6 +1586,7 @@ cat > "_site/index.html" << ENDINDEX
       border-color: #5625be;
       color: #8be9fd;
       box-shadow: 0 0 6px rgba(86, 37, 190, 0.3);
+      transform: scale(1.03);
     }
     .filter-btn[data-cat="all"].active { color: #8be9fd; border-color: #5625be; }
     .filter-btn[data-cat="trojan"] { border-color: rgba(198,40,40,0.3); }
@@ -1989,18 +2086,27 @@ echo "Built: index.html"
 # ── sitemap.xml ────────────────────────────────────────────────────────────
 sitemap_entries=""
 for i in $(seq 1 $total_posts); do
+    # Extract image URLs from rendered post for image sitemap
+    image_entries=""
+    if [ -f "/tmp/mzbuild_${p_slugs[$i]}.html" ]; then
+      while IFS= read -r img_url; do
+        image_entries+="
+    <image:image><image:loc>${img_url}</image:loc></image:image>"
+      done < <(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${p_slugs[$i]}.html" 2>/dev/null | sed 's/.*src="//;s/".*//' || true)
+    fi
     sitemap_entries+="
   <url>
     <loc>https://mzheader.tech/posts/${p_slugs[$i]}.html</loc>
-    <lastmod>${p_date_strs[$i]}</lastmod>
+    <lastmod>${p_date_modifieds[$i]}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.8</priority>${image_entries}
   </url>"
 done
 
 cat > "_site/sitemap.xml" << ENDSITEMAP
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mzheader.tech/</loc>
     <lastmod>${p_date_strs[1]}</lastmod>
@@ -2060,7 +2166,15 @@ cat > "_site/404.html" << 'END404'
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 — MZHeader: Reverse Engineering Malware</title>
   <link rel="icon" href="/favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: "Fira Code";
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url("/fonts/FiraCode-latin.woff2") format("woff2");
+    }
+  </style>
   <script>
     // Redirect old Jekyll URLs (/posts/slug) to new ones (/posts/slug.html)
     var path = window.location.pathname.replace(/\/$/, '');
