@@ -78,6 +78,7 @@ ASSET_HEAD='
   <meta name="theme-color" content="#5625be" />
   <link rel="alternate" type="application/atom+xml" title="MZHeader RSS Feed" href="/atom.xml" />
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/FiraCode-latin.woff2" crossorigin />
   <style>
     @font-face {
       font-family: "Fira Code";
@@ -165,6 +166,9 @@ PYSTRIP
     # Extract first image URL from rendered HTML for per-post OG image
     first_img=$(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${slug}.html" | head -1 | sed 's/.*src="//;s/".*//' || true)
     if [ -n "$first_img" ]; then
+      case "$first_img" in
+        /*) first_img="https://mzheader.tech${first_img}" ;;
+      esac
       p_og_images[$post_idx]="$first_img"
     else
       p_og_images[$post_idx]="https://mzheader.tech/assets/img/og-preview.png"
@@ -229,6 +233,7 @@ for i in $(seq 1 $total_posts); do
                 <span class=\"rsrc-title-block\">
                   <span class=\"rsrc-title\">${p_titles[$j]}</span>
                   <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span></span>
+                  <span class=\"rsrc-mobile-desc\">; ${p_descs[$j]}</span>
                 </span>
               </a>"
                 fi
@@ -267,6 +272,7 @@ for i in $(seq 1 $total_posts); do
         <span class=\"rsrc-title-block\">
           <span class=\"rsrc-title\">${p_titles[$i]}</span>
           <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span></span>
+          <span class=\"rsrc-mobile-desc\">; ${p_descs[$i]}</span>
         </span>
       </a>"
     fi
@@ -318,6 +324,8 @@ for i in $(seq 1 $total_posts); do
   <title>${title} — MZHeader: Reverse Engineering Malware</title>
   <meta name="description" content="${description}" />
   <meta name="author" content="Liam Chugg" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://mzheader.tech/posts/${slug}.html" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="${title}" />
@@ -1198,6 +1206,8 @@ cat > "_site/index.html" << ENDINDEX
   <title>MZHeader: Reverse Engineering Malware</title>
   <meta name="description" content="Malware analysis blog by Liam Chugg, Security Researcher at CrowdStrike. Practical reverse engineering: unpacking, deobfuscation, debugging, disassembly, and memory forensics." />
   <meta name="author" content="Liam Chugg" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://mzheader.tech/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Reverse Engineering Malware" />
@@ -1264,7 +1274,7 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.95rem;
       font-family: "Fira Code", "Consolas", monospace;
       color: #50fa7b;
-      opacity: 0.55;
+      opacity: 0.75;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       margin-bottom: 0.2em;
@@ -1849,7 +1859,7 @@ cat > "_site/index.html" << ENDINDEX
     @media (max-width: 600px) {
       body { padding: 1rem; }
       .title-malware { font-size: 1.8rem; }
-      .title-re { font-size: 0.75rem; letter-spacing: 0.12em; }
+      .title-re { font-size: 0.8rem; letter-spacing: 0.12em; }
       .pe-section-flags { display: none; }
       .pe-gutter { display: none; }
       .rsrc-post-row .rsrc-gutter { display: none; }
@@ -1857,8 +1867,21 @@ cat > "_site/index.html" << ENDINDEX
       .rsrc-post-row .rsrc-title { white-space: normal; }
       .pe-window-titlebar .wt-path { display: none; }
       .pe-window-titlebar .window-tag { display: none; }
-      .about-toggle { font-size: 0.6rem; }
+      .about-toggle { font-size: 0.78rem; }
+      .rsrc-meta { font-size: 0.8rem; }
+      .rsrc-badge { font-size: 0.72rem; opacity: 0.8; }
+      .filter-btn { font-size: 0.78rem; padding: 0.32rem 0.7rem; }
+      .rsrc-mobile-desc {
+        display: block;
+        font-family: "Fira Code", "Consolas", monospace;
+        font-size: 0.82rem;
+        color: #a0a0b8;
+        line-height: 1.5;
+        padding: 0.15rem 0 0.5rem 0;
+        margin: 0;
+      }
     }
+    .rsrc-mobile-desc { display: none; }
 
     /* Reduced motion preference */
     @media (prefers-reduced-motion: reduce) {
@@ -2088,21 +2111,39 @@ ${posts_list_html}
   const postData = {};
   ${post_data_js}
 
+  function makeDiv(cls, text) {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = text;
+    return el;
+  }
+  function makeMetaRow(label, value, extraStyle) {
+    const row = document.createElement('div');
+    row.className = 'pe-detail-date';
+    if (extraStyle) row.setAttribute('style', extraStyle);
+    const lbl = document.createElement('span');
+    lbl.className = 'meta-label';
+    lbl.textContent = label;
+    const val = document.createElement('span');
+    val.className = 'meta-value';
+    val.textContent = value;
+    row.appendChild(lbl);
+    row.appendChild(document.createTextNode(' '));
+    row.appendChild(val);
+    return row;
+  }
   function showDetail(row) {
     const data = postData[row.id];
     if (data) {
       panel.classList.add('active');
+      detailBody.textContent = '';
+      detailBody.appendChild(makeDiv('pe-detail-title', data.title));
+      detailBody.appendChild(makeDiv('pe-detail-desc', data.desc));
       if (data.series) {
-        detailBody.innerHTML =
-          '<div class="pe-detail-title">' + data.title + '</div>' +
-          '<div class="pe-detail-desc">' + data.desc + '</div>' +
-          '<div class="pe-detail-date"><span class="meta-label">Posts:</span> <span class="meta-value">' + data.count + '</span></div>';
+        detailBody.appendChild(makeMetaRow('Posts:', data.count));
       } else {
-        detailBody.innerHTML =
-          '<div class="pe-detail-title">' + data.title + '</div>' +
-          '<div class="pe-detail-desc">' + data.desc + '</div>' +
-          '<div class="pe-detail-date"><span class="meta-label">TimeDateStamp:</span> <span class="meta-value">' + data.date + '</span></div>' +
-          '<div class="pe-detail-date" style="border-top:none;margin-top:0;padding-top:0.2rem;"><span class="meta-label">ReadTime:</span> <span class="meta-value">' + data.readTime + '</span></div>';
+        detailBody.appendChild(makeMetaRow('TimeDateStamp:', data.date));
+        detailBody.appendChild(makeMetaRow('ReadTime:', data.readTime, 'border-top:none;margin-top:0;padding-top:0.2rem;'));
       }
     }
   }
@@ -2308,6 +2349,9 @@ for i in $(seq 1 $total_posts); do
     image_entries=""
     if [ -f "/tmp/mzbuild_${p_slugs[$i]}.html" ]; then
       while IFS= read -r img_url; do
+        case "$img_url" in
+          /*) img_url="https://mzheader.tech${img_url}" ;;
+        esac
         image_entries+="
     <image:image><image:loc>${img_url}</image:loc></image:image>"
       done < <(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${p_slugs[$i]}.html" 2>/dev/null | sed 's/.*src="//;s/".*//' || true)
@@ -2321,13 +2365,14 @@ for i in $(seq 1 $total_posts); do
   </url>"
 done
 
+build_date=$(date -u +%Y-%m-%d)
 cat > "_site/sitemap.xml" << ENDSITEMAP
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://mzheader.tech/</loc>
-    <lastmod>${p_date_strs[1]}</lastmod>
+    <lastmod>${build_date}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>${sitemap_entries}
