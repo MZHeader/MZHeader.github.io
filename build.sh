@@ -233,7 +233,6 @@ for i in $(seq 1 $total_posts); do
                 <span class=\"rsrc-title-block\">
                   <span class=\"rsrc-title\">${p_titles[$j]}</span>
                   <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span></span>
-                  <span class=\"rsrc-mobile-desc\">; ${p_descs[$j]}</span>
                 </span>
               </a>"
                 fi
@@ -272,7 +271,6 @@ for i in $(seq 1 $total_posts); do
         <span class=\"rsrc-title-block\">
           <span class=\"rsrc-title\">${p_titles[$i]}</span>
           <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span></span>
-          <span class=\"rsrc-mobile-desc\">; ${p_descs[$i]}</span>
         </span>
       </a>"
     fi
@@ -1871,17 +1869,7 @@ cat > "_site/index.html" << ENDINDEX
       .rsrc-meta { font-size: 0.8rem; }
       .rsrc-badge { font-size: 0.72rem; opacity: 0.8; }
       .filter-btn { font-size: 0.78rem; padding: 0.32rem 0.7rem; }
-      .rsrc-mobile-desc {
-        display: block;
-        font-family: "Fira Code", "Consolas", monospace;
-        font-size: 0.82rem;
-        color: #a0a0b8;
-        line-height: 1.5;
-        padding: 0.15rem 0 0.5rem 0;
-        margin: 0;
-      }
     }
-    .rsrc-mobile-desc { display: none; }
 
     /* Reduced motion preference */
     @media (prefers-reduced-motion: reduce) {
