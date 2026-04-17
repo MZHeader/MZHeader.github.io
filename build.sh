@@ -1191,7 +1191,54 @@ ENDHEADER
 ENDFOOTER
 
     echo "Built: posts/${slug}.html"
+
+    # ── Emit Jekyll-style permalink redirect stub ──
+    # Older URLs of the form /YYYY/MM/DD/slug.html were indexed before the
+    # site moved to /posts/slug.html. Generate a physical redirect so Google
+    # can consolidate the indexed URL to the current canonical.
+    jekyll_year="${date_str:0:4}"
+    jekyll_month="${date_str:5:2}"
+    jekyll_day="${date_str:8:2}"
+    jekyll_dir="_site/${jekyll_year}/${jekyll_month}/${jekyll_day}"
+    mkdir -p "$jekyll_dir"
+    cat > "${jekyll_dir}/${slug}.html" << ENDREDIRECT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${title} — MZHeader</title>
+  <link rel="canonical" href="https://mzheader.tech/posts/${slug}.html" />
+  <meta name="robots" content="noindex,follow" />
+  <meta http-equiv="refresh" content="0; url=https://mzheader.tech/posts/${slug}.html" />
+</head>
+<body>
+  <p>This post has moved to <a href="https://mzheader.tech/posts/${slug}.html">/posts/${slug}.html</a>.</p>
+</body>
+</html>
+ENDREDIRECT
+    echo "Redirect: ${jekyll_year}/${jekyll_month}/${jekyll_day}/${slug}.html"
 done
+
+# ── Extra rename redirects (old slug → new slug) ──
+# The Huntress CTF 2025 post was originally at /2025/11/01/huntress-ctf-2025-...
+# before the slug was tightened to huntress-ctf2025.
+mkdir -p "_site/2025/11/01"
+cat > "_site/2025/11/01/huntress-ctf-2025-reverse-engineering-challenges.html" << 'ENDRENAME'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Huntress CTF 2025 — MZHeader</title>
+  <link rel="canonical" href="https://mzheader.tech/posts/huntress-ctf2025-reverse-engineering-challenges.html" />
+  <meta name="robots" content="noindex,follow" />
+  <meta http-equiv="refresh" content="0; url=https://mzheader.tech/posts/huntress-ctf2025-reverse-engineering-challenges.html" />
+</head>
+<body>
+  <p>This post has moved to <a href="https://mzheader.tech/posts/huntress-ctf2025-reverse-engineering-challenges.html">/posts/huntress-ctf2025-reverse-engineering-challenges.html</a>.</p>
+</body>
+</html>
+ENDRENAME
+echo "Redirect: 2025/11/01/huntress-ctf-2025-reverse-engineering-challenges.html"
 
 # Generate index.html
 cat > "_site/index.html" << ENDINDEX
@@ -2437,6 +2484,7 @@ cat > "_site/404.html" << 'END404'
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 — MZHeader: Reverse Engineering Malware</title>
+  <meta name="robots" content="noindex,follow" />
   <link rel="icon" href="/favicon.ico" />
   <style>
     @font-face {
