@@ -1064,7 +1064,27 @@ ENDHEADER
   });
   var countEl = document.getElementById("rsrc-count");
   if (countEl) countEl.textContent = rows.length + " entries";
-  if (activeRow) setTimeout(function() { activeRow.scrollIntoView({ block: "center", behavior: "instant" }); }, 0);
+
+  // ── Series group: toggle + auto-expand active ──
+  window.toggleSeries = function(seriesId) {
+    var children = document.getElementById("children-" + seriesId);
+    var toggle = document.getElementById("toggle-" + seriesId);
+    var group = children ? children.parentElement : null;
+    if (!children || !toggle) return;
+    var isOpen = children.style.display !== "none";
+    children.style.display = isOpen ? "none" : "";
+    toggle.textContent = isOpen ? "[+]" : "[-]";
+    if (group) group.classList.toggle("open", !isOpen);
+  };
+
+  if (activeRow) {
+    var parentGroup = activeRow.closest(".series-group");
+    if (parentGroup) {
+      var sid = parentGroup.getAttribute("data-series");
+      if (sid) window.toggleSeries(sid);
+    }
+    setTimeout(function() { activeRow.scrollIntoView({ block: "center", behavior: "instant" }); }, 0);
+  }
 
   // ── Sidebar toggle ──
   var sidebar = document.getElementById("rsrc-sidebar");
