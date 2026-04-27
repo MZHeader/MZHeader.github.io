@@ -1,0 +1,261 @@
+/*
+ * MZHeader — Dracula + Indigo Theme
+ * ===================================
+ * Drop this file into your repo as: css/theme.css
+ * Then in build.sh, add to ASSET_HEAD (after the main.css line):
+ *   <link rel="stylesheet" href="/css/theme.css" />
+ *
+ * This file overrides the color values from main.css.
+ * Everything else (layout, typography, animations) is unchanged.
+ *
+ * Accent:  Indigo  #6870c4  (replaces vivid purple #5625be)
+ * Palette: Dracula backgrounds (replaces near-black #1e1e1e family)
+ */
+
+/* ─── Dracula backgrounds ─────────────────────────────────────────── */
+body {
+  background-color: #282a36;
+  background-image:
+    radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.06) 2px,
+      rgba(0, 0, 0, 0.06) 4px
+    );
+  color: #f8f8f2;
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────── */
+#rsrc-sidebar {
+  background: #21222c;
+  border-right-color: #44475a;
+}
+#rsrc-sidebar::-webkit-scrollbar-track { background: #21222c; }
+#rsrc-sidebar::-webkit-scrollbar-thumb { background: #44475a; }
+
+.rsrc-toolbar {
+  background: #1e1f2a;
+  border-bottom-color: #44475a;
+}
+.rsrc-toolbar-dot {
+  background: #6870c4;
+  box-shadow: 0 0 4px rgba(104,112,196,0.6);
+}
+.rsrc-toolbar-label { color: #8be9fd; }
+.rsrc-toolbar-count { color: #555872; }
+.rsrc-section-header { color: #555872; border-bottom-color: #2a2b3a; }
+
+/* Sidebar rows */
+#rsrc-sidebar a.rsrc-post-row {
+  border-bottom-color: #1e1f2a;
+}
+#rsrc-sidebar a.rsrc-post-row:hover,
+#rsrc-sidebar a.rsrc-post-row:focus-visible {
+  background: rgba(104,112,196,0.1);
+  border-left-color: #6870c4;
+}
+#rsrc-sidebar a.rsrc-post-row.active {
+  background: rgba(139,233,253,0.05);
+  border-left-color: #8be9fd;
+}
+#rsrc-sidebar .rsrc-gutter { color: #555872; }
+#rsrc-sidebar a.rsrc-post-row.active .rsrc-gutter { color: #6870c4; }
+#rsrc-sidebar .rsrc-title { color: #8b90a8; }
+#rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #cdd1e0; }
+#rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
+
+/* Sidebar toggle */
+.rsrc-toggle-btn { color: #555872; }
+.rsrc-toggle-btn:hover { color: #8be9fd; }
+#rsrc-sidebar.collapsed .rsrc-toggle-btn { color: #6870c4; }
+
+/* ─── Top nav ─────────────────────────────────────────────────────── */
+.post-nav { border-bottom-color: #44475a; }
+.back-link { color: #50fa7b; text-shadow: 0 0 6px rgba(80,250,123,0.3); }
+.back-link:hover { text-shadow: 0 0 10px rgba(80,250,123,0.6); }
+.post-meta { color: #6272a4; }
+
+/* ─── Article headings ────────────────────────────────────────────── */
+article h1 {
+  /* Indigo tint, NO text-shadow glow */
+  color: #9498e8;
+  text-shadow: none;
+  border-bottom-color: #44475a;
+}
+article h2 {
+  color: #8be9fd;
+  border-left-color: #6870c4;
+}
+article h3 {
+  color: #9498e8;
+  border-left-color: #44475a;
+}
+article p  { color: #cdd1e0; }
+article li { color: #cdd1e0; }
+article strong { color: #f8f8f2; }
+
+/* ─── Article tables ──────────────────────────────────────────────── */
+article table { border-color: #44475a; }
+article th {
+  background: #1e1f2a;
+  color: #8be9fd;
+  border-bottom-color: #6870c4;
+}
+article td {
+  border-bottom-color: #2a2b3a;
+  color: #cdd1e0;
+}
+article tr:nth-child(even) td { background: rgba(40,42,54,0.6); }
+article tr:hover td { background: rgba(104,112,196,0.07); }
+
+/* ─── Global links ────────────────────────────────────────────────── */
+a { color: #6870c4; }
+@keyframes hex-shift {
+  0%   { color: #6870c4; }
+  50%  { color: #8be9fd; }
+  100% { color: #50fa7b; }
+}
+
+/* ─── Code blocks ─────────────────────────────────────────────────── */
+pre { border-top-color: #6870c4; }
+pre code {
+  background: #21222c;
+  border-color: #44475a;
+}
+code {
+  background: #21222c;
+  border-color: rgba(104,112,196,0.35);
+  color: #f8f8f2;
+}
+
+/* ─── Blockquote & hr ─────────────────────────────────────────────── */
+blockquote { border-left-color: #6870c4; }
+hr { border-top-color: #44475a; }
+
+/* ─── Images ──────────────────────────────────────────────────────── */
+img { border-color: #44475a; }
+
+/* ─── TOC ─────────────────────────────────────────────────────────── */
+.toc { border-color: #44475a; }
+.toc-trigger { background: #1e1f2a; }
+.toc-trigger:hover { background: rgba(104,112,196,0.1); }
+.toc-label { color: #8be9fd; }
+.toc-toggle { color: #6870c4; }
+.toc-trigger:hover .toc-toggle { color: #8be9fd; }
+.toc-body li a { color: #8b90a8; }
+.toc-body li:hover > a { color: #8be9fd; }
+.toc-body li a.toc-active { color: #8be9fd; }
+.toc-body li a.toc-active::before { color: #6870c4; }
+.toc-body li a::before { color: #f1fa8c; }
+.toc-category { color: #6870c4; }
+.toc-h3 a { color: #6272a4 !important; }
+.toc-h3:hover > a { color: #8be9fd !important; }
+
+/* ─── Reading progress bar ────────────────────────────────────────── */
+.reading-progress {
+  background: #6870c4;
+  box-shadow: 0 0 6px rgba(104,112,196,0.4);
+}
+
+/* ─── Scroll-to-top ───────────────────────────────────────────────── */
+.scroll-top-btn {
+  background: rgba(30,31,42,0.9);
+  border-color: #44475a;
+  color: #6870c4;
+}
+.scroll-top-btn:hover { color: #8be9fd; border-color: #6870c4; }
+
+/* ─── Copy button ─────────────────────────────────────────────────── */
+.copy-btn { background: #2a2b3a; border-color: #44475a; color: #8be9fd; }
+.copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
+
+/* ─── Related posts ───────────────────────────────────────────────── */
+.related-posts { border-color: #44475a; background: rgba(30,31,42,0.6); }
+.related-label { color: #8be9fd; }
+.related-post-link { color: #8b90a8; }
+.related-post-link:hover { color: #8be9fd; border-left-color: #6870c4; background: rgba(104,112,196,0.08); }
+
+/* ─── Pagination ──────────────────────────────────────────────────── */
+.post-pagination { border-top-color: #44475a; }
+.post-pagination-link { color: #8be9fd; }
+.post-pagination-link:hover { color: #50fa7b; }
+
+/* ─── Mobile nav ──────────────────────────────────────────────────── */
+#mobile-nav { background: #21222c; border-bottom-color: #44475a; }
+.mob-back { color: #50fa7b; }
+.mob-back:hover { color: #8be9fd; }
+.mob-sep { color: #44475a; }
+.mob-title { color: #6272a4; }
+
+/* ─── Homepage: PE window ─────────────────────────────────────────── */
+.pe-window { border-color: #44475a; background: rgba(30,31,42,0.7); }
+.pe-window-titlebar { background: #1e1f2a; border-bottom-color: #44475a; color: #555872; }
+.pe-window-dot.dot-close { background: #ff5555; box-shadow: 0 0 4px rgba(255,85,85,0.5); }
+.pe-window-dot.dot-min,
+.pe-window-dot.dot-max { background: #44475a; }
+
+/* ─── Homepage: title ─────────────────────────────────────────────── */
+.title-re { color: #50fa7b; }
+.title-malware {
+  color: #ff5555;
+  text-shadow: 0 0 8px rgba(255,85,85,0.6), 0 0 20px rgba(255,85,85,0.3);
+}
+@keyframes glitch-malware {
+  0%,88%,100% {
+    text-shadow: 0 0 8px rgba(255,85,85,0.6), 0 0 20px rgba(255,85,85,0.3);
+    transform: translate(0);
+  }
+  90%  { text-shadow: -2px 0 #8be9fd, 2px 0 #8be9fd; transform: translate(-2px,0); }
+  91%  { text-shadow: 3px 0 #8be9fd, -1px 0 #8be9fd; transform: translate(1px,1px); }
+  92%  { text-shadow: 2px 0 #8be9fd, -2px 0 #8be9fd; transform: translate(2px,0); }
+  93%  { text-shadow: -1px 0 #ff5555, 1px 0 #8be9fd; transform: translate(-1px,-1px); }
+  94%  { text-shadow: -1px 0 #8be9fd; transform: translate(-1px,0); }
+  96%  { text-shadow: 1px 0 #8be9fd; transform: translate(1px,0); }
+  98%  { text-shadow: 0 0 8px rgba(255,85,85,0.6); transform: translate(0); }
+}
+
+/* ─── Homepage: post rows ─────────────────────────────────────────── */
+.rsrc-post-row {
+  border-bottom-color: #2a2b3a;
+}
+.rsrc-post-row:hover,
+.rsrc-post-row:focus-visible {
+  background: rgba(104,112,196,0.08);
+  border-left-color: #6870c4;
+}
+.rsrc-post-row.active,
+.rsrc-post-row:focus-visible {
+  background: rgba(139,233,253,0.04);
+  border-left-color: #8be9fd;
+}
+.rsrc-gutter { color: #555872; }
+.rsrc-title { color: #8b90a8; }
+.rsrc-post-row:hover .rsrc-title { color: #cdd1e0; }
+.rsrc-title::before { color: #f1fa8c; }
+.rsrc-meta { color: #555872; }
+
+/* ─── Badges ──────────────────────────────────────────────────────── */
+.rsrc-badge--rats        { background: rgba(189,147,249,0.1);  border-color: rgba(189,147,249,0.35); color: #bd93f9; }
+.rsrc-badge--infostealer { background: rgba(255,85,85,0.1);    border-color: rgba(255,85,85,0.35);   color: #ff8080; }
+.rsrc-badge--ctf         { background: rgba(241,250,140,0.08); border-color: rgba(241,250,140,0.3);  color: #f1fa8c; }
+.rsrc-badge--loader      { background: rgba(80,250,123,0.08);  border-color: rgba(80,250,123,0.3);   color: #50fa7b; }
+.rsrc-badge--downloader  { background: rgba(139,233,253,0.08); border-color: rgba(139,233,253,0.3);  color: #8be9fd; }
+.rsrc-badge--trojan      { background: rgba(255,85,85,0.07);   border-color: rgba(255,85,85,0.25);   color: #cc6060; }
+.rsrc-badge--analysis    { background: rgba(98,114,164,0.15);  border-color: rgba(98,114,164,0.35);  color: #6272a4; }
+
+/* ─── Series groups ───────────────────────────────────────────────── */
+.series-header:hover { background: rgba(104,112,196,0.08); }
+.series-label { color: #6870c4; }
+.series-toggle { color: #6870c4; }
+.series-child { border-bottom-color: #2a2b3a; }
+.series-child:hover { background: rgba(104,112,196,0.06); border-left-color: #6870c4; }
+
+/* ─── Homepage: h1/h2/h3 (shared CSS, outside article) ───────────── */
+h1, h2, h3, h4 { color: #6870c4; }
+
+/* ─── Inline detail panel (homepage hover) ────────────────────────── */
+.detail-panel { background: rgba(30,31,42,0.95); border-color: #44475a; }
+.detail-panel-title { color: #8be9fd; }
+.detail-panel-desc  { color: #8b90a8; }

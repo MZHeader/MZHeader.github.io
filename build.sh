@@ -9,6 +9,7 @@ cp -r samples _site/ 2>/dev/null || true
 cp favicon.ico _site/ 2>/dev/null || true
 cp CNAME _site/ 2>/dev/null || true
 cp -r fonts _site/ 2>/dev/null || true
+cp -r css _site/ 2>/dev/null || true
 
 SHARED_CSS='
     * { box-sizing: border-box; }
@@ -73,6 +74,7 @@ GA_HEAD='
 
 ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#5625be" />
