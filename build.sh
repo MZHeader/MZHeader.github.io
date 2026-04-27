@@ -500,16 +500,14 @@ for i in $(seq 1 $total_posts); do
     #rsrc-sidebar .series-header .rsrc-title::before {
       content: "je   ";
       opacity: 1;
-      color: #6870c4;
+      color: #e6db74;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.65rem;
       font-weight: normal;
     }
     #rsrc-sidebar .series-group.open > .series-header .rsrc-title::before {
       content: "jne  ";
-      color: #8be9fd;
     }
-    #rsrc-sidebar .series-header:hover .rsrc-title::before { color: #8be9fd; }
     #rsrc-sidebar .series-group.open > .series-header { background: rgba(104, 112, 196, 0.06); }
     #rsrc-sidebar .series-children .rsrc-post-row { padding-left: 1.5rem; }
 
