@@ -22,7 +22,7 @@ SHARED_CSS='
       max-width: 900px;
       margin: 0 auto;
     }
-    h1, h2, h3, h4 { color: #5625be; }
+    h1, h2, h3, h4 { color: #7880d8; }
     @keyframes hex-shift { 0% { color: #5625be; } 50% { color: #8be9fd; } 100% { color: #50fa7b; } }
     a { color: #5625be; text-decoration: none; transition: letter-spacing 0.15s ease; }
     a:hover { text-decoration: underline; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
@@ -1599,7 +1599,6 @@ cat > "_site/index.html" << ENDINDEX
       min-width: 0;
     }
     .rsrc-post-row .rsrc-title {
-      color: #e8e8e8;
       font-family: "Segoe UI", "Roboto", sans-serif;
       font-size: 0.95rem;
       font-weight: 600;
