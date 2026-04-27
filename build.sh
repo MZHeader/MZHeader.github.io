@@ -479,6 +479,40 @@ for i in $(seq 1 $total_posts); do
     #rsrc-sidebar a.rsrc-post-row.active .rsrc-title { color: #8be9fd; }
     #rsrc-sidebar .rsrc-meta { display: none; }
 
+    /* ── Sidebar: series group affordances ── */
+    #rsrc-sidebar .series-header {
+      display: flex;
+      align-items: center;
+      padding: 0.4rem 0.6rem 0.4rem 1rem;
+      cursor: pointer;
+      user-select: none;
+      border-left: 2px solid transparent;
+      border-bottom: 1px solid #1e1f2a;
+      transition: background 0.12s ease, border-left-color 0.12s ease;
+    }
+    #rsrc-sidebar .series-header:hover {
+      background: rgba(104, 112, 196, 0.1);
+      border-left-color: #6870c4;
+    }
+    #rsrc-sidebar .series-header:hover .rsrc-title { color: #cdd1e0; }
+    #rsrc-sidebar .series-header:hover .series-toggle { color: #8be9fd; }
+    #rsrc-sidebar .series-header .rsrc-title-block { flex: 1; min-width: 0; }
+    #rsrc-sidebar .series-header .rsrc-meta {
+      display: inline;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+      font-size: 0;
+    }
+    #rsrc-sidebar .series-header .rsrc-meta .rsrc-badge { display: none; }
+    #rsrc-sidebar .series-header .series-toggle {
+      color: #6870c4;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.82rem;
+    }
+    #rsrc-sidebar .series-group.open > .series-header { background: rgba(104, 112, 196, 0.06); }
+    #rsrc-sidebar .series-group.open > .series-header .series-toggle { color: #8be9fd; }
+    #rsrc-sidebar .series-children .rsrc-post-row { padding-left: 1.5rem; }
+
     /* ── Main content ── */
     #post-main {
       margin-left: 230px;
