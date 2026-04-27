@@ -57,31 +57,6 @@ SHARED_CSS='
       font-size: 0.9rem;
     }
     .post-meta { color: #999; font-size: 0.85rem; margin-bottom: 2rem; }
-    .theme-toggle {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 1.5rem;
-      height: 36px;
-      padding: 0 0.75rem;
-      background: rgba(16, 16, 22, 0.9);
-      border: 1px solid #2a2a3a;
-      border-radius: 4px;
-      color: #6870c4;
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.75rem;
-      cursor: pointer;
-      z-index: 90;
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
-    }
-    .theme-toggle:hover { color: #8be9fd; border-color: #6870c4; }
-    .theme-toggle:focus-visible { outline: 2px solid #6870c4; outline-offset: 2px; }
-    [data-theme="light"] .theme-toggle {
-      background: rgba(244, 244, 246, 0.95);
-      border-color: #c8c8d0;
-      color: #4a5a9e;
-    }
-    [data-theme="light"] .theme-toggle:hover { color: #161618; border-color: #4a5a9e; }
-    @media (max-width: 900px) { .theme-toggle { bottom: 1rem; left: 1rem; } }
 '
 
 # Write shared CSS to external file
@@ -98,23 +73,6 @@ GA_HEAD='
 '
 
 ASSET_HEAD='
-  <script>
-    (function(){try{var t=localStorage.getItem("theme");if(t==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();
-    document.addEventListener("DOMContentLoaded",function(){
-      var b=document.createElement("button");
-      b.className="theme-toggle";b.id="themeToggle";b.type="button";
-      b.setAttribute("aria-label","Toggle light/dark theme");
-      function lbl(){var l=document.documentElement.getAttribute("data-theme")==="light";b.textContent=l?"; mode = dark":"; mode = light";b.setAttribute("aria-pressed",l?"true":"false");}
-      lbl();
-      b.addEventListener("click",function(){
-        var l=document.documentElement.getAttribute("data-theme")==="light";
-        if(l){document.documentElement.removeAttribute("data-theme");try{localStorage.setItem("theme","dark");}catch(e){}}
-        else{document.documentElement.setAttribute("data-theme","light");try{localStorage.setItem("theme","light");}catch(e){}}
-        lbl();
-      });
-      document.body.appendChild(b);
-    });
-  </script>
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
@@ -1012,7 +970,6 @@ for i in $(seq 1 $total_posts); do
   }
   </script>
   <link rel="stylesheet" href="/css/theme.css" />
-  <link rel="stylesheet" href="/css/theme-light.css" />
 </head>
 <body>
 
@@ -2103,7 +2060,6 @@ cat > "_site/index.html" << ENDINDEX
   ]
   </script>
   <link rel="stylesheet" href="/css/theme.css" />
-  <link rel="stylesheet" href="/css/theme-light.css" />
 </head>
 <body>
 
@@ -2637,7 +2593,6 @@ cat > "_site/404.html" << 'END404'
     a:focus-visible { outline:2px solid #5625be; outline-offset:2px; }
   </style>
   <link rel="stylesheet" href="/css/theme.css" />
-  <link rel="stylesheet" href="/css/theme-light.css" />
 </head>
 <body>
   <div class="pe-box">
