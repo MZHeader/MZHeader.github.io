@@ -74,7 +74,6 @@ GA_HEAD='
 
 ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
-  <link rel="stylesheet" href="/css/theme.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#5625be" />
@@ -938,6 +937,7 @@ for i in $(seq 1 $total_posts); do
     ]
   }
   </script>
+  <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
 
@@ -2008,6 +2008,7 @@ cat > "_site/index.html" << ENDINDEX
     }
   ]
   </script>
+  <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
 
@@ -2540,6 +2541,7 @@ cat > "_site/404.html" << 'END404'
     a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
     a:focus-visible { outline:2px solid #5625be; outline-offset:2px; }
   </style>
+  <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
   <div class="pe-box">
