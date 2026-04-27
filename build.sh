@@ -481,7 +481,6 @@ for i in $(seq 1 $total_posts); do
 
     /* ── Sidebar: series group affordances ── */
     #rsrc-sidebar .series-header {
-      position: relative;
       display: block;
       padding: 0.45rem 0.75rem;
       cursor: pointer;
@@ -495,23 +494,23 @@ for i in $(seq 1 $total_posts); do
       border-left-color: #6870c4;
     }
     #rsrc-sidebar .series-header:hover .rsrc-title { color: #cdd1e0; }
-    #rsrc-sidebar .series-header:hover .series-toggle { color: #8be9fd; }
     #rsrc-sidebar .series-header .rsrc-title-block { display: block; }
-    #rsrc-sidebar .series-header .rsrc-meta {
-      display: block;
-      font-size: 0;
-      position: absolute;
-      top: 0.4rem;
-      right: 0.55rem;
-    }
-    #rsrc-sidebar .series-header .rsrc-meta .rsrc-badge { display: none; }
-    #rsrc-sidebar .series-header .series-toggle {
+    #rsrc-sidebar .series-header .rsrc-meta { display: none; }
+    /* je/jne affordance — always visible (overrides the hover-only "call" prefix) */
+    #rsrc-sidebar .series-header .rsrc-title::before {
+      content: "je   ";
+      opacity: 1;
       color: #6870c4;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
+      font-weight: normal;
     }
+    #rsrc-sidebar .series-group.open > .series-header .rsrc-title::before {
+      content: "jne  ";
+      color: #8be9fd;
+    }
+    #rsrc-sidebar .series-header:hover .rsrc-title::before { color: #8be9fd; }
     #rsrc-sidebar .series-group.open > .series-header { background: rgba(104, 112, 196, 0.06); }
-    #rsrc-sidebar .series-group.open > .series-header .series-toggle { color: #8be9fd; }
     #rsrc-sidebar .series-children .rsrc-post-row { padding-left: 1.5rem; }
 
     /* ── Main content ── */
