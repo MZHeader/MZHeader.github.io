@@ -28,7 +28,7 @@ Memory Defenses: .text section CRC hashing, IAT integrity checks, encrypted vari
 
 The challenge consists of three files of interest. The game components with built in anti-cheat: `TBM.exe`, a kernel driver `TBMKD.sys` and a Watchdog binary `WatchdogMain.exe`.
 
-# TBM.exe Analysis 
+# TBM.exe Analysis - Game And Userland Anti-Cheat
 IDA identifies the `WinMain` function, the first function called is then `sub_140024DD0`
 
 ## Memory Integrity Check
@@ -479,3 +479,240 @@ LOBYTE(v11) = (Buffer.Protect & 0xFFFFFCFF) == PAGE_EXECUTE_READWRITE
 ### Further Integrity Checks
 
 Many of the other functions called involve hashing a specific component, and later checking it and validating the result of a newly genereated hash, ensuring no tampering has taken place.
+
+## TBM.exe Summary So Far
+
+We've covered the main self-protection mechanisms in TBM.exe that run in looped threads and will terminate the process if triggered. There is much more that we haven't looked at in depth, but the important thing is that all of these usermode checks only protect against internal tampering. They can't stop an external process from reading or writing game memory. This is where the kernel driver comes in play.
+
+## Kernel Driver Communication
+
+`TBM.exe` creates a service named `TBMKEv1.` which is used to communicate with the kernel driver. It opens `\\\\.\\TBMKEv1` via `CreateFileW.` and stores the handle in a global.
+
+There are then numerous functions and monitoring threads that register, authenticate and montior the driver. `TBM.exe` proves that it is alive, is validated and validates target process status.
+
+# TBMKD.sys Analysis - Kernel Driver
+
+## Memory Scanning
+
+The kernel driver attches to the register process via `PsLookupProcessByProcessId` and `KeStackAttachProcess`. It then finds and validates the main module and scans memory regions - using `ZwQueryVirtualMemory` looking for pages matching `MEM_COMMIT` (0x1000), `MEM_PRIVATE` (0x20000) and Executable/writable protection (`PAGE_EXECUTE_READWRITE`, `PAGE_EXECUTE_WRITECOPY`, etc).
+
+```c
+if ( *(_WORD *)main_module == 0x5A4D ) // MZ header check
+{
+  offset_to_lfanew = *(int *)(main_module + 0x3C); // Offset to lfanew
+  if ( *(_DWORD *)(offset_to_lfanew + main_module) == 0x4550 ) // PE header check
+```
+
+```c
+if ( (_DWORD)v16 == 4096         // State == MEM_COMMIT
+  && DWORD2(v16) == 0x20000      // Type == MEM_PRIVATE
+  && v7 )                        // Protection is executable
+```
+
+This function is checking for any suspicious memory pages within the games process, as that could indicate some kind of code has been injected.
+
+## File Integrity Checks
+
+The kernel driver also implements integrity checks by CRC32 hashing the file on disk and compares it to a hardcoded value - `0x688FFE38`
+
+```c
+tbm_hash = CRC32_hash(v2);
+```
+
+```c
+if ( tbm_hash != hardcoded_hash )
+```
+
+```c
+Watchdog_filepath = (struct _UNICODE_STRING *)build_file_path(v2, L"WatchdogMain.exe");
+```
+
+```c
+watchdog_hash = CRC32_hash(Watchdog_filepath);
+```
+
+```c
+if ( watchdog_hash == hardcoded_watchdog_hash )
+```
+
+## Handle Access Stripping (ObRegisterCallbacks)
+
+The driver registers a callback via `ObRegisterCallbacks` that intercepts all handle creation operations targeting the game process. When any external process attempts to open a handle to `TBM.exe`, the callback strips access rights that would allow memory manipulation:
+
+```c
+{
+    ULONG target_pid = PsGetProcessId(*(PEPROCESS*)(OperationInfo + 8));
+    ULONG caller_pid = PsGetCurrentProcessId();
+
+    if (ProcessId != 0)
+    {
+        if (target_pid == ProcessId && caller_pid != ProcessId)
+        {
+            ULONG *access = *(ULONG**)(OperationInfo + 0x20);
+            ULONG original = *access;
+
+            if (original & 0x87A)
+            {
+                *access = original & 0xFFFFF785;
+                log("stripped handle rights from PID %d", caller_pid);
+            }
+        }
+    }
+    return OB_PREOP_SUCCESS;
+}
+```
+
+The mask `0x87A` covers the following access rights:
+
+| Right | Value | Effect |
+|-------|-------|--------|
+| `PROCESS_CREATE_THREAD` | `0x0002` | Cannot inject threads |
+| `PROCESS_VM_OPERATION` | `0x0008` | Cannot VirtualProtect/Alloc |
+| `PROCESS_VM_READ` | `0x0010` | Cannot ReadProcessMemory |
+| `PROCESS_VM_WRITE` | `0x0020` | Cannot WriteProcessMemory |
+| `PROCESS_DUP_HANDLE` | `0x0040` | Cannot duplicate handles |
+| `PROCESS_SUSPEND_RESUME` | `0x0800` | Cannot suspend threads |
+
+Without these rights, an external trainer cannot interact with the game process at all.
+
+## Driver Self-Integrity Check
+
+The driver spawns a system thread that runs a periodic monitoring loop. Every ~5 seconds, it calls a self-integrity validation function:
+
+```c
+{
+    __int64 last_integrity = SharedUserData->InterruptTime;
+
+    while (1)
+    {
+        LARGE_INTEGER timeout = {.QuadPart = -10000000}; 
+        if (!KeWaitForSingleObject(&Event, Executive, KernelMode, FALSE, &timeout))
+            break;
+
+        __int64 now = SharedUserData->InterruptTime;
+
+        if (now - last_integrity >= 50000000) 
+        {
+            self_integrity_check();
+            last_integrity = now;
+        }
+        
+    }
+    PsTerminateSystemThread(STATUS_SUCCESS);
+}
+```
+
+The integrity function performs two checks:
+
+```c
+char self_integrity_check()
+{
+    // byte-for-byte comparison of .text section against saved copy
+    if (P && Source1 && Length)
+    {
+        if (RtlCompareMemory(Source1, P, Length) != Length)
+        {
+            set_violation_flags(32, 6);
+            return 0;
+        }
+
+        // FNV-1 hash of the saved copy
+        unsigned int fnv = 0x811C9DC5;
+        for (SIZE_T i = 0; i < Length; i++)
+            fnv = 0x01000193 * (fnv ^ Source1[i]);
+
+        if (fnv != expected_fnv_hash)
+        {
+            set_violation_flags(32, 6);
+            return 0;
+        }
+    }
+    return 1;
+}
+```
+
+When any driver bytes are modified, this function detects it and sets violation flags that are reported to `TBM.exe` and the game is terminated.
+
+# Bypass - Driver Patching
+
+Three patches were required:
+
+## Disable Client CRC32 Validation
+
+The driver validates `TBM.exe`'s integrity on registration (IOCTL `0x222284`) by comparing a CRC32 hash against the hardcoded value `0x688FFE38`. The gate check `if (hardcoded_hash)` means if the stored value is zero, the entire check is skipped.
+
+Although we aren't modifying `TBM.exe` in our approach, zeroing this value ensures the driver won't reject the game if it were ever modified, and more importantly, it's required because the driver also validates `WatchdogMain.exe` through similar logic using a second hardcoded hash at a nearby offset.
+
+| Property | Value |
+|----------|-------|
+| File offset | `0x6C04` |
+| Original bytes | `38 FE 8F 68` (0x688FFE38 LE) |
+| Patched bytes | `00 00 00 00` |
+
+## Disable Driver Self-Integrity Check
+
+Since we're patching the driver's `.data` section, the self-integrity check will detect the modification via `RtlCompareMemory` and set violation flags. We NOP the call instruction in `StartRoutine` to prevent the integrity check from ever executing.
+
+| Property | Value |
+|----------|-------|
+| File offset | `0x2B08` |
+| Original bytes | `E8 AF FB FF FF` (`call self_integrity_check`) |
+| Patched bytes | `90 90 90 90 90` (NOP x5) |
+
+## Disable Handle Access Stripping
+
+The `ObRegisterCallbacks` callback's first conditional branch checks if `ProcessId` (the registered game PID) is non-zero. If zero, it jumps past all stripping logic. We convert this conditional jump (`jz`) to an unconditional jump (`jmp`), causing the callback to always exit immediately without modifying handle access rights.
+
+| Property | Value |
+|----------|-------|
+| File offset | `0x24BC` |
+| Original bytes | `0F 84 BA 00 00 00` (`jz loc_14000317C`) |
+| Patched bytes | `E9 BB 00 00 00 90` (`jmp loc_14000317C; nop`) |
+
+## Patcher Script
+
+```python
+import shutil
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent
+DRIVER_ORIG = BASE_DIR / "TBMKD.sys"
+DRIVER_OUT  = BASE_DIR / "TBMKD_patched.sys"
+
+DRIVER_PATCHES = [
+    {
+        "name": "Disable CRC32 validation of TBM.exe",
+        "offset": 0x6C04,
+        "original": bytes.fromhex("38FE8F68"),
+        "patch":    bytes.fromhex("00000000"),
+    },
+    {
+        "name": "Disable driver self-integrity check",
+        "offset": 0x2B08,
+        "original": bytes.fromhex("e8affbffff"),
+        "patch":    bytes.fromhex("9090909090"),
+    },
+    {
+        "name": "Disable handle stripping",
+        "offset": 0x24BC,
+        "original": bytes.fromhex("0f84ba000000"),
+        "patch":    bytes.fromhex("e9bb00000090"),
+    },
+]
+
+def patch_driver():
+    shutil.copy2(DRIVER_ORIG, DRIVER_OUT)
+    data = bytearray(DRIVER_OUT.read_bytes())
+
+    for p in DRIVER_PATCHES:
+        off = p["offset"]
+        assert data[off:off+len(p["original"])] == bytearray(p["original"])
+        data[off:off+len(p["patch"])] = p["patch"]
+        print(f"[+] {p['name']} @ 0x{off:X}")
+
+    DRIVER_OUT.write_bytes(bytes(data))
+    print(f"\n[+] Saved: {DRIVER_OUT.name}")
+
+if __name__ == "__main__":
+    patch_driver()
+```
