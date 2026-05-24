@@ -212,7 +212,7 @@ The string encryption works by XORing the first byte with the hex value `0x30` (
     while ( counter < 12 );
 ```
 
-The ASCII representation if 0x30 - 0x42 is '0123456789:;', as such, we can use the following [Binary Refinery](https://github.com/binref/refinery) pipeline to decrypt this string:
+The ASCII representation of 0x30 + 12 is '0123456789:;', as such, we can use the following [Binary Refinery](https://github.com/binref/refinery) pipeline to decrypt this string:
 
 ```
 emit 'dCKqMEWDKt_;' | xor '0123456789:;'
@@ -227,7 +227,7 @@ emit <ciphertext> | alu "B ^ ((K % 56) + 52)"
 
 ## Admin Check
 
-The anti-cheat the proceeds to check if it's running in an elevated state:
+The anti-cheat then proceeds to check if it's running in an elevated state:
 
 ![Admin check](/assets/img/tbmke-admin-check.png)
 
@@ -244,12 +244,12 @@ ShellExecuteA(nullptr, IsMember, Filename, nullptr, nullptr, 1);
 AC::teardown();
 ```
 
-The function I named `AC::teardown` function closes connection to the driver and stops and deletes the service `TBMKEv1`. This function is called numerous times throughout the binary on every exit path.
+The function I named `AC::teardown` closes the connection to the driver and stops and deletes the service `TBMKEv1`. This function is called numerous times throughout the binary on every exit path.
 
-If the process is running in an elevated state, we head into a function I named`AntiCheat_init`. We partly analysed this function earlier when we followed through with our memory integrity analysis.
+If the process is running in an elevated state, we head into a function I named `AntiCheat_init`. We partly analysed this function earlier when we followed through with our memory integrity analysis.
 
 ## File Integrity Check
-The first function called in `AntiCheat_init` is `sub_14002C1D0`. This function was relatively easy to recognise as it's similar to the previous memory integrity check we analysed in that it reutns a CRC32 hash. In this case, it's returning a hash of the current running executable (`TBM.exe`).
+The first function called in `AntiCheat_init` is `sub_14002C1D0`. This function was relatively easy to recognise as it's similar to the previous memory integrity check we analysed in that it returns a CRC32 hash. In this case, it's returning a hash of the current running executable (`TBM.exe`).
 
 ```c
   memset(Filename, 0, 260u);
@@ -367,7 +367,7 @@ ProcessDebugPort:
 HMODULE ntdll = GetModuleHandleA("ntdll.dll");
 auto NtQIP = GetProcAddress(ntdll, "NtQueryInformationProcess")
 DWORD debug_port = 0;
-NTSTATUS s2 = NtQIP(GetCurrentProcess(), 7 &debug_port, 4, NULL);
+NTSTATUS s2 = NtQIP(GetCurrentProcess(), 7, &debug_port, 4, NULL);
 if (NT_SUCCESS(s2) && debug_port != 0) {
 trigger("[!] CHEAT DETECTED\n\nReason: Debugger(DebugPort)\n\nGame will terminate.");
 }
@@ -402,7 +402,7 @@ if (ctx.Dr0 || ctx.Dr1 || ctx.Dr2 || ctx.Dr3) {
 
 ## Process Enumeration
 
-Three functions exist to detect running process that might be used to debug / cheat. These are at `0x14002CD10`, `0x14002EDE0` and `0x1400389A0`.
+Three functions exist to detect running processes that might be used to debug / cheat. These are at `0x14002CD10`, `0x14002EDE0` and `0x1400389A0`.
 
 `0x14002CD10` uses the Windows API `CreateToolhelp32Snapshot` to scan all running processes and compare them against a list.
 
@@ -416,7 +416,7 @@ The following error is displayed if a blocklisted process is found, followed by 
 
 ## Looped Thread Function
 
-As mentioned earlier there is further functionality includded in the `sub_140042E50` function, which I'll take quick look at now.
+As mentioned earlier there is further functionality included in the `sub_140042E50` function, which I'll take quick look at now.
 
 ### Function Hooking Detection
 
@@ -438,7 +438,7 @@ else
 
 ### IAT Hook Detection
 
-Firslty, DLLs are resolved. The Import Directory is then walked and validated for matching DLL names. 
+Firstly, DLLs are resolved. The Import Directory is then walked and validated for matching DLL names. 
 
 ```c
 offsets = (*(*handle_to_self + 0x3CLL) + *handle_to_self + 0x90LL);
@@ -478,23 +478,25 @@ LOBYTE(v11) = (Buffer.Protect & 0xFFFFFCFF) == PAGE_EXECUTE_READWRITE
 
 ### Further Integrity Checks
 
-Many of the other functions called involve hashing a specific component, and later checking it and validating the result of a newly genereated hash, ensuring no tampering has taken place.
+Many of the other functions called involve hashing a specific component, and later checking it and validating the result of a newly generated hash, ensuring no tampering has taken place.
 
 ## TBM.exe Summary So Far
 
-We've covered the main self-protection mechanisms in TBM.exe that run in looped threads and will terminate the process if triggered. There is much more that we haven't looked at in depth, but the important thing is that all of these usermode checks only protect against internal tampering. They can't stop an external process from reading or writing game memory. This is where the kernel driver comes in play.
+We've covered the main self-protection mechanisms in TBM.exe that run in looped threads and will terminate the process if triggered. There is a lot more that wasn't looked at in depth, but the important thing is that all of these usermode checks only protect against internal tampering. They can't stop an external process from reading or writing game memory. This is where the kernel driver comes in play.
+
+Realistically I didn't need to reverse engineer all of the anti-cheat components to this level, but I enjoyed doing so. When we've worked out how to bypass the anti-cheat I'll revisit `TBM.exe` to identify prime candidates of game code for the cheat.
 
 ## Kernel Driver Communication
 
-`TBM.exe` creates a service named `TBMKEv1.` which is used to communicate with the kernel driver. It opens `\\\\.\\TBMKEv1` via `CreateFileW.` and stores the handle in a global.
+`TBM.exe` creates a service named `TBMKEv1`, which is used to communicate with the kernel driver. It opens `\\\\.\\TBMKEv1` via `CreateFileW` and stores the handle in a global.
 
-There are then numerous functions and monitoring threads that register, authenticate and montior the driver. `TBM.exe` proves that it is alive, is validated and validates target process status.
+There are then numerous functions and monitoring threads that register, authenticate and monitor the driver. `TBM.exe` proves that it is alive, is validated and validates target process status.
 
 # TBMKD.sys Analysis - Kernel Driver
 
 ## Memory Scanning
 
-The kernel driver attches to the register process via `PsLookupProcessByProcessId` and `KeStackAttachProcess`. It then finds and validates the main module and scans memory regions - using `ZwQueryVirtualMemory` looking for pages matching `MEM_COMMIT` (0x1000), `MEM_PRIVATE` (0x20000) and Executable/writable protection (`PAGE_EXECUTE_READWRITE`, `PAGE_EXECUTE_WRITECOPY`, etc).
+The kernel driver attaches to the register process via `PsLookupProcessByProcessId` and `KeStackAttachProcess`. It then finds and validates the main module and scans memory regions - using `ZwQueryVirtualMemory` looking for pages matching `MEM_COMMIT` (0x1000), `MEM_PRIVATE` (0x20000) and Executable/writable protection (`PAGE_EXECUTE_READWRITE`, `PAGE_EXECUTE_WRITECOPY`, etc).
 
 ```c
 if ( *(_WORD *)main_module == 0x5A4D ) // MZ header check
@@ -509,7 +511,7 @@ if ( (_DWORD)v16 == 4096         // State == MEM_COMMIT
   && v7 )                        // Protection is executable
 ```
 
-This function is checking for any suspicious memory pages within the games process, as that could indicate some kind of code has been injected.
+This function is checking for any suspicious memory pages within the game's process, as that could indicate some kind of code has been injected.
 
 ## File Integrity Checks
 
@@ -562,16 +564,7 @@ The driver uses `ObRegisterCallbacks` to strip handle access rights from any ext
 }
 ```
 
-The mask `0x87A` covers the following access rights:
-
-| Right | Value | Effect |
-|-------|-------|--------|
-| `PROCESS_CREATE_THREAD` | `0x0002` | Cannot inject threads |
-| `PROCESS_VM_OPERATION` | `0x0008` | Cannot VirtualProtect/Alloc |
-| `PROCESS_VM_READ` | `0x0010` | Cannot ReadProcessMemory |
-| `PROCESS_VM_WRITE` | `0x0020` | Cannot WriteProcessMemory |
-| `PROCESS_DUP_HANDLE` | `0x0040` | Cannot duplicate handles |
-| `PROCESS_SUSPEND_RESUME` | `0x0800` | Cannot suspend threads |
+The mask `0x87A` strips the following rights - `PROCESS_CREATE_THREAD`, `PROCESS_VM_OPERATION`, `PROCESS_VM_READ`, `PROCESS_VM_WRITE`, `PROCESS_DUP_HANDLE` and `PROCESS_SUSPEND_RESUME`. Making it difficult for any external process to read / write memory.
 
 ## Driver Self-Integrity Check
 
@@ -633,37 +626,19 @@ Violation flags are set and reported back to `TBM.exe`, which terminates the gam
 
 # Bypass - Driver Patching
 
-Three patches to `TBMKD.sys` are needed:
+Three patches to `TBMKD.sys` are needed.
 
 ## Disable Client CRC32 Validation
 
-When `TBM.exe` registers with the driver via IOCTL `0x222284`, the driver CRC32 hashes `TBM.exe` and checks it against the hardcoded value `0x688FFE38`. There's a gate that skips the validation entirely if the stored hash is zero, so zeroing it out is enough. The watchdog gets the same treatment — there's a matching hardcoded hash for `WatchdogMain.exe` nearby.
-
-| Property | Value |
-|----------|-------|
-| File offset | `0x6C04` |
-| Original bytes | `38 FE 8F 68` (0x688FFE38 LE) |
-| Patched bytes | `00 00 00 00` |
+When `TBM.exe` registers with the driver, the driver CRC32 hashes `TBM.exe` and compares it against the hardcoded value `0x688FFE38`. The check is skipped if the stored hash is zero, so that's our solution. The hash sits at file offset `0x6C04` (`38 FE 8F 68`). We'll overwrite this with `00 00 00 00`. The watchdog hash nearby gets the same treatment.
 
 ## Disable Driver Self-Integrity Check
 
-Any patch to the `.data` section would get caught by `RtlCompareMemory`. NOP-ing the call to `self_integrity_check` in `StartRoutine` is cleaner — it kills the check before it runs.
-
-| Property | Value |
-|----------|-------|
-| File offset | `0x2B08` |
-| Original bytes | `E8 AF FB FF FF` (`call self_integrity_check`) |
-| Patched bytes | `90 90 90 90 90` (NOP x5) |
+At file offset `0x26BC` the `self_integrity_check` prologue `48 89 5C 24 08 48` becomes `B8 01 00 00 00 C3` (`mov eax, 1 ; ret`), so it just returns.
 
 ## Disable Handle Access Stripping
 
-Looking at the callback, the first branch checks whether `ProcessId` (the game PID) is non-zero — zero means no stripping. Flipping the `jz` to an unconditional `jmp` makes it always take the skip path.
-
-| Property | Value |
-|----------|-------|
-| File offset | `0x24BC` |
-| Original bytes | `0F 84 BA 00 00 00` (`jz loc_14000317C`) |
-| Patched bytes | `E9 BB 00 00 00 90` (`jmp loc_14000317C; nop`) |
+The callback's first branch checks whether the game PID is set - if it's zero, nothing gets stripped. We'll just flip that conditional jump `jz` into an unconditional jump `jmp` so it always skips. At file offset `0x24BC`, `0F 84 BA 00 00 00` (`jz loc_14000317C`) becomes `E9 BB 00 00 00 90` (`jmp loc_14000317C; nop`). 
 
 ## Patcher Script
 
@@ -671,9 +646,9 @@ Looking at the callback, the first branch checks whether `ProcessId` (the game P
 import shutil
 
 patches = [
-    (0x6C04, "00000000"),
-    (0x2B08, "9090909090"),
     (0x24BC, "e9bb00000090"),
+    (0x26BC, "b801000000c3"),
+    (0x6C04, "00000000"),
 ]
 
 shutil.copy2("TBMKD.sys", "TBMKD_patched.sys")
@@ -684,4 +659,246 @@ for off, new in patches:
     buf[off:off + len(new)] = new
 
 open("TBMKD_patched.sys", "wb").write(buf)
+```
+
+With the patch in place, we revisit `TBM.exe`
+
+# TBM.exe Again
+
+## Identifying Game Code And Guards
+
+We're going to try and create a cheat that gives us unlimited health and unlimited ammo. The first step in doing that is to identify where those values are within the game. I'm going to do this statically with IDA.
+
+I was able to identify what were very likely game values within the `AntiCheat_init` function based on the decimal values corresponding to the games default health and ammo values.
+
+```c
+hash_fnv1a(&dword_140070990, 100); // Health = 100
+hash_fnv1a(&dword_140070910, 30); // Ammo = 30
+hash_fnv1a(&dword_140070800, 0);
+hash_fnv1a(&dword_140070A10, 0);
+hash_fnv1a(&dword_140070890, 1);
+```
+
+`hash_fnv1a` turns values into a 0x78 byte block.
+Two keys are pulled and used from globals that are initialised during runtime:
+
+```c
+key_1 = ::key_1;
+key_2 = ::key_2;
+*a1 = *::key_1 ^ a2;
+a1[26] = *key_2 ^ a2;
+v5 = a1 + 1;
+a1[8] = -559038242;
+a1[14] = -1318387531;
+v6 = 7;
+v7 = *key_1 ^ *key_2 ^ a2;
+.....
+```
+
+Both keys are derived at startup and are PID/tick-based, making them unique per run.
+
+A monitoring thread, `sub_140043730`, shuffles and runs a set of guard functions:
+
+```c
+case 1: sub_1400336D0();   // health guard
+case 2: sub_140033CD0();   // ammo guard
+case 5: AC::anti_debugging();
+```
+
+The anti-cheat also keeps a shadow / backup copy of these values, and constantly checks the health and ammo against them.
+
+Each one is stored as `value XOR a key`, which decodes to how much the value has changed (0 means unchanged).
+
+To overcome this, write the key itself into the shadow, then `key XOR key = 0`, meaning unchanged, and the guard stays happy.
+
+## Avoiding The Handle Scan
+
+The anti-cheat also scans for any process that's currently holding a handle to `TBM.exe`. It queries `SystemHandleInformation` and walks every handle in the system:
+
+```c
+v44 = dwProcessId;
+v111 = dwProcessId;
+v45 = lpMem;
+v46 = 0;
+if ( *lpMem )
+{
+  while ( 1 )
+  {
+    v47 = v45[6 * v46 + 2];
+    v48 = &v45[6 * v46];
+    if ( v47 != CurrentProcessId && v47 != v44 && (v47 & 0xFFFFFFFB) != 0 && (v48[6] & 0x30) != 0 )
+      break;
+LABEL_34:
+    if ( ++v46 >= *v45 )
+      return 0;
+  }
+```
+
+The scan only catches handles that are open at the moment it runs. So instead of having a handle open for the whole session, we'll open one, do a single read or write, and close it.
+
+Putting all of this together, here's the trainer:
+
+```python
+import ctypes
+import ctypes.wintypes as wt
+import struct
+import sys
+import time
+
+k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+k32.GetTickCount64.restype = ctypes.c_uint64
+
+PROCESS_VM_READ           = 0x0010
+PROCESS_VM_WRITE          = 0x0020
+PROCESS_VM_OPERATION      = 0x0008
+PROCESS_QUERY_INFORMATION = 0x0400
+ACCESS = PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_QUERY_INFORMATION
+TH32CS_SNAPPROCESS = 0x2
+TH32CS_SNAPMODULE  = 0x8
+
+
+class PROCESSENTRY32(ctypes.Structure):
+    _fields_ = [
+        ("dwSize",              wt.DWORD),
+        ("cntUsage",            wt.DWORD),
+        ("th32ProcessID",       wt.DWORD),
+        ("th32DefaultHeapID",   ctypes.c_size_t),
+        ("th32ModuleID",        wt.DWORD),
+        ("cntThreads",          wt.DWORD),
+        ("th32ParentProcessID", wt.DWORD),
+        ("pcPriClassBase",      ctypes.c_long),
+        ("dwFlags",             wt.DWORD),
+        ("szExeFile",           ctypes.c_char * 260),
+    ]
+
+
+class MODULEENTRY32(ctypes.Structure):
+    _fields_ = [
+        ("dwSize",        wt.DWORD),
+        ("th32ModuleID",  wt.DWORD),
+        ("th32ProcessID", wt.DWORD),
+        ("GlblcntUsage",  wt.DWORD),
+        ("ProccntUsage",  wt.DWORD),
+        ("modBaseAddr",   ctypes.POINTER(wt.BYTE)),
+        ("modBaseSize",   wt.DWORD),
+        ("hModule",       wt.HMODULE),
+        ("szModule",      ctypes.c_char * 256),
+        ("szExePath",     ctypes.c_char * 260),
+    ]
+
+
+def find_pid(name):
+    snap = k32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+    pe = PROCESSENTRY32()
+    pe.dwSize = ctypes.sizeof(PROCESSENTRY32)
+    pid = None
+    if k32.Process32First(snap, ctypes.byref(pe)):
+        while True:
+            if pe.szExeFile.lower() == name.lower():
+                pid = pe.th32ProcessID
+                break
+            if not k32.Process32Next(snap, ctypes.byref(pe)):
+                break
+    k32.CloseHandle(snap)
+    return pid
+
+
+def get_base(pid, name):
+    snap = k32.CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid)
+    me = MODULEENTRY32()
+    me.dwSize = ctypes.sizeof(MODULEENTRY32)
+    base = None
+    if k32.Module32First(snap, ctypes.byref(me)):
+        while True:
+            if me.szModule.lower() == name.lower():
+                base = ctypes.cast(me.modBaseAddr, ctypes.c_void_p).value
+                break
+            if not k32.Module32Next(snap, ctypes.byref(me)):
+                break
+    k32.CloseHandle(snap)
+    return base
+
+
+# open/use/close every time so we never hold a handle the driver can scan for
+def rpm(pid, addr, fmt):
+    h = k32.OpenProcess(ACCESS, False, pid)
+    buf = ctypes.create_string_buffer(struct.calcsize(fmt))
+    k32.ReadProcessMemory(h, ctypes.c_void_p(addr), buf, len(buf), None)
+    k32.CloseHandle(h)
+    return struct.unpack(fmt, buf.raw)[0]
+
+
+def wpm(pid, addr, data):
+    h = k32.OpenProcess(ACCESS, False, pid)
+    k32.WriteProcessMemory(h, ctypes.c_void_p(addr), data, len(data), None)
+    k32.CloseHandle(h)
+
+# rebuild the 0x78 protected-value block the game expects (hash_fnv1a
+def encode_var(key1, key2, value):
+    out = [0] * 30
+    v = value & 0xFFFFFFFF
+    out[0]  = (key1 ^ v) & 0xFFFFFFFF
+    out[8]  = 0xDEADC0DE
+    out[14] = 0xB16B00B5
+    out[26] = (key2 ^ v) & 0xFFFFFFFF
+    h = (key1 ^ key2 ^ v) & 0xFFFFFFFF
+    def step():
+        nonlocal h
+        h = ((16777619 * h) ^ 0x811C9DC5) & 0xFFFFFFFF
+        return h
+    for i in [*range(1, 8), *range(9, 14), *range(15, 26), *range(27, 30)]:
+        out[i] = step()
+    return struct.pack('<30I', *out)
+
+
+KEY1   = 0x70888
+KEY2   = 0x707C0
+KEY_C8 = 0x707C8
+KEY_D8 = 0x707D8
+HEALTH = 0x70990
+AMMO   = 0x70910
+HP_SHADOWS   = (0x707F0, 0x70878)
+AMMO_SHADOWS = (0x70AC0, 0x70880, 0x70988)
+FIRE   = 0x70B74
+RELOAD = 0x70FA4
+RELOAD2= 0x70FA0
+SCAN_TS = 0x70FE0
+
+
+def main():
+    pid = find_pid(b"TBM.exe")
+    if not pid:
+        sys.exit("TBM.exe not running")
+    base = get_base(pid, b"TBM.exe")
+    print(f"pid={pid} base={hex(base)}")
+
+    while True:
+        key1   = rpm(pid, rpm(pid, base + KEY1, '<Q'), '<I')
+        key2   = rpm(pid, rpm(pid, base + KEY2, '<Q'), '<I')
+        key_c8 = rpm(pid, rpm(pid, base + KEY_C8, '<Q'), '<I')
+        key_d8 = rpm(pid, rpm(pid, base + KEY_D8, '<Q'), '<I')
+        kc8 = struct.pack('<I', key_c8)
+        kd8 = struct.pack('<I', key_d8)
+
+        wpm(pid, base + HEALTH, encode_var(key1, key2, 100))
+        for shd in HP_SHADOWS:
+            p = rpm(pid, base + shd, '<Q')
+            wpm(pid, p, kc8)
+            wpm(pid, p + 4, kd8)
+
+        wpm(pid, base + AMMO, encode_var(key1, key2, 30))
+        for shd in AMMO_SHADOWS:
+            p = rpm(pid, base + shd, '<Q')
+            wpm(pid, p, kc8)
+            wpm(pid, p + 4, kd8)
+
+        wpm(pid, base + FIRE, b'\x00')
+        wpm(pid, base + RELOAD, struct.pack('<I', 0))
+        wpm(pid, base + RELOAD2, struct.pack('<I', 0))
+        wpm(pid, base + SCAN_TS, struct.pack('<Q', k32.GetTickCount64()))
+
+        time.sleep(0.1)
+
+
+main()
 ```
