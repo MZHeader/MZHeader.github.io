@@ -1,6 +1,6 @@
 ---
 title: "TryBypassMe Kernel Edition (TBMKEv1)"
-tags: Crackmes
+tags: CTF
 series: Crackmes
 description: A write-up for TryBypassMe (TBMKEv1), an advanced crackme featuring a ring 0 kernel driver, encrypted watchdog, anti-analysis, and memory integrity defenses.
 ---
