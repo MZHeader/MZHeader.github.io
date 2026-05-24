@@ -537,7 +537,7 @@ if ( watchdog_hash == hardcoded_watchdog_hash )
 
 ## Handle Access Stripping (ObRegisterCallbacks)
 
-The driver registers a callback via `ObRegisterCallbacks` that intercepts all handle creation operations targeting the game process. When any external process attempts to open a handle to `TBM.exe`, the callback strips access rights that would allow memory manipulation:
+The driver uses `ObRegisterCallbacks` to strip handle access rights from any external process that tries to open a handle to `TBM.exe`:
 
 ```c
 {
@@ -573,11 +573,9 @@ The mask `0x87A` covers the following access rights:
 | `PROCESS_DUP_HANDLE` | `0x0040` | Cannot duplicate handles |
 | `PROCESS_SUSPEND_RESUME` | `0x0800` | Cannot suspend threads |
 
-Without these rights, an external trainer cannot interact with the game process at all.
-
 ## Driver Self-Integrity Check
 
-The driver spawns a system thread that runs a periodic monitoring loop. Every ~5 seconds, it calls a self-integrity validation function:
+There's also a system thread running a monitoring loop every ~5 seconds, calling a self-integrity check:
 
 ```c
 {
@@ -602,7 +600,7 @@ The driver spawns a system thread that runs a periodic monitoring loop. Every ~5
 }
 ```
 
-The integrity function performs two checks:
+Looking at `self_integrity_check`:
 
 ```c
 char self_integrity_check()
@@ -631,17 +629,15 @@ char self_integrity_check()
 }
 ```
 
-When any driver bytes are modified, this function detects it and sets violation flags that are reported to `TBM.exe` and the game is terminated.
+Violation flags are set and reported back to `TBM.exe`, which terminates the game.
 
 # Bypass - Driver Patching
 
-Three patches were required:
+Three patches to `TBMKD.sys` are needed:
 
 ## Disable Client CRC32 Validation
 
-The driver validates `TBM.exe`'s integrity on registration (IOCTL `0x222284`) by comparing a CRC32 hash against the hardcoded value `0x688FFE38`. The gate check `if (hardcoded_hash)` means if the stored value is zero, the entire check is skipped.
-
-Although we aren't modifying `TBM.exe` in our approach, zeroing this value ensures the driver won't reject the game if it were ever modified, and more importantly, it's required because the driver also validates `WatchdogMain.exe` through similar logic using a second hardcoded hash at a nearby offset.
+When `TBM.exe` registers with the driver via IOCTL `0x222284`, the driver CRC32 hashes `TBM.exe` and checks it against the hardcoded value `0x688FFE38`. There's a gate that skips the validation entirely if the stored hash is zero, so zeroing it out is enough. The watchdog gets the same treatment — there's a matching hardcoded hash for `WatchdogMain.exe` nearby.
 
 | Property | Value |
 |----------|-------|
@@ -651,7 +647,7 @@ Although we aren't modifying `TBM.exe` in our approach, zeroing this value ensur
 
 ## Disable Driver Self-Integrity Check
 
-Since we're patching the driver's `.data` section, the self-integrity check will detect the modification via `RtlCompareMemory` and set violation flags. We NOP the call instruction in `StartRoutine` to prevent the integrity check from ever executing.
+Any patch to the `.data` section would get caught by `RtlCompareMemory`. NOP-ing the call to `self_integrity_check` in `StartRoutine` is cleaner — it kills the check before it runs.
 
 | Property | Value |
 |----------|-------|
@@ -661,7 +657,7 @@ Since we're patching the driver's `.data` section, the self-integrity check will
 
 ## Disable Handle Access Stripping
 
-The `ObRegisterCallbacks` callback's first conditional branch checks if `ProcessId` (the registered game PID) is non-zero. If zero, it jumps past all stripping logic. We convert this conditional jump (`jz`) to an unconditional jump (`jmp`), causing the callback to always exit immediately without modifying handle access rights.
+Looking at the callback, the first branch checks whether `ProcessId` (the game PID) is non-zero — zero means no stripping. Flipping the `jz` to an unconditional `jmp` makes it always take the skip path.
 
 | Property | Value |
 |----------|-------|
@@ -673,46 +669,19 @@ The `ObRegisterCallbacks` callback's first conditional branch checks if `Process
 
 ```python
 import shutil
-from pathlib import Path
 
-BASE_DIR = Path(__file__).parent
-DRIVER_ORIG = BASE_DIR / "TBMKD.sys"
-DRIVER_OUT  = BASE_DIR / "TBMKD_patched.sys"
-
-DRIVER_PATCHES = [
-    {
-        "name": "Disable CRC32 validation of TBM.exe",
-        "offset": 0x6C04,
-        "original": bytes.fromhex("38FE8F68"),
-        "patch":    bytes.fromhex("00000000"),
-    },
-    {
-        "name": "Disable driver self-integrity check",
-        "offset": 0x2B08,
-        "original": bytes.fromhex("e8affbffff"),
-        "patch":    bytes.fromhex("9090909090"),
-    },
-    {
-        "name": "Disable handle stripping",
-        "offset": 0x24BC,
-        "original": bytes.fromhex("0f84ba000000"),
-        "patch":    bytes.fromhex("e9bb00000090"),
-    },
+patches = [
+    (0x6C04, "00000000"),
+    (0x2B08, "9090909090"),
+    (0x24BC, "e9bb00000090"),
 ]
 
-def patch_driver():
-    shutil.copy2(DRIVER_ORIG, DRIVER_OUT)
-    data = bytearray(DRIVER_OUT.read_bytes())
+shutil.copy2("TBMKD.sys", "TBMKD_patched.sys")
+buf = bytearray(open("TBMKD_patched.sys", "rb").read())
 
-    for p in DRIVER_PATCHES:
-        off = p["offset"]
-        assert data[off:off+len(p["original"])] == bytearray(p["original"])
-        data[off:off+len(p["patch"])] = p["patch"]
-        print(f"[+] {p['name']} @ 0x{off:X}")
+for off, new in patches:
+    new = bytes.fromhex(new)
+    buf[off:off + len(new)] = new
 
-    DRIVER_OUT.write_bytes(bytes(data))
-    print(f"\n[+] Saved: {DRIVER_OUT.name}")
-
-if __name__ == "__main__":
-    patch_driver()
+open("TBMKD_patched.sys", "wb").write(buf)
 ```
