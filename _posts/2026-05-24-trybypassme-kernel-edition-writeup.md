@@ -1,13 +1,14 @@
 ---
+title: "TryBypassMe Kernel Edition (TBMKEv1)"
 tags: Crackmes
 description: A write-up for TryBypassMe (TBMKEv1), an advanced crackme featuring a ring 0 kernel driver, encrypted watchdog, anti-analysis, and memory integrity defenses.
 ---
 
-# TryBypassMe
+## TryBypassMe
 
 [TryBypassMe](https://crackmes.one/crackme/69db34d6b38f9259eec7eb32) (TBMKEv1) - Advanced Crackme Game
 
-## Description and Goal:
+### Description and Goal:
 Welcome to TryBypassMe! This is a custom-built, educational top-down shooter designed specifically to test your reverse engineering skills.
 
 Your goal is to successfully reverse engineer the protections and create a working bypass/trainer (e.g., infinite health, infinite ammo, or score manipulation) without triggering the game-over kill switch or crashing the application. Because of the heavy integrity checks, simple memory patching or basic injections will not work. A valid writeup must detail exactly how you neutered the tamper guards, bypassed the kernel/watchdog communications, and successfully cheated.
