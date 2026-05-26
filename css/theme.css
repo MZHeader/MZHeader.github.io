@@ -44,8 +44,8 @@ body {
   box-shadow: 0 0 4px rgba(104,112,196,0.7);
 }
 .rsrc-toolbar-label { color: #8be9fd; }
-.rsrc-toolbar-count { color: #3d4060; }
-.rsrc-section-header { color: #3d4060; border-bottom-color: #181924; }
+.rsrc-toolbar-count { color: #7c81ac; }
+.rsrc-section-header { color: #7c81ac; border-bottom-color: #181924; }
 
 /* Sidebar rows */
 #rsrc-sidebar a.rsrc-post-row {
@@ -60,7 +60,7 @@ body {
   background: rgba(139,233,253,0.06);
   border-left-color: #8be9fd;
 }
-#rsrc-sidebar .rsrc-gutter { color: #3d4060; }
+#rsrc-sidebar .rsrc-gutter { color: #7c81ac; }
 #rsrc-sidebar a.rsrc-post-row.active .rsrc-gutter { color: #6870c4; }
 #rsrc-sidebar .rsrc-title { color: #a0a4c0; }
 #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #e8e8f8; }
@@ -149,7 +149,7 @@ img { border-color: #2e3050; }
 .toc-body li a.toc-active::before { color: #6870c4; }
 .toc-body li a::before { color: #f1fa8c; }
 .toc-category { color: #6870c4; }
-.toc-h3 a { color: #6272a4 !important; }
+.toc-h3 a { color: #8088c4 !important; }
 .toc-h3:hover > a { color: #8be9fd !important; }
 
 /* ─── Reading progress bar ────────────────────────────────────────── */
@@ -190,7 +190,7 @@ img { border-color: #2e3050; }
 
 /* ─── Homepage: PE window ─────────────────────────────────────────── */
 .pe-window { border-color: #2e3050; background: rgba(10,10,18,0.8); }
-.pe-window-titlebar { background: #0c0d14; border-bottom-color: #2e3050; color: #3d4060; }
+.pe-window-titlebar { background: #0c0d14; border-bottom-color: #2e3050; color: #7c81ac; }
 .pe-window-dot.dot-close { background: #ff5555; box-shadow: 0 0 4px rgba(255,85,85,0.5); }
 .pe-window-dot.dot-min,
 .pe-window-dot.dot-max { background: #44475a; }
@@ -229,11 +229,11 @@ img { border-color: #2e3050; }
   background: rgba(139,233,253,0.04);
   border-left-color: #8be9fd;
 }
-.rsrc-gutter { color: #3d4060; }
+.rsrc-gutter { color: #7c81ac; }
 .rsrc-title { color: #a0a4c0; }
 .rsrc-post-row:hover .rsrc-title { color: #e8e8f8; }
 .rsrc-title::before { color: #f1fa8c; }
-.rsrc-meta { color: #3d4060; }
+.rsrc-meta { color: #7c81ac; }
 
 /* ─── Badges ──────────────────────────────────────────────────────── */
 .rsrc-badge--rats        { background: rgba(189,147,249,0.1);  border-color: rgba(189,147,249,0.35); color: #bd93f9; }

@@ -367,6 +367,22 @@ for i in $(seq 1 $total_posts); do
         );
     }
 
+    /* ── Skip-to-content link ── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: #5625be;
+      color: #fff;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.8rem;
+      border-radius: 0 0 4px 4px;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 0; }
+
     /* ── Sidebar ── */
     #rsrc-sidebar {
       width: 230px;
@@ -782,6 +798,7 @@ for i in $(seq 1 $total_posts); do
 
     /* ── Mobile nav bar ── */
     #mobile-nav { display: none; }
+    #mobile-scrim { display: none; }
 
     /* ── Mobile ── */
     @media (max-width: 900px) {
@@ -794,6 +811,7 @@ for i in $(seq 1 $total_posts); do
       article h1 { font-size: 1.4rem; }
       article h2 { font-size: 1.05rem; }
       pre code { font-size: 0.8rem; }
+      article table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
       body.sidebar-collapsed #post-main { margin-left: 0; }
       #mobile-nav {
         display: flex;
@@ -824,6 +842,46 @@ for i in $(seq 1 $total_posts); do
         white-space: nowrap;
         flex: 1;
         min-width: 0;
+      }
+      #mobile-nav .mob-menu {
+        background: none;
+        border: none;
+        color: #6870c4;
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-right: -0.5rem;
+      }
+      #mobile-nav .mob-menu:hover,
+      #mobile-nav .mob-menu:focus-visible { color: #8be9fd; }
+      /* Post-list drawer */
+      body.mobile-nav-open { overflow: hidden; }
+      body.mobile-nav-open #rsrc-sidebar {
+        display: flex;
+        position: fixed;
+        top: 44px; left: 0; bottom: 0;
+        width: 80%;
+        max-width: 300px;
+        min-width: 0;
+        z-index: 150;
+        overflow-y: auto;
+      }
+      body.mobile-nav-open #rsrc-sidebar a.rsrc-post-row,
+      body.mobile-nav-open #rsrc-sidebar .series-header { min-height: 44px; }
+      body.mobile-nav-open #rsrc-sidebar .rsrc-toggle-btn { display: none; }
+      body.mobile-nav-open #mobile-scrim {
+        display: block;
+        position: fixed;
+        top: 44px; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 140;
       }
     }
 
@@ -973,6 +1031,8 @@ for i in $(seq 1 $total_posts); do
 </head>
 <body>
 
+<a href="#post-main" class="skip-link">Skip to content</a>
+
 <div class="reading-progress" id="readingProgress"></div>
 
   <nav id="rsrc-sidebar">
@@ -992,7 +1052,9 @@ ${posts_list_html}
     <a class="mob-back" href="/">&larr; ret</a>
     <span class="mob-sep">/</span>
     <span class="mob-title">${short_title}</span>
+    <button class="mob-menu" id="mobMenuBtn" aria-label="Toggle post list" aria-expanded="false" aria-controls="rsrc-sidebar">&#9776;</button>
   </div>
+  <div id="mobile-scrim"></div>
 
   <div id="post-main">
     <div class="post-nav">
@@ -1145,6 +1207,28 @@ ENDHEADER
       var next = !isCollapsed;
       localStorage.setItem("rsrc-sidebar-collapsed", next ? "1" : "0");
       applyCollapsed(next);
+    });
+  }
+
+  // ── Mobile post-list drawer ──
+  var mobMenuBtn = document.getElementById("mobMenuBtn");
+  var mobileScrim = document.getElementById("mobile-scrim");
+  function closeMobileNav() {
+    document.body.classList.remove("mobile-nav-open");
+    if (mobMenuBtn) mobMenuBtn.setAttribute("aria-expanded", "false");
+  }
+  if (mobMenuBtn) {
+    mobMenuBtn.addEventListener("click", function() {
+      var open = document.body.classList.toggle("mobile-nav-open");
+      mobMenuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  if (mobileScrim) {
+    mobileScrim.addEventListener("click", closeMobileNav);
+  }
+  if (sidebar) {
+    sidebar.addEventListener("click", function(e) {
+      if (e.target.closest("a.rsrc-post-row")) closeMobileNav();
     });
   }
 
