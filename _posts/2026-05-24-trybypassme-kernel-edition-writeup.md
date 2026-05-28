@@ -1341,6 +1341,8 @@ if __name__ == "__main__":
 #define IOCTL_GET_PROCESS  CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA13, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define IOCTL_GET_MODULE   CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA14, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+#define MAX_USER_ADDRESS 0x7FFFFFFFEFFFULL
+
 typedef struct _MEMORY_REQUEST {
     ULONG  ProcessId;
     ULONG  _pad;
@@ -1369,29 +1371,28 @@ typedef struct _MODULE_REQUEST {
     UINT64 BaseAddress;
 } MODULE_REQUEST, *PMODULE_REQUEST;
 
-NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
-    PEPROCESS SourceProcess,
-    PVOID     SourceAddress,
-    PEPROCESS TargetProcess,
-    PVOID     TargetAddress,
-    SIZE_T    BufferSize,
-    KPROCESSOR_MODE PreviousMode,
-    PSIZE_T   ReturnSize
-);
-
 NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
-
 NTKERNELAPI PVOID PsGetProcessPeb(PEPROCESS Process);
+NTKERNELAPI NTSTATUS PsGetProcessExitStatus(PEPROCESS Process);
 
-static NTSTATUS KernelRead(PEPROCESS srcProc, UINT64 address, PVOID dst, ULONG size) {
-    SIZE_T bytes;
-    return MmCopyVirtualMemory(
-        srcProc, (PVOID)address,
-        PsGetCurrentProcess(), dst,
-        size, KernelMode, &bytes);
+static BOOLEAN IsProcessAlive(PEPROCESS process) {
+    return PsGetProcessExitStatus(process) == STATUS_PENDING;
 }
 
-// Kernel-safe narrow/narrow case-insensitive compare — no CRT locale access.
+static NTSTATUS ReadAttached(UINT64 address, PVOID dst, ULONG size) {
+    if (address == 0 || address > MAX_USER_ADDRESS)
+        return STATUS_ACCESS_VIOLATION;
+
+    __try {
+        ProbeForRead((PVOID)address, size, 1);
+        RtlCopyMemory(dst, (PVOID)address, size);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return GetExceptionCode();
+    }
+
+    return STATUS_SUCCESS;
+}
+
 static BOOLEAN StrEqualI(const CHAR* a, const CHAR* b) {
     while (*a && *b) {
         CHAR ca = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a;
@@ -1416,48 +1417,65 @@ static BOOLEAN WcsiEqual(const WCHAR* wide, const CHAR* narrow) {
 static UINT64 FindModuleInPeb(PEPROCESS process, const CHAR* moduleName) {
     PVOID pebRaw = PsGetProcessPeb(process);
     if (!pebRaw) return 0;
+
+    if (!IsProcessAlive(process))
+        return 0;
+
     UINT64 peb = (UINT64)pebRaw;
+    KAPC_STATE apcState;
+    KeStackAttachProcess(process, &apcState);
 
-    UINT64 ldr = 0;
-    if (!NT_SUCCESS(KernelRead(process, peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
-        return 0;
+    UINT64 result = 0;
 
-    UINT64 listHead = ldr + 0x20;
-    UINT64 flink    = 0;
-    if (!NT_SUCCESS(KernelRead(process, listHead, &flink, sizeof(flink))) || !flink)
-        return 0;
+    __try {
+        UINT64 ldr = 0;
+        if (!NT_SUCCESS(ReadAttached(peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
+            goto cleanup;
 
-    for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
-        if (flink < 0x1000 || flink > 0x7FFFFFFFFFFF0000ULL) break;
+        UINT64 listHead = ldr + 0x20;
+        UINT64 flink    = 0;
+        if (!NT_SUCCESS(ReadAttached(listHead, &flink, sizeof(flink))) || !flink)
+            goto cleanup;
 
-        UINT64 entry = flink - 0x10;
+        for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
+            if (flink < 0x10000 || flink > MAX_USER_ADDRESS) break;
 
-        UINT64 dllBase  = 0;
-        USHORT nameLen  = 0;
-        UINT64 nameBuf  = 0;
+            UINT64 entry = flink - 0x10;
 
-        KernelRead(process, entry + 0x30, &dllBase,  sizeof(dllBase));
-        KernelRead(process, entry + 0x58, &nameLen,  sizeof(nameLen));
-        KernelRead(process, entry + 0x60, &nameBuf,  sizeof(nameBuf));
+            UINT64 dllBase  = 0;
+            USHORT nameLen  = 0;
+            UINT64 nameBuf  = 0;
 
-        if (nameBuf && nameBuf > 0x1000 && nameBuf < 0x7FFFFFFFFFFF0000ULL &&
-            nameLen >= 2 && nameLen <= 512) {
-            WCHAR wideName[256] = {0};
-            ULONG readLen = (nameLen < (sizeof(wideName) - sizeof(WCHAR)))
-                            ? nameLen : (sizeof(wideName) - sizeof(WCHAR));
-            if (NT_SUCCESS(KernelRead(process, nameBuf, wideName, readLen))) {
-                wideName[readLen / sizeof(WCHAR)] = L'\0';
-                if (WcsiEqual(wideName, moduleName))
-                    return dllBase;
+            ReadAttached(entry + 0x30, &dllBase,  sizeof(dllBase));
+            ReadAttached(entry + 0x58, &nameLen,  sizeof(nameLen));
+            ReadAttached(entry + 0x60, &nameBuf,  sizeof(nameBuf));
+
+            if (nameBuf && nameBuf > 0x10000 && nameBuf <= MAX_USER_ADDRESS &&
+                nameLen >= 2 && nameLen <= 512) {
+                WCHAR wideName[256] = {0};
+                ULONG readLen = (nameLen < (sizeof(wideName) - sizeof(WCHAR)))
+                                ? nameLen : (sizeof(wideName) - sizeof(WCHAR));
+                if (NT_SUCCESS(ReadAttached(nameBuf, wideName, readLen))) {
+                    wideName[readLen / sizeof(WCHAR)] = L'\0';
+                    if (WcsiEqual(wideName, moduleName)) {
+                        result = dllBase;
+                        goto cleanup;
+                    }
+                }
             }
-        }
 
-        UINT64 next = 0;
-        if (!NT_SUCCESS(KernelRead(process, flink, &next, sizeof(next))))
-            break;
-        flink = next;
+            UINT64 next = 0;
+            if (!NT_SUCCESS(ReadAttached(flink, &next, sizeof(next))))
+                break;
+            flink = next;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        result = 0;
     }
-    return 0;
+
+cleanup:
+    KeUnstackDetachProcess(&apcState);
+    return result;
 }
 
 static PDEVICE_OBJECT g_DeviceObject = NULL;
@@ -1491,7 +1509,6 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
     NTSTATUS  status = STATUS_INVALID_DEVICE_REQUEST;
     ULONG_PTR info   = 0;
     PEPROCESS process = NULL;
-    SIZE_T    bytes   = 0;
 
     switch (ioctl) {
 
@@ -1500,12 +1517,24 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
             status = STATUS_BUFFER_TOO_SMALL; break;
         }
         PBASE_REQUEST breq = (PBASE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        if (breq->ProcessId == 0) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
         status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)breq->ProcessId, &process);
         if (!NT_SUCCESS(status)) break;
-        breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
+
+        __try {
+            breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+            breq->BaseAddress = 0;
+            status = GetExceptionCode();
+        }
+
         ObDereferenceObject(process);
-        info   = sizeof(BASE_REQUEST);
-        status = STATUS_SUCCESS;
+        if (NT_SUCCESS(status)) {
+            info   = sizeof(BASE_REQUEST);
+            status = STATUS_SUCCESS;
+        }
         break;
     }
 
@@ -1515,9 +1544,14 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         }
         PPROCESS_REQUEST preq = (PPROCESS_REQUEST)Irp->AssociatedIrp.SystemBuffer;
         preq->Name[sizeof(preq->Name) - 1] = '\0';
+
+        if (preq->Name[0] == '\0') {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+
         preq->ProcessId = 0;
 
-        for (ULONG id = 4; id < 0x10000; id += 4) {
+        for (ULONG id = 4; id < 0x40000; id += 4) {
             PEPROCESS p = NULL;
             if (!NT_SUCCESS(PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)id, &p)))
                 continue;
@@ -1539,6 +1573,11 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         }
         PMODULE_REQUEST mreq = (PMODULE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
         mreq->Name[sizeof(mreq->Name) - 1] = '\0';
+
+        if (mreq->ProcessId == 0 || mreq->Name[0] == '\0') {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+
         mreq->BaseAddress = 0;
 
         status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)mreq->ProcessId, &process);
@@ -1558,18 +1597,51 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
             status = STATUS_BUFFER_TOO_SMALL; break;
         }
         PMEMORY_REQUEST req = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+
         if (req->Size == 0 || req->Size > sizeof(req->Buffer)) {
             status = STATUS_INVALID_PARAMETER; break;
         }
+        if (req->ProcessId == 0) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+        if (req->Address == 0 || req->Address > MAX_USER_ADDRESS) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+        if (req->Address + req->Size < req->Address) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+        if (req->Address + req->Size - 1 > MAX_USER_ADDRESS) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+
         status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)req->ProcessId, &process);
         if (!NT_SUCCESS(status)) break;
 
-        if (ioctl == IOCTL_READ_MEMORY)
-            status = MmCopyVirtualMemory(process, (PVOID)req->Address,
-                PsGetCurrentProcess(), req->Buffer, req->Size, KernelMode, &bytes);
-        else
-            status = MmCopyVirtualMemory(PsGetCurrentProcess(), req->Buffer,
-                process, (PVOID)req->Address, req->Size, KernelMode, &bytes);
+        if (!IsProcessAlive(process)) {
+            ObDereferenceObject(process);
+            status = STATUS_PROCESS_IS_TERMINATING;
+            break;
+        }
+
+        {
+            KAPC_STATE apcState;
+            KeStackAttachProcess(process, &apcState);
+
+            __try {
+                if (ioctl == IOCTL_READ_MEMORY) {
+                    ProbeForRead((PVOID)req->Address, req->Size, 1);
+                    RtlCopyMemory(req->Buffer, (PVOID)req->Address, req->Size);
+                } else {
+                    ProbeForWrite((PVOID)req->Address, req->Size, 1);
+                    RtlCopyMemory((PVOID)req->Address, req->Buffer, req->Size);
+                }
+                status = STATUS_SUCCESS;
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                status = GetExceptionCode();
+            }
+
+            KeUnstackDetachProcess(&apcState);
+        }
 
         ObDereferenceObject(process);
         if (NT_SUCCESS(status)) info = sizeof(MEMORY_REQUEST);
@@ -1621,5 +1693,4 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
     return STATUS_SUCCESS;
 }
-
 ```
