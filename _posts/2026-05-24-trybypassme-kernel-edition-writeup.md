@@ -1325,3 +1325,301 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+
+
+```
+#include <ntddk.h>
+
+#define DEVICE_NAME     L"\\Device\\WinDiagSvc"
+#define SYMLINK_NAME    L"\\DosDevices\\WinDiagSvc"
+#define POOL_TAG        'gDwS'
+
+#define IOCTL_READ_MEMORY  CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA10, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WRITE_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA11, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_BASE     CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA12, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_PROCESS  CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA13, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_MODULE   CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA14, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+typedef struct _MEMORY_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 Address;
+    ULONG  Size;
+    ULONG  _pad2;
+    UCHAR  Buffer[4096];
+} MEMORY_REQUEST, *PMEMORY_REQUEST;
+
+typedef struct _BASE_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 BaseAddress;
+} BASE_REQUEST, *PBASE_REQUEST;
+
+typedef struct _PROCESS_REQUEST {
+    CHAR  Name[256];
+    ULONG ProcessId;
+    ULONG _pad;
+} PROCESS_REQUEST, *PPROCESS_REQUEST;
+
+typedef struct _MODULE_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    CHAR   Name[256];
+    UINT64 BaseAddress;
+} MODULE_REQUEST, *PMODULE_REQUEST;
+
+NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
+    PEPROCESS SourceProcess,
+    PVOID     SourceAddress,
+    PEPROCESS TargetProcess,
+    PVOID     TargetAddress,
+    SIZE_T    BufferSize,
+    KPROCESSOR_MODE PreviousMode,
+    PSIZE_T   ReturnSize
+);
+
+NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
+
+NTKERNELAPI PVOID PsGetProcessPeb(PEPROCESS Process);
+
+static NTSTATUS KernelRead(PEPROCESS srcProc, UINT64 address, PVOID dst, ULONG size) {
+    SIZE_T bytes;
+    return MmCopyVirtualMemory(
+        srcProc, (PVOID)address,
+        PsGetCurrentProcess(), dst,
+        size, KernelMode, &bytes);
+}
+
+// Kernel-safe narrow/narrow case-insensitive compare — no CRT locale access.
+static BOOLEAN StrEqualI(const CHAR* a, const CHAR* b) {
+    while (*a && *b) {
+        CHAR ca = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a;
+        CHAR cb = (*b >= 'A' && *b <= 'Z') ? (*b + 32) : *b;
+        if (ca != cb) return FALSE;
+        a++; b++;
+    }
+    return (*a == '\0') && (*b == '\0');
+}
+
+static BOOLEAN WcsiEqual(const WCHAR* wide, const CHAR* narrow) {
+    while (*wide && *narrow) {
+        WCHAR w = (*wide  >= L'A' && *wide  <= L'Z') ? (*wide  + 32) : *wide;
+        CHAR  n = (*narrow >= 'A'  && *narrow <= 'Z')  ? (*narrow + 32) : *narrow;
+        if (w != (WCHAR)(UCHAR)n) return FALSE;
+        wide++;
+        narrow++;
+    }
+    return (*wide == L'\0') && (*narrow == '\0');
+}
+
+static UINT64 FindModuleInPeb(PEPROCESS process, const CHAR* moduleName) {
+    PVOID pebRaw = PsGetProcessPeb(process);
+    if (!pebRaw) return 0;
+    UINT64 peb = (UINT64)pebRaw;
+
+    UINT64 ldr = 0;
+    if (!NT_SUCCESS(KernelRead(process, peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
+        return 0;
+
+    UINT64 listHead = ldr + 0x20;
+    UINT64 flink    = 0;
+    if (!NT_SUCCESS(KernelRead(process, listHead, &flink, sizeof(flink))) || !flink)
+        return 0;
+
+    for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
+        if (flink < 0x1000 || flink > 0x7FFFFFFFFFFF0000ULL) break;
+
+        UINT64 entry = flink - 0x10;
+
+        UINT64 dllBase  = 0;
+        USHORT nameLen  = 0;
+        UINT64 nameBuf  = 0;
+
+        KernelRead(process, entry + 0x30, &dllBase,  sizeof(dllBase));
+        KernelRead(process, entry + 0x58, &nameLen,  sizeof(nameLen));
+        KernelRead(process, entry + 0x60, &nameBuf,  sizeof(nameBuf));
+
+        if (nameBuf && nameBuf > 0x1000 && nameBuf < 0x7FFFFFFFFFFF0000ULL &&
+            nameLen >= 2 && nameLen <= 512) {
+            WCHAR wideName[256] = {0};
+            ULONG readLen = (nameLen < (sizeof(wideName) - sizeof(WCHAR)))
+                            ? nameLen : (sizeof(wideName) - sizeof(WCHAR));
+            if (NT_SUCCESS(KernelRead(process, nameBuf, wideName, readLen))) {
+                wideName[readLen / sizeof(WCHAR)] = L'\0';
+                if (WcsiEqual(wideName, moduleName))
+                    return dllBase;
+            }
+        }
+
+        UINT64 next = 0;
+        if (!NT_SUCCESS(KernelRead(process, flink, &next, sizeof(next))))
+            break;
+        flink = next;
+    }
+    return 0;
+}
+
+static PDEVICE_OBJECT g_DeviceObject = NULL;
+
+static NTSTATUS DispatchCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchClose(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+
+    PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(Irp);
+    ULONG  ioctl  = stack->Parameters.DeviceIoControl.IoControlCode;
+    ULONG  inLen  = stack->Parameters.DeviceIoControl.InputBufferLength;
+    ULONG  outLen = stack->Parameters.DeviceIoControl.OutputBufferLength;
+    NTSTATUS  status = STATUS_INVALID_DEVICE_REQUEST;
+    ULONG_PTR info   = 0;
+    PEPROCESS process = NULL;
+    SIZE_T    bytes   = 0;
+
+    switch (ioctl) {
+
+    case IOCTL_GET_BASE: {
+        if (inLen < sizeof(BASE_REQUEST) || outLen < sizeof(BASE_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PBASE_REQUEST breq = (PBASE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)breq->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+        breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
+        ObDereferenceObject(process);
+        info   = sizeof(BASE_REQUEST);
+        status = STATUS_SUCCESS;
+        break;
+    }
+
+    case IOCTL_GET_PROCESS: {
+        if (inLen < sizeof(PROCESS_REQUEST) || outLen < sizeof(PROCESS_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PPROCESS_REQUEST preq = (PPROCESS_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        preq->Name[sizeof(preq->Name) - 1] = '\0';
+        preq->ProcessId = 0;
+
+        for (ULONG id = 4; id < 0x10000; id += 4) {
+            PEPROCESS p = NULL;
+            if (!NT_SUCCESS(PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)id, &p)))
+                continue;
+            PCHAR imgName = PsGetProcessImageFileName(p);
+            if (imgName && StrEqualI(imgName, preq->Name))
+                preq->ProcessId = id;
+            ObDereferenceObject(p);
+            if (preq->ProcessId) break;
+        }
+
+        status = preq->ProcessId ? STATUS_SUCCESS : STATUS_NOT_FOUND;
+        if (NT_SUCCESS(status)) info = sizeof(PROCESS_REQUEST);
+        break;
+    }
+
+    case IOCTL_GET_MODULE: {
+        if (inLen < sizeof(MODULE_REQUEST) || outLen < sizeof(MODULE_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PMODULE_REQUEST mreq = (PMODULE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        mreq->Name[sizeof(mreq->Name) - 1] = '\0';
+        mreq->BaseAddress = 0;
+
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)mreq->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+
+        mreq->BaseAddress = FindModuleInPeb(process, mreq->Name);
+        ObDereferenceObject(process);
+
+        status = mreq->BaseAddress ? STATUS_SUCCESS : STATUS_NOT_FOUND;
+        if (NT_SUCCESS(status)) info = sizeof(MODULE_REQUEST);
+        break;
+    }
+
+    case IOCTL_READ_MEMORY:
+    case IOCTL_WRITE_MEMORY: {
+        if (inLen < sizeof(MEMORY_REQUEST) || outLen < sizeof(MEMORY_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PMEMORY_REQUEST req = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        if (req->Size == 0 || req->Size > sizeof(req->Buffer)) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)req->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+
+        if (ioctl == IOCTL_READ_MEMORY)
+            status = MmCopyVirtualMemory(process, (PVOID)req->Address,
+                PsGetCurrentProcess(), req->Buffer, req->Size, KernelMode, &bytes);
+        else
+            status = MmCopyVirtualMemory(PsGetCurrentProcess(), req->Buffer,
+                process, (PVOID)req->Address, req->Size, KernelMode, &bytes);
+
+        ObDereferenceObject(process);
+        if (NT_SUCCESS(status)) info = sizeof(MEMORY_REQUEST);
+        break;
+    }
+
+    default:
+        status = STATUS_INVALID_DEVICE_REQUEST;
+        break;
+    }
+
+    Irp->IoStatus.Status      = status;
+    Irp->IoStatus.Information = info;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return status;
+}
+
+static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNICODE_STRING symlink;
+    RtlInitUnicodeString(&symlink, SYMLINK_NAME);
+    IoDeleteSymbolicLink(&symlink);
+    if (g_DeviceObject) IoDeleteDevice(g_DeviceObject);
+}
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+{
+    UNREFERENCED_PARAMETER(RegistryPath);
+
+    UNICODE_STRING devName, symName;
+    RtlInitUnicodeString(&devName, DEVICE_NAME);
+    RtlInitUnicodeString(&symName, SYMLINK_NAME);
+
+    NTSTATUS status = IoCreateDevice(DriverObject, 0, &devName,
+        FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &g_DeviceObject);
+    if (!NT_SUCCESS(status)) return status;
+
+    status = IoCreateSymbolicLink(&symName, &devName);
+    if (!NT_SUCCESS(status)) { IoDeleteDevice(g_DeviceObject); return status; }
+
+    DriverObject->DriverUnload                         = DriverUnload;
+    DriverObject->MajorFunction[IRP_MJ_CREATE]         = DispatchCreate;
+    DriverObject->MajorFunction[IRP_MJ_CLOSE]          = DispatchClose;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DispatchIoctl;
+
+    g_DeviceObject->Flags |= DO_BUFFERED_IO;
+    g_DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+
+    return STATUS_SUCCESS;
+}
+
+```
