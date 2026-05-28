@@ -902,3 +902,426 @@ def main():
 
 main()
 ```
+
+# Bypass - Kernel Driver
+
+Maybe a more "proper" way to solve this challenge is to develop and run a custom kernel driver and get that to do all of the memory patching.
+Despite this game launching with a kernel driver, it does not enumerate kernel drivers on the system, therefore, we can use it and bypass all of the user-land checks.
+
+```c
+#include <ntddk.h>
+
+#define DEVICE_NAME     L"\\Device\\CheatDrv"
+#define SYMLINK_NAME    L"\\DosDevices\\CheatDrv"
+#define POOL_TAG        'tChD'
+
+#define IOCTL_READ_MEMORY  CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WRITE_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_BASE     CTL_CODE(FILE_DEVICE_UNKNOWN, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+typedef struct _MEMORY_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 Address;
+    ULONG  Size;
+    ULONG  _pad2;
+    UCHAR  Buffer[4096];
+} MEMORY_REQUEST, *PMEMORY_REQUEST;
+
+NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
+    PEPROCESS SourceProcess,
+    PVOID     SourceAddress,
+    PEPROCESS TargetProcess,
+    PVOID     TargetAddress,
+    SIZE_T    BufferSize,
+    KPROCESSOR_MODE PreviousMode,
+    PSIZE_T   ReturnSize
+);
+
+NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
+
+typedef struct _BASE_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 BaseAddress;
+} BASE_REQUEST, *PBASE_REQUEST;
+
+static PDEVICE_OBJECT g_DeviceObject = NULL;
+
+static NTSTATUS DispatchCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchClose(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+
+    PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(Irp);
+    ULONG ioctl = stack->Parameters.DeviceIoControl.IoControlCode;
+    ULONG inLen = stack->Parameters.DeviceIoControl.InputBufferLength;
+    ULONG outLen = stack->Parameters.DeviceIoControl.OutputBufferLength;
+    NTSTATUS status = STATUS_INVALID_DEVICE_REQUEST;
+    ULONG_PTR info = 0;
+    PEPROCESS process = NULL;
+    SIZE_T bytes = 0;
+
+    if (ioctl == IOCTL_GET_BASE) {
+        PBASE_REQUEST breq;
+        PVOID base;
+        if (inLen < sizeof(BASE_REQUEST) || outLen < sizeof(BASE_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL;
+            goto done;
+        }
+        breq = (PBASE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)breq->ProcessId, &process);
+        if (!NT_SUCCESS(status))
+            goto done;
+        base = PsGetProcessSectionBaseAddress(process);
+        ObDereferenceObject(process);
+        breq->BaseAddress = (UINT64)base;
+        info = sizeof(BASE_REQUEST);
+        status = STATUS_SUCCESS;
+        goto done;
+    }
+
+    {
+        PMEMORY_REQUEST req = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+
+        if (inLen < sizeof(MEMORY_REQUEST) || outLen < sizeof(MEMORY_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL;
+            goto done;
+        }
+
+        if (req->Size == 0 || req->Size > sizeof(req->Buffer)) {
+            status = STATUS_INVALID_PARAMETER;
+            goto done;
+        }
+
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)req->ProcessId, &process);
+        if (!NT_SUCCESS(status))
+            goto done;
+
+        switch (ioctl) {
+        case IOCTL_READ_MEMORY:
+            status = MmCopyVirtualMemory(
+                process, (PVOID)req->Address,
+                PsGetCurrentProcess(), req->Buffer,
+                req->Size, KernelMode, &bytes);
+            if (NT_SUCCESS(status))
+                info = sizeof(MEMORY_REQUEST);
+            break;
+
+        case IOCTL_WRITE_MEMORY:
+            status = MmCopyVirtualMemory(
+                PsGetCurrentProcess(), req->Buffer,
+                process, (PVOID)req->Address,
+                req->Size, KernelMode, &bytes);
+            if (NT_SUCCESS(status))
+                info = sizeof(MEMORY_REQUEST);
+            break;
+
+        default:
+            status = STATUS_INVALID_DEVICE_REQUEST;
+            break;
+        }
+
+        ObDereferenceObject(process);
+    }
+
+done:
+    Irp->IoStatus.Status = status;
+    Irp->IoStatus.Information = info;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return status;
+}
+
+static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+
+    UNICODE_STRING symlink;
+    RtlInitUnicodeString(&symlink, SYMLINK_NAME);
+    IoDeleteSymbolicLink(&symlink);
+
+    if (g_DeviceObject)
+        IoDeleteDevice(g_DeviceObject);
+}
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+{
+    UNREFERENCED_PARAMETER(RegistryPath);
+
+    UNICODE_STRING devName, symName;
+    RtlInitUnicodeString(&devName, DEVICE_NAME);
+    RtlInitUnicodeString(&symName, SYMLINK_NAME);
+
+    NTSTATUS status = IoCreateDevice(
+        DriverObject, 0, &devName,
+        FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE,
+        &g_DeviceObject);
+
+    if (!NT_SUCCESS(status))
+        return status;
+
+    status = IoCreateSymbolicLink(&symName, &devName);
+    if (!NT_SUCCESS(status)) {
+        IoDeleteDevice(g_DeviceObject);
+        return status;
+    }
+
+    DriverObject->DriverUnload = DriverUnload;
+    DriverObject->MajorFunction[IRP_MJ_CREATE] = DispatchCreate;
+    DriverObject->MajorFunction[IRP_MJ_CLOSE]  = DispatchClose;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DispatchIoctl;
+
+    g_DeviceObject->Flags |= DO_BUFFERED_IO;
+    g_DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+
+    return STATUS_SUCCESS;
+}
+```
+
+Modified trainer.py to communicate with our driver:
+```python
+import ctypes
+import ctypes.wintypes as wt
+import struct
+import sys
+import time
+
+k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+k32.GetTickCount64.restype = ctypes.c_uint64
+
+TH32CS_SNAPPROCESS = 0x2
+
+IOCTL_READ  = 0x222000  # CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
+IOCTL_WRITE = 0x222004  # CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
+IOCTL_BASE  = 0x222008  # CTL_CODE(FILE_DEVICE_UNKNOWN, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+
+class PROCESSENTRY32(ctypes.Structure):
+    _fields_ = [
+        ("dwSize",              wt.DWORD),
+        ("cntUsage",            wt.DWORD),
+        ("th32ProcessID",       wt.DWORD),
+        ("th32DefaultHeapID",   ctypes.c_size_t),
+        ("th32ModuleID",        wt.DWORD),
+        ("cntThreads",          wt.DWORD),
+        ("th32ParentProcessID", wt.DWORD),
+        ("pcPriClassBase",      ctypes.c_long),
+        ("dwFlags",             wt.DWORD),
+        ("szExeFile",           ctypes.c_char * 260),
+    ]
+
+
+class MEMORY_REQUEST(ctypes.Structure):
+    _fields_ = [
+        ("ProcessId", wt.DWORD),
+        ("_pad",      wt.DWORD),
+        ("Address",   ctypes.c_uint64),
+        ("Size",      wt.DWORD),
+        ("_pad2",     wt.DWORD),
+        ("Buffer",    ctypes.c_ubyte * 4096),
+    ]
+
+
+class BASE_REQUEST(ctypes.Structure):
+    _fields_ = [
+        ("ProcessId",   wt.DWORD),
+        ("_pad",        wt.DWORD),
+        ("BaseAddress", ctypes.c_uint64),
+    ]
+
+
+def find_pid(name):
+    snap = k32.CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
+    pe = PROCESSENTRY32()
+    pe.dwSize = ctypes.sizeof(PROCESSENTRY32)
+    pid = None
+    if k32.Process32First(snap, ctypes.byref(pe)):
+        while True:
+            if pe.szExeFile.lower() == name.lower():
+                pid = pe.th32ProcessID
+                break
+            if not k32.Process32Next(snap, ctypes.byref(pe)):
+                break
+    k32.CloseHandle(snap)
+    return pid
+
+
+def get_base_via_driver(hDrv, pid):
+    """Get process base address via kernel driver (bypasses handle stripping)."""
+    req = BASE_REQUEST()
+    req.ProcessId = pid
+    bytesReturned = wt.DWORD()
+    ok = k32.DeviceIoControl(
+        hDrv, IOCTL_BASE,
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(bytesReturned), None
+    )
+    if ok and req.BaseAddress:
+        return req.BaseAddress
+    return None
+
+
+def open_driver():
+    h = k32.CreateFileW(
+        "\\\\.\\CheatDrv",
+        0xC0000000,  # GENERIC_READ | GENERIC_WRITE
+        0, None, 3,  # OPEN_EXISTING
+        0, None
+    )
+    if h == -1 or h == 0xFFFFFFFF:
+        sys.exit("[!] Failed to open CheatDrv. Is the driver loaded?")
+    return h
+
+
+def rpm(hDrv, pid, addr, fmt):
+    req = MEMORY_REQUEST()
+    req.ProcessId = pid
+    req.Address = addr
+    req.Size = struct.calcsize(fmt)
+    bytesReturned = wt.DWORD()
+    ok = k32.DeviceIoControl(
+        hDrv, IOCTL_READ,
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(bytesReturned), None
+    )
+    if not ok:
+        return None
+    return struct.unpack_from(fmt, bytes(req.Buffer)[:req.Size])[0]
+
+
+def wpm(hDrv, pid, addr, data):
+    req = MEMORY_REQUEST()
+    req.ProcessId = pid
+    req.Address = addr
+    req.Size = len(data)
+    ctypes.memmove(req.Buffer, data, len(data))
+    bytesReturned = wt.DWORD()
+    k32.DeviceIoControl(
+        hDrv, IOCTL_WRITE,
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(req), ctypes.sizeof(req),
+        ctypes.byref(bytesReturned), None
+    )
+
+
+def encode_var(key1, key2, value):
+    """
+    Rebuild the 0x78-byte (30 DWORDs) protected-value block that hash_fnv1a creates.
+    The game stores values as: slot[0] = key1 ^ val, slot[26] = key2 ^ val,
+    with canaries at [8]=0xDEADC0DE, [14]=0xB16B00B5, and FNV-1 chain filling the rest.
+    """
+    out = [0] * 30
+    v = value & 0xFFFFFFFF
+    out[0]  = (key1 ^ v) & 0xFFFFFFFF
+    out[8]  = 0xDEADC0DE
+    out[14] = 0xB16B00B5
+    out[26] = (key2 ^ v) & 0xFFFFFFFF
+
+    h = (key1 ^ key2 ^ v) & 0xFFFFFFFF
+
+    def step():
+        nonlocal h
+        h = ((16777619 * h) ^ 0x811C9DC5) & 0xFFFFFFFF
+        return h
+
+    for i in [*range(1, 8), *range(9, 14), *range(15, 26), *range(27, 30)]:
+        out[i] = step()
+
+    return struct.pack('<30I', *out)
+
+
+# Offsets into TBM.exe .data section (RVA from module base)
+KEY1         = 0x70888
+KEY2         = 0x707C0
+KEY_C8       = 0x707C8
+KEY_D8       = 0x707D8
+HEALTH       = 0x70990
+AMMO         = 0x70910
+HP_SHADOWS   = (0x707F0, 0x70878)
+AMMO_SHADOWS = (0x70AC0, 0x70880, 0x70988)
+FIRE         = 0x70B74
+RELOAD       = 0x70FA4
+RELOAD2      = 0x70FA0
+SCAN_TS      = 0x70FE0
+
+
+def main():
+    pid = find_pid(b"TBM.exe")
+    if not pid:
+        sys.exit("[!] TBM.exe not running")
+
+    hDrv = open_driver()
+
+    base = get_base_via_driver(hDrv, pid)
+    if not base:
+        sys.exit("[!] Could not get TBM.exe base address")
+
+    print(f"[+] Attached: pid={pid}, base=0x{base:X}")
+    print("[+] Trainer active - infinite health & ammo")
+
+    while True:
+        try:
+            key1   = rpm(hDrv, pid, rpm(hDrv, pid, base + KEY1, '<Q'), '<I')
+            key2   = rpm(hDrv, pid, rpm(hDrv, pid, base + KEY2, '<Q'), '<I')
+            key_c8 = rpm(hDrv, pid, rpm(hDrv, pid, base + KEY_C8, '<Q'), '<I')
+            key_d8 = rpm(hDrv, pid, rpm(hDrv, pid, base + KEY_D8, '<Q'), '<I')
+
+            if key1 is None or key2 is None:
+                time.sleep(0.5)
+                continue
+
+            kc8 = struct.pack('<I', key_c8)
+            kd8 = struct.pack('<I', key_d8)
+
+            # Health = 100
+            wpm(hDrv, pid, base + HEALTH, encode_var(key1, key2, 100))
+            for shd in HP_SHADOWS:
+                p = rpm(hDrv, pid, base + shd, '<Q')
+                if p:
+                    wpm(hDrv, pid, p, kc8)
+                    wpm(hDrv, pid, p + 4, kd8)
+
+            # Ammo = 30
+            wpm(hDrv, pid, base + AMMO, encode_var(key1, key2, 30))
+            for shd in AMMO_SHADOWS:
+                p = rpm(hDrv, pid, base + shd, '<Q')
+                if p:
+                    wpm(hDrv, pid, p, kc8)
+                    wpm(hDrv, pid, p + 4, kd8)
+
+            # Clear fire/reload state
+            wpm(hDrv, pid, base + FIRE, b'\x00')
+            wpm(hDrv, pid, base + RELOAD, struct.pack('<I', 0))
+            wpm(hDrv, pid, base + RELOAD2, struct.pack('<I', 0))
+
+            # Spoof the handle-scan timestamp so anti-cheat thinks it just ran
+            wpm(hDrv, pid, base + SCAN_TS, struct.pack('<Q', k32.GetTickCount64()))
+
+        except Exception as e:
+            print(f"[!] Error: {e}")
+
+        time.sleep(0.1)
+
+
+if __name__ == "__main__":
+    main()
+```
