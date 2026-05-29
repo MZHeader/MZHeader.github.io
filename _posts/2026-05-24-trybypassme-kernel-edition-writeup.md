@@ -1325,3 +1325,330 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+
+
+```
+4: kd> !analyze -v
+Loading Kernel Symbols
+...............................................................
+................................................................
+................................................................
+................................................................
+.........
+Loading User Symbols
+PEB is paged out (Peb.Ldr = 000000bc`bee4c018).  Type ".hh dbgerr001" for details
+Loading unloaded module list
+............
+*******************************************************************************
+*                                                                             *
+*                        Bugcheck Analysis                                    *
+*                                                                             *
+*******************************************************************************
+
+PAGE_FAULT_IN_NONPAGED_AREA (50)
+Invalid system memory was referenced.  This cannot be protected by try-except.
+Typically the address is just plain bad or it is pointing at freed memory.
+Arguments:
+Arg1: ffffffff974e2378, memory referenced.
+Arg2: 0000000000000000, X64: bit 0 set if the fault was due to a not-present PTE.
+	bit 1 is set if the fault was due to a write, clear if a read.
+	bit 3 is set if the processor decided the fault was due to a corrupted PTE.
+	bit 4 is set if the fault was due to attempted execute of a no-execute PTE.
+	- ARM64: bit 1 is set if the fault was due to a write, clear if a read.
+	bit 3 is set if the fault was due to attempted execute of a no-execute PTE.
+Arg3: fffff802a6df10d3, If non-zero, the instruction address which referenced the bad memory
+	address.
+Arg4: 0000000000000002, (reserved)
+
+Debugging Details:
+------------------
+
+*** WARNING: Unable to verify timestamp for Driver.sys
+
+KEY_VALUES_STRING: 1
+
+    Key  : AV.PTE
+    Value: Invalid
+
+    Key  : AV.Page.Virtual
+    Value: 0xffffffff974e0000
+
+    Key  : AV.Type
+    Value: Read
+
+    Key  : Analysis.CPU.mSec
+    Value: 1296
+
+    Key  : Analysis.Elapsed.mSec
+    Value: 7296
+
+    Key  : Analysis.IO.Other.Mb
+    Value: 15
+
+    Key  : Analysis.IO.Read.Mb
+    Value: 1
+
+    Key  : Analysis.IO.Write.Mb
+    Value: 24
+
+    Key  : Analysis.Init.CPU.mSec
+    Value: 781
+
+    Key  : Analysis.Init.Elapsed.mSec
+    Value: 130521
+
+    Key  : Analysis.Memory.CommitPeak.Mb
+    Value: 84
+
+    Key  : Analysis.Version.DbgEng
+    Value: 10.0.29547.1002
+
+    Key  : Analysis.Version.Description
+    Value: 10.2602.27.2 amd64fre
+
+    Key  : Analysis.Version.Ext
+    Value: 1.2602.27.2
+
+    Key  : Bugcheck.Code.LegacyAPI
+    Value: 0x50
+
+    Key  : Bugcheck.Code.TargetModel
+    Value: 0x50
+
+    Key  : Dump.Attributes.AsUlong
+    Value: 0x21808
+
+    Key  : Dump.Attributes.DiagDataWrittenToHeader
+    Value: 1
+
+    Key  : Dump.Attributes.ErrorCode
+    Value: 0x0
+
+    Key  : Dump.Attributes.KernelGeneratedTriageDump
+    Value: 1
+
+    Key  : Dump.Attributes.LastLine
+    Value: Dump completed successfully.
+
+    Key  : Dump.Attributes.ProgressPercentage
+    Value: 0
+
+    Key  : Failure.Bucket
+    Value: AV_Driver!unknown_function
+
+    Key  : Failure.Exception.IP.Address
+    Value: 0xfffff802a6df10d3
+
+    Key  : Failure.Exception.IP.Module
+    Value: Driver
+
+    Key  : Failure.Exception.IP.Offset
+    Value: 0x10d3
+
+    Key  : Failure.Hash
+    Value: {50741706-5edf-d56e-3b8a-0d131fb3e012}
+
+    Key  : Faulting.IP.Type
+    Value: Paged
+
+    Key  : Hypervisor.Enlightenments.ValueHex
+    Value: 0x7417df84
+
+    Key  : Hypervisor.Flags.AnyHypervisorPresent
+    Value: 1
+
+    Key  : Hypervisor.Flags.ApicEnlightened
+    Value: 0
+
+    Key  : Hypervisor.Flags.ApicVirtualizationAvailable
+    Value: 1
+
+    Key  : Hypervisor.Flags.AsyncMemoryHint
+    Value: 0
+
+    Key  : Hypervisor.Flags.CoreSchedulerRequested
+    Value: 0
+
+    Key  : Hypervisor.Flags.CpuManager
+    Value: 1
+
+    Key  : Hypervisor.Flags.DeprecateAutoEoi
+    Value: 1
+
+    Key  : Hypervisor.Flags.DynamicCpuDisabled
+    Value: 1
+
+    Key  : Hypervisor.Flags.Epf
+    Value: 0
+
+    Key  : Hypervisor.Flags.ExtendedProcessorMasks
+    Value: 1
+
+    Key  : Hypervisor.Flags.HardwareMbecAvailable
+    Value: 1
+
+    Key  : Hypervisor.Flags.MaxBankNumber
+    Value: 0
+
+    Key  : Hypervisor.Flags.MemoryZeroingControl
+    Value: 0
+
+    Key  : Hypervisor.Flags.NoExtendedRangeFlush
+    Value: 0
+
+    Key  : Hypervisor.Flags.NoNonArchCoreSharing
+    Value: 1
+
+    Key  : Hypervisor.Flags.Phase0InitDone
+    Value: 1
+
+    Key  : Hypervisor.Flags.PowerSchedulerQos
+    Value: 0
+
+    Key  : Hypervisor.Flags.RootScheduler
+    Value: 0
+
+    Key  : Hypervisor.Flags.SynicAvailable
+    Value: 1
+
+    Key  : Hypervisor.Flags.UseQpcBias
+    Value: 0
+
+    Key  : Hypervisor.Flags.Value
+    Value: 55185662
+
+    Key  : Hypervisor.Flags.ValueHex
+    Value: 0x34a10fe
+
+    Key  : Hypervisor.Flags.VpAssistPage
+    Value: 1
+
+    Key  : Hypervisor.Flags.VsmAvailable
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.AccessStats
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.CrashdumpEnlightened
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.CreateVirtualProcessor
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.DisableHyperthreading
+    Value: 0
+
+    Key  : Hypervisor.RootFlags.HostTimelineSync
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.HypervisorDebuggingEnabled
+    Value: 0
+
+    Key  : Hypervisor.RootFlags.IsHyperV
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.LivedumpEnlightened
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.MapDeviceInterrupt
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.MceEnlightened
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.Nested
+    Value: 0
+
+    Key  : Hypervisor.RootFlags.StartLogicalProcessor
+    Value: 1
+
+    Key  : Hypervisor.RootFlags.Value
+    Value: 1015
+
+    Key  : Hypervisor.RootFlags.ValueHex
+    Value: 0x3f7
+
+    Key  : WER.System.BIOSRevision
+    Value: 5.27.0.0
+
+
+BUGCHECK_CODE:  50
+
+BUGCHECK_P1: ffffffff974e2378
+
+BUGCHECK_P2: 0
+
+BUGCHECK_P3: fffff802a6df10d3
+
+BUGCHECK_P4: 2
+
+FILE_IN_CAB:  052826-39265-01.dmp
+
+TAG_NOT_DEFINED_202b:  *** Unknown TAG in analysis list 202b
+
+
+DUMP_FILE_ATTRIBUTES: 0x21808
+  Kernel Generated Triage Dump
+
+FAULTING_THREAD:  ffffca0fb64bb0c0
+
+EXCEPTION_PARAMETER1:  0000000000000000
+
+EXCEPTION_PARAMETER2:  ffffffff974e2378
+
+READ_ADDRESS: fffff802f55c44d8: Unable to get MiVisibleState
+ ffffffff974e2378 
+
+MM_INTERNAL_CODE:  2
+
+BLACKBOXBSD: 1 (!blackboxbsd)
+
+
+BLACKBOXNTFS: 1 (!blackboxntfs)
+
+
+BLACKBOXPNP: 1 (!blackboxpnp)
+
+
+BLACKBOXWINLOGON: 1 (!blackboxwinlogon) (!blackboxwinlogonnotify)
+
+
+CUSTOMER_CRASH_COUNT:  1
+
+PROCESS_NAME:  4F1G76N.exe.ex
+
+IP_IN_PAGED_CODE: 
+Driver+10d3
+fffff802`a6df10d3 0fbe00          movsx   eax,byte ptr [rax]
+
+STACK_TEXT:  
+ffff830e`0e6570b8 fffff802`f49135e0     : 00000000`00000050 ffffffff`974e2378 00000000`00000000 ffff830e`0e657320 : nt!KeBugCheckEx
+ffff830e`0e6570c0 fffff802`f48bed26     : 00000000`00000000 ffff8000`00000000 ffffffff`974e2378 0000007f`fffffff8 : nt!MiSystemFault+0x850
+ffff830e`0e6571b0 fffff802`f4cb80cb     : 00000000`00000000 00000000`00000001 ffffca0f`b9d4c860 00000000`00000000 : nt!MmAccessFault+0x646
+ffff830e`0e657320 fffff802`a6df10d3     : ffffca0f`b26c3920 00000000`00000108 00000000`00000000 fffff802`a6df193d : nt!KiPageFault+0x38b
+ffff830e`0e6574b0 ffffca0f`b26c3920     : 00000000`00000108 00000000`00000000 fffff802`a6df193d ffffffff`974e2378 : Driver+0x10d3
+ffff830e`0e6574b8 00000000`00000108     : 00000000`00000000 fffff802`a6df193d ffffffff`974e2378 ffffca0f`b8e16bc0 : 0xffffca0f`b26c3920
+ffff830e`0e6574c0 00000000`00000000     : fffff802`a6df193d ffffffff`974e2378 ffffca0f`b8e16bc0 ffffca0f`b9d4c860 : 0x108
+
+
+SYMBOL_NAME:  Driver+10d3
+
+MODULE_NAME: Driver
+
+IMAGE_NAME:  Driver.sys
+
+STACK_COMMAND: .process /r /p 0xffffca0fb895d080; .thread /r /p 0xffffca0fb64bb0c0 ; kb
+
+BUCKET_ID_FUNC_OFFSET:  10d3
+
+FAILURE_BUCKET_ID:  AV_Driver!unknown_function
+
+OSPLATFORM_TYPE:  x64
+
+OSNAME:  Windows 10
+
+FAILURE_ID_HASH:  {50741706-5edf-d56e-3b8a-0d131fb3e012}
+
+Followup:     MachineOwner
+```
