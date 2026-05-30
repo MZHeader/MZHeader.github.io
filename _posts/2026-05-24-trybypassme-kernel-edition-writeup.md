@@ -1326,7 +1326,7 @@ if __name__ == "__main__":
     main()
 ```
 
-new-2
+new-3
 ```
 #include <ntifs.h>
 #include <ntimage.h>
@@ -1650,77 +1650,81 @@ static VOID ZeroOwnTimestamp(PDRIVER_OBJECT DriverObject) {
 
 static NTSTATUS KernelRead(PEPROCESS Process, PVOID src, PVOID dst, SIZE_T size) {
     SIZE_T bytes = 0;
-    __try {
-        return MmCopyVirtualMemory(Process, src, PsGetCurrentProcess(), dst,
-                                   size, UserMode, &bytes);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
+    return MmCopyVirtualMemory(Process, src, PsGetCurrentProcess(), dst,
+                               size, UserMode, &bytes);
 }
 
 static NTSTATUS KernelWrite(PEPROCESS Process, PVOID src, PVOID dst, SIZE_T size) {
     SIZE_T bytes = 0;
-    __try {
-        return MmCopyVirtualMemory(PsGetCurrentProcess(), src, Process, dst,
-                                   size, UserMode, &bytes);
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
+    return MmCopyVirtualMemory(PsGetCurrentProcess(), src, Process, dst,
+                               size, UserMode, &bytes);
 }
 
 // ============================================================
 // Module base lookup — walks target process PEB InMemoryOrderModuleList
+// Uses MmCopyVirtualMemory for all reads so no SEH is needed and no
+// bugcheck occurs if the process tears down mid-walk.
 // ============================================================
+
+static NTSTATUS SafeReadVm(PEPROCESS proc, UINT64 addr, PVOID dst, SIZE_T size) {
+    if (addr == 0) return STATUS_ACCESS_VIOLATION;
+    SIZE_T bytes = 0;
+    return MmCopyVirtualMemory(proc, (PVOID)addr, PsGetCurrentProcess(), dst,
+                               size, KernelMode, &bytes);
+}
 
 static UINT64 FindModuleBase(PEPROCESS process, const CHAR* name) {
     PVOID pebRaw = PsGetProcessPeb(process);
     if (!pebRaw) return 0;
 
-    KAPC_STATE apcState;
-    KeStackAttachProcess(process, &apcState);
+    UINT64 peb = (UINT64)pebRaw;
+    UINT64 ldr = 0;
+    if (!NT_SUCCESS(SafeReadVm(process, peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
+        return 0;
 
-    UINT64 result = 0;
-    __try {
-        UINT64 peb  = (UINT64)pebRaw;
-        UINT64 ldr  = *(UINT64*)(peb + 0x18);
-        if (!ldr) __leave;
+    UINT64 listHead = ldr + 0x20;
+    UINT64 flink = 0;
+    if (!NT_SUCCESS(SafeReadVm(process, listHead, &flink, sizeof(flink))) || !flink)
+        return 0;
 
-        UINT64 listHead = ldr + 0x20;
-        UINT64 flink    = *(UINT64*)listHead;
+    for (INT guard = 0; guard < 512 && flink && flink != listHead; guard++) {
+        UINT64 entry = flink - 0x10;
 
-        for (INT guard = 0; guard < 512 && flink && flink != listHead; guard++) {
-            UINT64 entry   = flink - 0x10;
-            UINT64 dllBase = *(UINT64*)(entry + 0x30);
-            USHORT nameLen = *(USHORT*)(entry + 0x58);
-            UINT64 nameBuf = *(UINT64*)(entry + 0x60);
+        UINT64 dllBase = 0;
+        USHORT nameLen = 0;
+        UINT64 nameBuf = 0;
 
-            if (nameBuf && nameLen >= 2 && nameLen <= 512) {
-                WCHAR wide[256] = {};
-                ULONG copyLen = min((ULONG)nameLen, (ULONG)(sizeof(wide) - sizeof(WCHAR)));
-                RtlCopyMemory(wide, (PVOID)nameBuf, copyLen);
+        SafeReadVm(process, entry + 0x30, &dllBase, sizeof(dllBase));
+        SafeReadVm(process, entry + 0x58, &nameLen, sizeof(nameLen));
+        SafeReadVm(process, entry + 0x60, &nameBuf, sizeof(nameBuf));
 
-                BOOLEAN match = TRUE;
+        if (nameBuf && nameLen >= 2 && nameLen <= 512) {
+            WCHAR wide[256] = {};
+            ULONG copyLen = min((ULONG)nameLen, (ULONG)(sizeof(wide) - sizeof(WCHAR)));
+            if (NT_SUCCESS(SafeReadVm(process, nameBuf, wide, copyLen))) {
+                wide[copyLen / sizeof(WCHAR)] = L'\0';
+
                 ULONG wlen = copyLen / sizeof(WCHAR);
                 ULONG nlen = (ULONG)strlen(name);
-                if (wlen != nlen) {
-                    match = FALSE;
-                } else {
-                    for (ULONG j = 0; j < wlen && match; j++) {
-                        WCHAR wc = wide[j];
-                        CHAR  nc = name[j];
-                        if (wc >= L'A' && wc <= L'Z') wc += 32;
-                        if (nc >= 'A'  && nc <= 'Z')  nc += 32;
-                        if (wc != (WCHAR)(UCHAR)nc) match = FALSE;
-                    }
+                BOOLEAN match = (wlen == nlen);
+                for (ULONG j = 0; j < wlen && match; j++) {
+                    WCHAR wc = wide[j];
+                    CHAR  nc = name[j];
+                    if (wc >= L'A' && wc <= L'Z') wc += 32;
+                    if (nc >= 'A'  && nc <= 'Z')  nc += 32;
+                    if (wc != (WCHAR)(UCHAR)nc) match = FALSE;
                 }
-                if (match) { result = dllBase; __leave; }
+                if (match) return dllBase;
             }
-
-            flink = *(UINT64*)flink;
         }
-    }
-    __except (EXCEPTION_EXECUTE_HANDLER) { result = 0; }
 
-    KeUnstackDetachProcess(&apcState);
-    return result;
+        UINT64 next = 0;
+        if (!NT_SUCCESS(SafeReadVm(process, flink, &next, sizeof(next))))
+            break;
+        flink = next;
+    }
+
+    return 0;
 }
 
 // ============================================================
@@ -1907,19 +1911,19 @@ static VOID RemoveWalkChainHook() {
 VOID DriverUnload(PDRIVER_OBJECT DriverObject) {
     RemoveWalkChainHook();
 
-    // Restore borrowed null.sys handler before deleting the device so no IRP
-    // can arrive after g_pDevice is gone but before the handler is swapped back.
-    if (g_borrowedDrv) {
-        g_borrowedDrv->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
-        ObDereferenceObject(g_borrowedDrv);
-        g_borrowedDrv = nullptr;
-    }
-
     UNICODE_STRING lnkName = RTL_CONSTANT_STRING(COMM_SYMLINK_NAME);
     IoDeleteSymbolicLink(&lnkName);
     if (g_pDevice) {
         IoDeleteDevice(g_pDevice);
         g_pDevice = nullptr;
+    }
+
+    // Restore borrowed null.sys handler AFTER our device is gone so no IRP
+    // can target our device through the original handler.
+    if (g_borrowedDrv) {
+        g_borrowedDrv->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
+        ObDereferenceObject(g_borrowedDrv);
+        g_borrowedDrv = nullptr;
     }
 
     PVOID ntBase = GetNtKernelBase(DriverObject);
@@ -1981,10 +1985,17 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
     UNICODE_STRING devName = RTL_CONSTANT_STRING(COMM_DEVICE_NAME);
     UNICODE_STRING lnkName = RTL_CONSTANT_STRING(COMM_SYMLINK_NAME);
 
-    NTSTATUS status = IoCreateDevice(DriverObject, 0, &devName,
+    NTSTATUS status = IoCreateDevice(pDevOwner, 0, &devName,
                                      FILE_DEVICE_UNKNOWN, 0, FALSE, &g_pDevice);
     if (!NT_SUCCESS(status)) {
         LOG("[!] DriverEntry: IoCreateDevice failed: 0x%08X\n", status);
+        if (g_borrowedDrv) {
+            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
+            ObDereferenceObject(g_borrowedDrv);
+            g_borrowedDrv = nullptr;
+        }
         return status;
     }
     g_pDevice->Flags |= DO_BUFFERED_IO;
@@ -1995,6 +2006,13 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
         LOG("[!] DriverEntry: IoCreateSymbolicLink failed: 0x%08X\n", status);
         IoDeleteDevice(g_pDevice);
         g_pDevice = nullptr;
+        if (g_borrowedDrv) {
+            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
+            ObDereferenceObject(g_borrowedDrv);
+            g_borrowedDrv = nullptr;
+        }
         return status;
     }
 
