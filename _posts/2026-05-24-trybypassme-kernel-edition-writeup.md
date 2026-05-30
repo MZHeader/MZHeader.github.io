@@ -1334,23 +1334,6 @@ if __name__ == "__main__":
 NTKERNELAPI PCHAR PsGetProcessImageFileName(PEPROCESS Process);
 extern POBJECT_TYPE *IoDriverObjectType;
 
-// PsLoadedModuleList / PsLoadedModuleResource — exported by ntoskrnl.
-// Inserting a fake LDR entry makes RtlLookupFunctionEntry find our .pdata,
-// enabling table-based SEH for kdmapper-loaded drivers.
-extern LIST_ENTRY PsLoadedModuleList;
-extern ERESOURCE  PsLoadedModuleResource;
-
-typedef struct _KD_LDR_ENTRY {
-    LIST_ENTRY     InLoadOrderLinks;
-    LIST_ENTRY     InMemoryOrderLinks;
-    LIST_ENTRY     InInitializationOrderLinks;
-    PVOID          DllBase;
-    PVOID          EntryPoint;
-    ULONG          SizeOfImage;
-    UNICODE_STRING FullDllName;
-    UNICODE_STRING BaseDllName;
-} KD_LDR_ENTRY, *PKD_LDR_ENTRY;
-
 NTKERNELAPI NTSTATUS ObReferenceObjectByName(
     PUNICODE_STRING ObjectName,
     ULONG           Attributes,
@@ -1361,6 +1344,30 @@ NTKERNELAPI NTSTATUS ObReferenceObjectByName(
     PVOID           ParseContext,
     PVOID*          Object
 );
+
+NTKERNELAPI NTSTATUS RtlAddGrowableFunctionTable(
+    PVOID*            DynamicTable,
+    PRUNTIME_FUNCTION FunctionTable,
+    ULONG             EntryCount,
+    ULONG             MaximumEntryCount,
+    ULONG_PTR         RangeBase,
+    ULONG_PTR         RangeEnd
+);
+NTKERNELAPI VOID RtlDeleteGrowableFunctionTable(PVOID DynamicTable);
+
+// Manual /GS cookie init — kdmapper skips CRT so __security_init_cookie never runs.
+extern ULONG_PTR __security_cookie;
+extern ULONG_PTR __security_cookie_complement;
+
+static VOID InitSecurityCookie(void) {
+    LARGE_INTEGER perf = KeQueryPerformanceCounter(NULL);
+    ULONG_PTR cookie = (ULONG_PTR)__rdtsc() ^ (ULONG_PTR)perf.QuadPart ^ (ULONG_PTR)&perf;
+    cookie &= 0x0000FFFFFFFFFFFFULL;
+    if (cookie == 0x2B992DDFA232) cookie++;
+    if (cookie == 0) cookie = 0x2B992DDFA233;
+    __security_cookie = cookie;
+    __security_cookie_complement = ~cookie;
+}
 
 #define DEVICE_NAME     L"\\Device\\WinDiagSvc"
 #define SYMLINK_NAME    L"\\DosDevices\\WinDiagSvc"
@@ -1508,9 +1515,9 @@ static UINT64 FindModuleInPeb(PEPROCESS process, const CHAR* moduleName) {
     return result;
 }
 
-static PDEVICE_OBJECT g_DeviceObject = NULL;
-static BOOLEAN        g_KdMapped     = FALSE;
-static PKD_LDR_ENTRY  g_LdrEntry     = NULL;
+static PDEVICE_OBJECT g_DeviceObject  = NULL;
+static BOOLEAN        g_KdMapped      = FALSE;
+static PVOID          g_DynamicTable   = NULL;
 
 static NTSTATUS DispatchCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
@@ -1700,17 +1707,14 @@ static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
     RtlInitUnicodeString(&symlink, SYMLINK_NAME);
     IoDeleteSymbolicLink(&symlink);
     if (g_DeviceObject) IoDeleteDevice(g_DeviceObject);
+    if (g_DynamicTable) RtlDeleteGrowableFunctionTable(g_DynamicTable);
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath);
 
-// Scan backward from DriverEntry to find the MZ/PE header of our own image.
-// Safe without __try: kdmapper places us in non-paged pool so all pages are
-// always present. We stop as soon as we hit a valid MZ+PE header.
 static UINT64 FindImageBase(void) {
     UINT64 addr = ((UINT64)(ULONG_PTR)DriverEntry) & ~(UINT64)0xFFF;
     for (int i = 0; i < 1024; i++, addr -= 0x1000) {
-        // Stop if this page isn't mapped — we've scanned below the allocation.
         if (!MmIsAddressValid((PVOID)addr))
             break;
         PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)addr;
@@ -1733,23 +1737,21 @@ static VOID RegisterExceptionTable(void) {
     PIMAGE_NT_HEADERS nt  = (PIMAGE_NT_HEADERS)(base + (ULONG)dos->e_lfanew);
     ULONG imageSize = nt->OptionalHeader.SizeOfImage;
 
-    PKD_LDR_ENTRY entry = (PKD_LDR_ENTRY)ExAllocatePool2(
-        POOL_FLAG_NON_PAGED, sizeof(KD_LDR_ENTRY), POOL_TAG);
-    if (!entry) return;
+    IMAGE_DATA_DIRECTORY excDir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+    if (excDir.VirtualAddress == 0 || excDir.Size == 0)
+        return;
 
-    RtlZeroMemory(entry, sizeof(KD_LDR_ENTRY));
-    entry->DllBase     = (PVOID)base;
-    entry->SizeOfImage = imageSize;
-    RtlInitUnicodeString(&entry->BaseDllName, L"driver-kd.sys");
-    RtlInitUnicodeString(&entry->FullDllName, L"driver-kd.sys");
+    PRUNTIME_FUNCTION funcTable = (PRUNTIME_FUNCTION)(base + excDir.VirtualAddress);
+    ULONG entryCount = excDir.Size / sizeof(RUNTIME_FUNCTION);
 
-    KeEnterCriticalRegion();
-    ExAcquireResourceExclusiveLite(&PsLoadedModuleResource, TRUE);
-    InsertTailList(&PsLoadedModuleList, &entry->InLoadOrderLinks);
-    ExReleaseResourceLite(&PsLoadedModuleResource);
-    KeLeaveCriticalRegion();
-
-    g_LdrEntry = entry;
+    RtlAddGrowableFunctionTable(
+        &g_DynamicTable,
+        funcTable,
+        entryCount,
+        entryCount,
+        base,
+        base + imageSize
+    );
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
@@ -1757,16 +1759,17 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
     UNREFERENCED_PARAMETER(RegistryPath);
 
     if (!DriverObject) {
-        // x64 SEH is table-based: the kernel exception dispatcher calls
-        // RtlLookupFunctionEntry to find handlers. kdmapper doesn't register
-        // our .pdata, so every __try/__except in the driver is silently inert
-        // until we do this. Must happen before any code that can fault.
+        // kdmapper path: CRT never ran, so init /GS cookie first.
+        InitSecurityCookie();
+
+        // Register .pdata via RtlAddGrowableFunctionTable so the kernel
+        // exception dispatcher finds our unwind info. This is what
+        // KeInvertedFunctionTable uses on 25H2 — the PsLoadedModuleList
+        // trick no longer covers the fast path.
         RegisterExceptionTable();
 
         // Loaded via kdmapper — borrow \Driver\Null as a real kernel object
         // so IoCreateDevice's internal ObReferenceObject call works correctly.
-        // ExAllocatePool2 raw memory has no OBJECT_HEADER and causes a
-        // REFERENCE_BY_POINTER bugcheck when the object manager touches it.
         UNICODE_STRING nullDrv;
         RtlInitUnicodeString(&nullDrv, L"\\Driver\\Null");
         NTSTATUS st = ObReferenceObjectByName(
@@ -1810,5 +1813,4 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
     return STATUS_SUCCESS;
 }
-
 ```
