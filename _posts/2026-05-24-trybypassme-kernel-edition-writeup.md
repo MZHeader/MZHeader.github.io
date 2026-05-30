@@ -1326,7 +1326,7 @@ if __name__ == "__main__":
     main()
 ```
 
-new-3
+new-4
 ```
 #include <ntifs.h>
 #include <ntimage.h>
@@ -1452,8 +1452,10 @@ extern "C" PVOID NTAPI PsGetProcessSectionBaseAddress(PEPROCESS Process);
 // ============================================================
 
 static PDEVICE_OBJECT   g_pDevice      = nullptr;
-// Saved MajorFunction[IRP_MJ_DEVICE_CONTROL] of the driver whose DriverObject we borrowed
+// Saved MajorFunction handlers of the driver whose DriverObject we borrowed
 // (null.sys on KDMapper path). Restored in DriverUnload / TeardownDevice.
+static PDRIVER_DISPATCH g_origCreate   = nullptr;
+static PDRIVER_DISPATCH g_origClose    = nullptr;
 static PDRIVER_DISPATCH g_origDevCtrl  = nullptr;
 // The borrowed DriverObject itself — kept referenced until cleanup so we can restore it.
 static PDRIVER_OBJECT   g_borrowedDrv  = nullptr;
@@ -1905,10 +1907,403 @@ static VOID RemoveWalkChainHook() {
 }
 
 // ============================================================
+// HWID Spoofing — Hardcoded values (realistic-looking)
+// ============================================================
+
+static const CHAR  g_fakeDiskSerial[]  = "WD-WMC4N0K2R7P1";
+static const UCHAR g_fakeMAC[6]        = { 0x4C, 0xED, 0xFB, 0x7A, 0x31, 0x9E };
+static const CHAR  g_fakeBiosSerial[]  = "PCBV3914002T";
+static const CHAR  g_fakeBoardSerial[] = "220851740600193";
+static const UCHAR g_fakeUUID[16]      = { 0x4C,0x4C,0x45,0x44,0x00,0x38,0x42,0x51,
+                                           0x80,0x54,0xB2,0xC0,0x4F,0x39,0x35,0x32 };
+static const ULONG g_fakeVolumeSerial  = 0x9C3E7A14;
+
+// ============================================================
+// HWID 1: Disk Serial — IRP filter on disk.sys
+// ============================================================
+
+#ifndef IOCTL_STORAGE_QUERY_PROPERTY
+#define IOCTL_STORAGE_QUERY_PROPERTY 0x002D1400
+#endif
+
+typedef enum _STORAGE_PROPERTY_ID_X {
+    StorageDeviceProperty_X = 0
+} STORAGE_PROPERTY_ID_X;
+
+typedef struct _STORAGE_PROPERTY_QUERY_X {
+    ULONG PropertyId;
+    ULONG QueryType;
+    UCHAR AdditionalParameters[1];
+} STORAGE_PROPERTY_QUERY_X;
+
+typedef struct _STORAGE_DEVICE_DESCRIPTOR_X {
+    ULONG Version;
+    ULONG Size;
+    UCHAR DeviceType;
+    UCHAR DeviceTypeModifier;
+    BOOLEAN RemovableMedia;
+    BOOLEAN CommandQueueing;
+    ULONG VendorIdOffset;
+    ULONG ProductIdOffset;
+    ULONG ProductRevisionOffset;
+    ULONG SerialNumberOffset;
+    // ...
+} STORAGE_DEVICE_DESCRIPTOR_X;
+
+static PDEVICE_OBJECT g_diskFilterDev = nullptr;
+static PDEVICE_OBJECT g_diskLowerDev  = nullptr;
+
+static NTSTATUS DiskQueryCompletion(PDEVICE_OBJECT DeviceObject, PIRP Irp, PVOID Context) {
+    UNREFERENCED_PARAMETER(DeviceObject);
+    UNREFERENCED_PARAMETER(Context);
+
+    if (Irp->PendingReturned) IoMarkIrpPending(Irp);
+
+    if (!NT_SUCCESS(Irp->IoStatus.Status))
+        return STATUS_SUCCESS;
+
+    STORAGE_DEVICE_DESCRIPTOR_X* desc =
+        (STORAGE_DEVICE_DESCRIPTOR_X*)Irp->AssociatedIrp.SystemBuffer;
+    if (!desc || desc->SerialNumberOffset == 0 || desc->SerialNumberOffset >= desc->Size)
+        return STATUS_SUCCESS;
+
+    PCHAR serial = (PCHAR)desc + desc->SerialNumberOffset;
+    SIZE_T maxLen = desc->Size - desc->SerialNumberOffset;
+    if (maxLen > 0) {
+        RtlZeroMemory(serial, maxLen);
+        SIZE_T copyLen = min(sizeof(g_fakeDiskSerial) - 1, maxLen - 1);
+        RtlCopyMemory(serial, g_fakeDiskSerial, copyLen);
+    }
+
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DiskFilterDispatch(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(Irp);
+
+    if (stack->MajorFunction == IRP_MJ_DEVICE_CONTROL &&
+        stack->Parameters.DeviceIoControl.IoControlCode == IOCTL_STORAGE_QUERY_PROPERTY) {
+        STORAGE_PROPERTY_QUERY_X* query =
+            (STORAGE_PROPERTY_QUERY_X*)Irp->AssociatedIrp.SystemBuffer;
+        if (query && query->PropertyId == StorageDeviceProperty_X) {
+            IoCopyCurrentIrpStackLocationToNext(Irp);
+            IoSetCompletionRoutine(Irp, DiskQueryCompletion, nullptr, TRUE, TRUE, TRUE);
+            return IoCallDriver(g_diskLowerDev, Irp);
+        }
+    }
+
+    IoSkipCurrentIrpStackLocation(Irp);
+    return IoCallDriver(g_diskLowerDev, Irp);
+}
+
+static NTSTATUS InstallDiskHook(PDRIVER_OBJECT pDevOwner) {
+    UNICODE_STRING diskName = RTL_CONSTANT_STRING(L"\\Device\\Harddisk0\\DR0");
+    PFILE_OBJECT fileObj = nullptr;
+    PDEVICE_OBJECT diskDev = nullptr;
+
+    NTSTATUS status = IoGetDeviceObjectPointer(&diskName, FILE_READ_ATTRIBUTES,
+                                               &fileObj, &diskDev);
+    if (!NT_SUCCESS(status)) {
+        LOG("[!] InstallDiskHook: IoGetDeviceObjectPointer failed 0x%08X\n", status);
+        return status;
+    }
+
+    status = IoCreateDevice(pDevOwner, 0, nullptr,
+                            diskDev->DeviceType, 0, FALSE, &g_diskFilterDev);
+    if (!NT_SUCCESS(status)) {
+        ObDereferenceObject(fileObj);
+        LOG("[!] InstallDiskHook: IoCreateDevice failed 0x%08X\n", status);
+        return status;
+    }
+
+    g_diskFilterDev->Flags |= (diskDev->Flags & (DO_BUFFERED_IO | DO_DIRECT_IO));
+    g_diskFilterDev->Flags &= ~DO_DEVICE_INITIALIZING;
+
+    g_diskLowerDev = IoAttachDeviceToDeviceStack(g_diskFilterDev, diskDev);
+    ObDereferenceObject(fileObj);
+
+    if (!g_diskLowerDev) {
+        IoDeleteDevice(g_diskFilterDev);
+        g_diskFilterDev = nullptr;
+        LOG("[!] InstallDiskHook: IoAttachDeviceToDeviceStack failed\n");
+        return STATUS_UNSUCCESSFUL;
+    }
+
+    LOG("[+] Disk serial hook installed\n");
+    return STATUS_SUCCESS;
+}
+
+static VOID RemoveDiskHook() {
+    if (g_diskFilterDev) {
+        if (g_diskLowerDev) IoDetachDevice(g_diskLowerDev);
+        IoDeleteDevice(g_diskFilterDev);
+        g_diskFilterDev = nullptr;
+        g_diskLowerDev  = nullptr;
+    }
+}
+
+// ============================================================
+// HWID 2: NIC MAC — Patch NDIS_MINIPORT_BLOCK
+// ============================================================
+
+// 25H2 build 26200 offsets (verify with: dt ndis!_NDIS_MINIPORT_BLOCK PermanentMacAddress)
+#define NDIS_PERMANENT_MAC_OFFSET  0x114
+#define NDIS_CURRENT_MAC_OFFSET    0x11A
+
+static PVOID g_miniportBlock = nullptr;
+static UCHAR g_origPermanentMAC[6] = {};
+static UCHAR g_origCurrentMAC[6]   = {};
+
+static NTSTATUS InstallMACSpoof() {
+    UNICODE_STRING ndisName = RTL_CONSTANT_STRING(L"\\Driver\\NDIS");
+    PDRIVER_OBJECT ndisDriver = nullptr;
+    NTSTATUS status = ObReferenceObjectByName(&ndisName, OBJ_CASE_INSENSITIVE,
+                                              nullptr, 0, *IoDriverObjectType,
+                                              KernelMode, nullptr, (PVOID*)&ndisDriver);
+    if (!NT_SUCCESS(status)) {
+        LOG("[!] InstallMACSpoof: ObReferenceObjectByName(NDIS) failed 0x%08X\n", status);
+        return status;
+    }
+
+    for (PDEVICE_OBJECT dev = ndisDriver->DeviceObject; dev; dev = dev->NextDevice) {
+        if (!dev->DeviceExtension) continue;
+        PUCHAR miniport = (PUCHAR)dev->DeviceExtension;
+        PUCHAR permMAC = miniport + NDIS_PERMANENT_MAC_OFFSET;
+
+        if (permMAC[0] == 0 && permMAC[1] == 0 && permMAC[2] == 0) continue;
+        if (permMAC[0] == 0xFF) continue;
+
+        RtlCopyMemory(g_origPermanentMAC, permMAC, 6);
+        RtlCopyMemory(g_origCurrentMAC, miniport + NDIS_CURRENT_MAC_OFFSET, 6);
+
+        RtlCopyMemory(permMAC, g_fakeMAC, 6);
+        RtlCopyMemory(miniport + NDIS_CURRENT_MAC_OFFSET, g_fakeMAC, 6);
+
+        g_miniportBlock = miniport;
+        LOG("[+] MAC spoofed: %02X:%02X:%02X:%02X:%02X:%02X\n",
+            g_fakeMAC[0], g_fakeMAC[1], g_fakeMAC[2],
+            g_fakeMAC[3], g_fakeMAC[4], g_fakeMAC[5]);
+        break;
+    }
+
+    ObDereferenceObject(ndisDriver);
+    return STATUS_SUCCESS;
+}
+
+static VOID RemoveMACSpoof() {
+    if (g_miniportBlock) {
+        PUCHAR miniport = (PUCHAR)g_miniportBlock;
+        RtlCopyMemory(miniport + NDIS_PERMANENT_MAC_OFFSET, g_origPermanentMAC, 6);
+        RtlCopyMemory(miniport + NDIS_CURRENT_MAC_OFFSET, g_origCurrentMAC, 6);
+        g_miniportBlock = nullptr;
+    }
+}
+
+// ============================================================
+// HWID 3: SMBIOS — Physical memory patch
+// ============================================================
+
+static PVOID  g_smbiosMapping     = nullptr;
+static SIZE_T g_smbiosMappingSize = 0;
+
+static VOID PatchSMBIOSString(PUCHAR stringsStart, UCHAR index, const CHAR* replacement) {
+    if (index == 0) return;
+    PUCHAR s = stringsStart;
+    for (UCHAR i = 1; i < index; i++) {
+        while (*s) s++;
+        s++;
+    }
+    SIZE_T origLen = strlen((char*)s);
+    SIZE_T repLen  = strlen(replacement);
+    SIZE_T copyLen = min(origLen, repLen);
+    RtlZeroMemory(s, origLen);
+    RtlCopyMemory(s, replacement, copyLen);
+}
+
+static VOID PatchSMBIOSStructures(PUCHAR table, SIZE_T tableLen) {
+    PUCHAR ptr = table;
+    PUCHAR end = table + tableLen;
+
+    while (ptr < end - 4) {
+        UCHAR type   = ptr[0];
+        UCHAR length = ptr[1];
+        if (length < 4) break;
+
+        PUCHAR stringsStart = ptr + length;
+        PUCHAR strPtr = stringsStart;
+        while (strPtr < end - 1 && !(strPtr[0] == 0 && strPtr[1] == 0))
+            strPtr++;
+        strPtr += 2;
+
+        if (type == 1 && length >= 25) {
+            PatchSMBIOSString(stringsStart, ptr[7], g_fakeBiosSerial);
+            RtlCopyMemory(ptr + 8, g_fakeUUID, 16);
+            LOG("[+] SMBIOS Type 1 patched\n");
+        }
+        else if (type == 2 && length >= 8) {
+            PatchSMBIOSString(stringsStart, ptr[7], g_fakeBoardSerial);
+            LOG("[+] SMBIOS Type 2 patched\n");
+        }
+        else if (type == 3 && length >= 8) {
+            PatchSMBIOSString(stringsStart, ptr[7], g_fakeBiosSerial);
+            LOG("[+] SMBIOS Type 3 patched\n");
+        }
+        else if (type == 127) break;
+
+        ptr = strPtr;
+    }
+}
+
+static NTSTATUS InstallSMBIOSSpoof() {
+    PHYSICAL_ADDRESS biosStart = {};
+    biosStart.QuadPart = 0x000F0000;
+    PVOID biosRom = MmMapIoSpace(biosStart, 0x10000, MmNonCached);
+    if (!biosRom) {
+        LOG("[!] InstallSMBIOSSpoof: MmMapIoSpace(BIOS ROM) failed\n");
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    PUCHAR entry = nullptr;
+    for (ULONG i = 0; i < 0x10000 - 16; i += 16) {
+        PUCHAR p = (PUCHAR)biosRom + i;
+        if (p[0] == '_' && p[1] == 'S' && p[2] == 'M' && p[3] == '_') {
+            entry = p;
+            break;
+        }
+    }
+
+    if (!entry) {
+        MmUnmapIoSpace(biosRom, 0x10000);
+        LOG("[!] InstallSMBIOSSpoof: _SM_ signature not found\n");
+        return STATUS_NOT_FOUND;
+    }
+
+    PHYSICAL_ADDRESS tablePhys = {};
+    tablePhys.QuadPart = *(ULONG*)(entry + 0x18);
+    USHORT tableLen    = *(USHORT*)(entry + 0x16);
+    MmUnmapIoSpace(biosRom, 0x10000);
+
+    if (tableLen == 0 || tablePhys.QuadPart == 0) {
+        LOG("[!] InstallSMBIOSSpoof: invalid table address/length\n");
+        return STATUS_NOT_FOUND;
+    }
+
+    g_smbiosMapping = MmMapIoSpace(tablePhys, tableLen, MmNonCached);
+    g_smbiosMappingSize = tableLen;
+    if (!g_smbiosMapping) {
+        LOG("[!] InstallSMBIOSSpoof: MmMapIoSpace(table) failed\n");
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    PatchSMBIOSStructures((PUCHAR)g_smbiosMapping, tableLen);
+    LOG("[+] SMBIOS spoof installed\n");
+    return STATUS_SUCCESS;
+}
+
+static VOID RemoveSMBIOSSpoof() {
+    if (g_smbiosMapping) {
+        MmUnmapIoSpace(g_smbiosMapping, g_smbiosMappingSize);
+        g_smbiosMapping = nullptr;
+    }
+}
+
+// ============================================================
+// HWID 4: Volume Serial — VPB patch
+// ============================================================
+
+static PDEVICE_OBJECT g_volumeDevice    = nullptr;
+static ULONG          g_origVolSerial   = 0;
+static PVPB           g_patchedVpb      = nullptr;
+
+static NTSTATUS InstallVolumeSerialSpoof() {
+    UNICODE_STRING volName = RTL_CONSTANT_STRING(L"\\DosDevices\\C:");
+    PFILE_OBJECT fileObj = nullptr;
+    PDEVICE_OBJECT devObj = nullptr;
+
+    NTSTATUS status = IoGetDeviceObjectPointer(&volName, FILE_READ_ATTRIBUTES,
+                                               &fileObj, &devObj);
+    if (!NT_SUCCESS(status)) {
+        LOG("[!] InstallVolumeSerialSpoof: IoGetDeviceObjectPointer failed 0x%08X\n", status);
+        return status;
+    }
+
+    PVPB vpb = fileObj->DeviceObject->Vpb;
+    if (!vpb) vpb = devObj->Vpb;
+
+    if (vpb) {
+        g_origVolSerial = vpb->SerialNumber;
+        vpb->SerialNumber = g_fakeVolumeSerial;
+        g_patchedVpb = vpb;
+        LOG("[+] Volume serial spoofed: 0x%08X -> 0x%08X\n", g_origVolSerial, g_fakeVolumeSerial);
+    }
+
+    ObDereferenceObject(fileObj);
+    return STATUS_SUCCESS;
+}
+
+static VOID RemoveVolumeSerialSpoof() {
+    if (g_patchedVpb && g_origVolSerial) {
+        g_patchedVpb->SerialNumber = g_origVolSerial;
+        g_patchedVpb = nullptr;
+    }
+}
+
+// ============================================================
+// Unified IRP dispatch — routes by DeviceObject identity
+// ============================================================
+
+static NTSTATUS UnifiedDispatch(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    if (DeviceObject == g_diskFilterDev)
+        return DiskFilterDispatch(DeviceObject, Irp);
+    if (DeviceObject == g_pDevice)
+        return DispatchIoctl(DeviceObject, Irp);
+    if (g_origDevCtrl)
+        return g_origDevCtrl(DeviceObject, Irp);
+    Irp->IoStatus.Status      = STATUS_NOT_SUPPORTED;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_NOT_SUPPORTED;
+}
+
+static NTSTATUS UnifiedCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    if (DeviceObject == g_diskFilterDev) {
+        IoSkipCurrentIrpStackLocation(Irp);
+        return IoCallDriver(g_diskLowerDev, Irp);
+    }
+    if (DeviceObject == g_pDevice)
+        return DispatchCreate(DeviceObject, Irp);
+    if (g_origCreate)
+        return g_origCreate(DeviceObject, Irp);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS UnifiedClose(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+    if (DeviceObject == g_diskFilterDev) {
+        IoSkipCurrentIrpStackLocation(Irp);
+        return IoCallDriver(g_diskLowerDev, Irp);
+    }
+    if (DeviceObject == g_pDevice)
+        return DispatchClose(DeviceObject, Irp);
+    if (g_origClose)
+        return g_origClose(DeviceObject, Irp);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+// ============================================================
 // Driver entry / unload
 // ============================================================
 
 VOID DriverUnload(PDRIVER_OBJECT DriverObject) {
+    RemoveDiskHook();
+    RemoveVolumeSerialSpoof();
+    RemoveMACSpoof();
+    RemoveSMBIOSSpoof();
     RemoveWalkChainHook();
 
     UNICODE_STRING lnkName = RTL_CONSTANT_STRING(COMM_SYMLINK_NAME);
@@ -1918,9 +2313,9 @@ VOID DriverUnload(PDRIVER_OBJECT DriverObject) {
         g_pDevice = nullptr;
     }
 
-    // Restore borrowed null.sys handler AFTER our device is gone so no IRP
-    // can target our device through the original handler.
     if (g_borrowedDrv) {
+        g_borrowedDrv->MajorFunction[IRP_MJ_CREATE]         = g_origCreate;
+        g_borrowedDrv->MajorFunction[IRP_MJ_CLOSE]          = g_origClose;
         g_borrowedDrv->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
         ObDereferenceObject(g_borrowedDrv);
         g_borrowedDrv = nullptr;
@@ -1956,6 +2351,11 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
         LOG("[!] DriverEntry: ntBase unavailable — WalkChainHook not installed\n");
     }
 
+    // HWID spoofing — install non-device-dependent spoofs first.
+    InstallSMBIOSSpoof();
+    InstallVolumeSerialSpoof();
+    InstallMACSpoof();
+
     // Determine which DriverObject to use for device creation:
     //   sc.exe path  — DriverObject is valid; use it directly.
     //   KDMapper path — DriverObject is NULL; borrow \\Driver\\Null's DriverObject.
@@ -1977,10 +2377,15 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
         g_borrowedDrv = pDevOwner;  // kept referenced until TeardownDevice restores it
     }
 
-    pDevOwner->MajorFunction[IRP_MJ_CREATE]  = DispatchCreate;
-    pDevOwner->MajorFunction[IRP_MJ_CLOSE]   = DispatchClose;
+    g_origCreate  = pDevOwner->MajorFunction[IRP_MJ_CREATE];
+    g_origClose   = pDevOwner->MajorFunction[IRP_MJ_CLOSE];
     g_origDevCtrl = pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL];
-    pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DispatchIoctl;
+    pDevOwner->MajorFunction[IRP_MJ_CREATE]         = UnifiedCreate;
+    pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = UnifiedClose;
+    pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = UnifiedDispatch;
+
+    // Disk serial spoof — needs pDevOwner for IoCreateDevice
+    InstallDiskHook(pDevOwner);
 
     UNICODE_STRING devName = RTL_CONSTANT_STRING(COMM_DEVICE_NAME);
     UNICODE_STRING lnkName = RTL_CONSTANT_STRING(COMM_SYMLINK_NAME);
@@ -1990,8 +2395,8 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
     if (!NT_SUCCESS(status)) {
         LOG("[!] DriverEntry: IoCreateDevice failed: 0x%08X\n", status);
         if (g_borrowedDrv) {
-            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origDevCtrl;
-            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origCreate;
+            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origClose;
             pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
             ObDereferenceObject(g_borrowedDrv);
             g_borrowedDrv = nullptr;
@@ -2007,8 +2412,8 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
         IoDeleteDevice(g_pDevice);
         g_pDevice = nullptr;
         if (g_borrowedDrv) {
-            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origDevCtrl;
-            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origDevCtrl;
+            pDevOwner->MajorFunction[IRP_MJ_CREATE]         = g_origCreate;
+            pDevOwner->MajorFunction[IRP_MJ_CLOSE]          = g_origClose;
             pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = g_origDevCtrl;
             ObDereferenceObject(g_borrowedDrv);
             g_borrowedDrv = nullptr;
