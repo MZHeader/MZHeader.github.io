@@ -1326,7 +1326,7 @@ if __name__ == "__main__":
     main()
 ```
 
-
+new
 ```
 #include <ntifs.h>
 #include <ntimage.h>
@@ -1809,3 +1809,4 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
     return STATUS_SUCCESS;
 }
+```
