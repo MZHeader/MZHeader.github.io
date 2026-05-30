@@ -1326,7 +1326,7 @@ if __name__ == "__main__":
     main()
 ```
 
-new
+new-1
 ```
 #include <ntifs.h>
 #include <ntimage.h>
@@ -1345,20 +1345,15 @@ NTKERNELAPI NTSTATUS ObReferenceObjectByName(
     PVOID*          Object
 );
 
-typedef IMAGE_RUNTIME_FUNCTION_ENTRY RUNTIME_FUNCTION, *PRUNTIME_FUNCTION;
-
-typedef NTSTATUS (NTAPI *pfnRtlAddGrowableFunctionTable)(
-    PVOID*            DynamicTable,
-    PRUNTIME_FUNCTION FunctionTable,
-    ULONG             EntryCount,
-    ULONG             MaximumEntryCount,
-    ULONG_PTR         RangeBase,
-    ULONG_PTR         RangeEnd
+NTSTATUS NTAPI MmCopyVirtualMemory(
+    PEPROCESS  SourceProcess,
+    PVOID      SourceAddress,
+    PEPROCESS  TargetProcess,
+    PVOID      TargetAddress,
+    SIZE_T     BufferSize,
+    KPROCESSOR_MODE PreviousMode,
+    PSIZE_T    ReturnSize
 );
-typedef VOID (NTAPI *pfnRtlDeleteGrowableFunctionTable)(PVOID DynamicTable);
-
-static pfnRtlAddGrowableFunctionTable    g_RtlAddGrowableFunctionTable    = NULL;
-static pfnRtlDeleteGrowableFunctionTable g_RtlDeleteGrowableFunctionTable = NULL;
 
 #define DEVICE_NAME     L"\\Device\\WinDiagSvc"
 #define SYMLINK_NAME    L"\\DosDevices\\WinDiagSvc"
@@ -1408,18 +1403,18 @@ static BOOLEAN IsProcessAlive(PEPROCESS process) {
     return PsGetProcessExitStatus(process) == STATUS_PENDING;
 }
 
-static NTSTATUS ReadAttached(UINT64 address, PVOID dst, ULONG size) {
+static NTSTATUS ReadProcessMemory(PEPROCESS process, UINT64 address, PVOID dst, SIZE_T size) {
     if (address == 0 || address > MAX_USER_ADDRESS)
         return STATUS_ACCESS_VIOLATION;
+    SIZE_T bytes = 0;
+    return MmCopyVirtualMemory(process, (PVOID)address, PsGetCurrentProcess(), dst, size, KernelMode, &bytes);
+}
 
-    __try {
-        ProbeForRead((PVOID)address, size, 1);
-        RtlCopyMemory(dst, (PVOID)address, size);
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        return GetExceptionCode();
-    }
-
-    return STATUS_SUCCESS;
+static NTSTATUS WriteProcessMemory(PEPROCESS process, UINT64 address, PVOID src, SIZE_T size) {
+    if (address == 0 || address > MAX_USER_ADDRESS)
+        return STATUS_ACCESS_VIOLATION;
+    SIZE_T bytes = 0;
+    return MmCopyVirtualMemory(PsGetCurrentProcess(), src, process, (PVOID)address, size, KernelMode, &bytes);
 }
 
 static BOOLEAN StrEqualI(const CHAR* a, const CHAR* b) {
@@ -1451,64 +1446,51 @@ static UINT64 FindModuleInPeb(PEPROCESS process, const CHAR* moduleName) {
         return 0;
 
     UINT64 peb = (UINT64)pebRaw;
-    KAPC_STATE apcState;
-    KeStackAttachProcess(process, &apcState);
+    UINT64 ldr = 0;
+    if (!NT_SUCCESS(ReadProcessMemory(process, peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
+        return 0;
 
-    UINT64 result = 0;
+    UINT64 listHead = ldr + 0x20;
+    UINT64 flink = 0;
+    if (!NT_SUCCESS(ReadProcessMemory(process, listHead, &flink, sizeof(flink))) || !flink)
+        return 0;
 
-    __try {
-        UINT64 ldr = 0;
-        if (!NT_SUCCESS(ReadAttached(peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
-            __leave;
+    for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
+        if (flink < 0x10000 || flink > MAX_USER_ADDRESS) break;
 
-        UINT64 listHead = ldr + 0x20;
-        UINT64 flink    = 0;
-        if (!NT_SUCCESS(ReadAttached(listHead, &flink, sizeof(flink))) || !flink)
-            __leave;
+        UINT64 entry = flink - 0x10;
 
-        for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
-            if (flink < 0x10000 || flink > MAX_USER_ADDRESS) break;
+        UINT64 dllBase = 0;
+        USHORT nameLen = 0;
+        UINT64 nameBuf = 0;
 
-            UINT64 entry = flink - 0x10;
+        ReadProcessMemory(process, entry + 0x30, &dllBase, sizeof(dllBase));
+        ReadProcessMemory(process, entry + 0x58, &nameLen, sizeof(nameLen));
+        ReadProcessMemory(process, entry + 0x60, &nameBuf, sizeof(nameBuf));
 
-            UINT64 dllBase  = 0;
-            USHORT nameLen  = 0;
-            UINT64 nameBuf  = 0;
-
-            ReadAttached(entry + 0x30, &dllBase,  sizeof(dllBase));
-            ReadAttached(entry + 0x58, &nameLen,  sizeof(nameLen));
-            ReadAttached(entry + 0x60, &nameBuf,  sizeof(nameBuf));
-
-            if (nameBuf && nameBuf > 0x10000 && nameBuf <= MAX_USER_ADDRESS &&
-                nameLen >= 2 && nameLen <= 512) {
-                WCHAR wideName[256] = {0};
-                USHORT maxNameLen = (USHORT)(sizeof(wideName) - sizeof(WCHAR));
-                ULONG readLen = (nameLen < maxNameLen) ? (ULONG)nameLen : (ULONG)maxNameLen;
-                if (NT_SUCCESS(ReadAttached(nameBuf, wideName, readLen))) {
-                    wideName[readLen / sizeof(WCHAR)] = L'\0';
-                    if (WcsiEqual(wideName, moduleName)) {
-                        result = dllBase;
-                        __leave;
-                    }
-                }
+        if (nameBuf && nameBuf > 0x10000 && nameBuf <= MAX_USER_ADDRESS &&
+            nameLen >= 2 && nameLen <= 512) {
+            WCHAR wideName[256] = {0};
+            USHORT maxNameLen = (USHORT)(sizeof(wideName) - sizeof(WCHAR));
+            ULONG readLen = (nameLen < maxNameLen) ? (ULONG)nameLen : (ULONG)maxNameLen;
+            if (NT_SUCCESS(ReadProcessMemory(process, nameBuf, wideName, readLen))) {
+                wideName[readLen / sizeof(WCHAR)] = L'\0';
+                if (WcsiEqual(wideName, moduleName))
+                    return dllBase;
             }
-
-            UINT64 next = 0;
-            if (!NT_SUCCESS(ReadAttached(flink, &next, sizeof(next))))
-                break;
-            flink = next;
         }
-    } __except (EXCEPTION_EXECUTE_HANDLER) {
-        result = 0;
+
+        UINT64 next = 0;
+        if (!NT_SUCCESS(ReadProcessMemory(process, flink, &next, sizeof(next))))
+            break;
+        flink = next;
     }
 
-    KeUnstackDetachProcess(&apcState);
-    return result;
+    return 0;
 }
 
-static PDEVICE_OBJECT g_DeviceObject  = NULL;
-static BOOLEAN        g_KdMapped      = FALSE;
-static PVOID          g_DynamicTable   = NULL;
+static PDEVICE_OBJECT g_DeviceObject = NULL;
+static BOOLEAN        g_KdMapped    = FALSE;
 
 static NTSTATUS DispatchCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
@@ -1553,18 +1535,11 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)breq->ProcessId, &process);
         if (!NT_SUCCESS(status)) break;
 
-        __try {
-            breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
-        } __except (EXCEPTION_EXECUTE_HANDLER) {
-            breq->BaseAddress = 0;
-            status = GetExceptionCode();
-        }
-
+        breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
         ObDereferenceObject(process);
-        if (NT_SUCCESS(status)) {
-            info   = sizeof(BASE_REQUEST);
-            status = STATUS_SUCCESS;
-        }
+
+        info   = sizeof(BASE_REQUEST);
+        status = STATUS_SUCCESS;
         break;
     }
 
@@ -1655,24 +1630,10 @@ static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
             break;
         }
 
-        {
-            KAPC_STATE apcState;
-            KeStackAttachProcess(process, &apcState);
-
-            __try {
-                if (ioctl == IOCTL_READ_MEMORY) {
-                    ProbeForRead((PVOID)req->Address, req->Size, 1);
-                    RtlCopyMemory(req->Buffer, (PVOID)req->Address, req->Size);
-                } else {
-                    ProbeForWrite((PVOID)req->Address, req->Size, 1);
-                    RtlCopyMemory((PVOID)req->Address, req->Buffer, req->Size);
-                }
-                status = STATUS_SUCCESS;
-            } __except (EXCEPTION_EXECUTE_HANDLER) {
-                status = GetExceptionCode();
-            }
-
-            KeUnstackDetachProcess(&apcState);
+        if (ioctl == IOCTL_READ_MEMORY) {
+            status = ReadProcessMemory(process, req->Address, req->Buffer, req->Size);
+        } else {
+            status = WriteProcessMemory(process, req->Address, req->Buffer, req->Size);
         }
 
         ObDereferenceObject(process);
@@ -1698,59 +1659,6 @@ static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
     RtlInitUnicodeString(&symlink, SYMLINK_NAME);
     IoDeleteSymbolicLink(&symlink);
     if (g_DeviceObject) IoDeleteDevice(g_DeviceObject);
-    if (g_DynamicTable && g_RtlDeleteGrowableFunctionTable)
-        g_RtlDeleteGrowableFunctionTable(g_DynamicTable);
-}
-
-NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath);
-
-static UINT64 FindImageBase(void) {
-    UINT64 addr = ((UINT64)(ULONG_PTR)DriverEntry) & ~(UINT64)0xFFF;
-    for (int i = 0; i < 1024; i++, addr -= 0x1000) {
-        if (!MmIsAddressValid((PVOID)addr))
-            break;
-        PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)addr;
-        if (dos->e_magic != IMAGE_DOS_SIGNATURE) continue;
-        LONG e_lfanew = dos->e_lfanew;
-        if (e_lfanew <= 0 || e_lfanew >= 0x10000) continue;
-        if (!MmIsAddressValid((PVOID)(addr + (ULONG)e_lfanew))) continue;
-        PIMAGE_NT_HEADERS nt = (PIMAGE_NT_HEADERS)(addr + (ULONG)e_lfanew);
-        if (nt->Signature == IMAGE_NT_SIGNATURE)
-            return addr;
-    }
-    return 0;
-}
-
-static VOID RegisterExceptionTable(void) {
-    UNICODE_STRING addName, delName;
-    RtlInitUnicodeString(&addName, L"RtlAddGrowableFunctionTable");
-    RtlInitUnicodeString(&delName, L"RtlDeleteGrowableFunctionTable");
-    g_RtlAddGrowableFunctionTable    = (pfnRtlAddGrowableFunctionTable)MmGetSystemRoutineAddress(&addName);
-    g_RtlDeleteGrowableFunctionTable = (pfnRtlDeleteGrowableFunctionTable)MmGetSystemRoutineAddress(&delName);
-    if (!g_RtlAddGrowableFunctionTable) return;
-
-    UINT64 base = FindImageBase();
-    if (!base) return;
-
-    PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)base;
-    PIMAGE_NT_HEADERS nt  = (PIMAGE_NT_HEADERS)(base + (ULONG)dos->e_lfanew);
-    ULONG imageSize = nt->OptionalHeader.SizeOfImage;
-
-    IMAGE_DATA_DIRECTORY excDir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
-    if (excDir.VirtualAddress == 0 || excDir.Size == 0)
-        return;
-
-    PRUNTIME_FUNCTION funcTable = (PRUNTIME_FUNCTION)(base + excDir.VirtualAddress);
-    ULONG entryCount = excDir.Size / sizeof(RUNTIME_FUNCTION);
-
-    g_RtlAddGrowableFunctionTable(
-        &g_DynamicTable,
-        funcTable,
-        entryCount,
-        entryCount,
-        base,
-        base + imageSize
-    );
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
@@ -1758,14 +1666,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
     UNREFERENCED_PARAMETER(RegistryPath);
 
     if (!DriverObject) {
-        // Register .pdata via RtlAddGrowableFunctionTable so the kernel
-        // exception dispatcher finds our unwind info. This is what
-        // KeInvertedFunctionTable uses on 25H2 — the PsLoadedModuleList
-        // trick no longer covers the fast path.
-        RegisterExceptionTable();
-
-        // Loaded via kdmapper — borrow \Driver\Null as a real kernel object
-        // so IoCreateDevice's internal ObReferenceObject call works correctly.
         UNICODE_STRING nullDrv;
         RtlInitUnicodeString(&nullDrv, L"\\Driver\\Null");
         NTSTATUS st = ObReferenceObjectByName(
@@ -1793,8 +1693,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
         return status;
     }
 
-    // Release our borrow — IoCreateDevice holds its own internal reference
-    // to the driver object, so it stays alive for the device's lifetime.
     if (g_KdMapped) ObDereferenceObject(DriverObject);
 
     if (!g_KdMapped)
@@ -1809,4 +1707,5 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
     return STATUS_SUCCESS;
 }
+
 ```
