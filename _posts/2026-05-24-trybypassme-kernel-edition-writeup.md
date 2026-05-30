@@ -1325,3 +1325,490 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+
+```
+#include <ntifs.h>
+#include <ntimage.h>
+
+NTKERNELAPI PCHAR PsGetProcessImageFileName(PEPROCESS Process);
+extern POBJECT_TYPE *IoDriverObjectType;
+
+// PsLoadedModuleList / PsLoadedModuleResource — exported by ntoskrnl.
+// Inserting a fake LDR entry makes RtlLookupFunctionEntry find our .pdata,
+// enabling table-based SEH for kdmapper-loaded drivers.
+extern LIST_ENTRY PsLoadedModuleList;
+extern ERESOURCE  PsLoadedModuleResource;
+
+typedef struct _KD_LDR_ENTRY {
+    LIST_ENTRY     InLoadOrderLinks;
+    LIST_ENTRY     InMemoryOrderLinks;
+    LIST_ENTRY     InInitializationOrderLinks;
+    PVOID          DllBase;
+    PVOID          EntryPoint;
+    ULONG          SizeOfImage;
+    UNICODE_STRING FullDllName;
+    UNICODE_STRING BaseDllName;
+} KD_LDR_ENTRY, *PKD_LDR_ENTRY;
+
+NTKERNELAPI NTSTATUS ObReferenceObjectByName(
+    PUNICODE_STRING ObjectName,
+    ULONG           Attributes,
+    PACCESS_STATE   AccessState,
+    ACCESS_MASK     DesiredAccess,
+    POBJECT_TYPE    ObjectType,
+    KPROCESSOR_MODE AccessMode,
+    PVOID           ParseContext,
+    PVOID*          Object
+);
+
+#define DEVICE_NAME     L"\\Device\\WinDiagSvc"
+#define SYMLINK_NAME    L"\\DosDevices\\WinDiagSvc"
+#define POOL_TAG        'gDwS'
+
+#define IOCTL_READ_MEMORY  CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA10, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_WRITE_MEMORY CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA11, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_BASE     CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA12, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_PROCESS  CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA13, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_GET_MODULE   CTL_CODE(FILE_DEVICE_UNKNOWN, 0xA14, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+#define MAX_USER_ADDRESS 0x7FFFFFFFEFFFULL
+
+typedef struct _MEMORY_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 Address;
+    ULONG  Size;
+    ULONG  _pad2;
+    UCHAR  Buffer[4096];
+} MEMORY_REQUEST, *PMEMORY_REQUEST;
+
+typedef struct _BASE_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    UINT64 BaseAddress;
+} BASE_REQUEST, *PBASE_REQUEST;
+
+typedef struct _PROCESS_REQUEST {
+    CHAR  Name[256];
+    ULONG ProcessId;
+    ULONG _pad;
+} PROCESS_REQUEST, *PPROCESS_REQUEST;
+
+typedef struct _MODULE_REQUEST {
+    ULONG  ProcessId;
+    ULONG  _pad;
+    CHAR   Name[256];
+    UINT64 BaseAddress;
+} MODULE_REQUEST, *PMODULE_REQUEST;
+
+NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(PEPROCESS Process);
+NTKERNELAPI PVOID PsGetProcessPeb(PEPROCESS Process);
+NTKERNELAPI NTSTATUS PsGetProcessExitStatus(PEPROCESS Process);
+
+static BOOLEAN IsProcessAlive(PEPROCESS process) {
+    return PsGetProcessExitStatus(process) == STATUS_PENDING;
+}
+
+static NTSTATUS ReadAttached(UINT64 address, PVOID dst, ULONG size) {
+    if (address == 0 || address > MAX_USER_ADDRESS)
+        return STATUS_ACCESS_VIOLATION;
+
+    __try {
+        ProbeForRead((PVOID)address, size, 1);
+        RtlCopyMemory(dst, (PVOID)address, size);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return GetExceptionCode();
+    }
+
+    return STATUS_SUCCESS;
+}
+
+static BOOLEAN StrEqualI(const CHAR* a, const CHAR* b) {
+    while (*a && *b) {
+        CHAR ca = (CHAR)((*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a);
+        CHAR cb = (CHAR)((*b >= 'A' && *b <= 'Z') ? (*b + 32) : *b);
+        if (ca != cb) return FALSE;
+        a++; b++;
+    }
+    return (*a == '\0') && (*b == '\0');
+}
+
+static BOOLEAN WcsiEqual(const WCHAR* wide, const CHAR* narrow) {
+    while (*wide && *narrow) {
+        WCHAR w = (WCHAR)((*wide  >= L'A' && *wide  <= L'Z') ? (*wide  + 32) : *wide);
+        CHAR  n = (CHAR)((*narrow >= 'A'  && *narrow <= 'Z')  ? (*narrow + 32) : *narrow);
+        if (w != (WCHAR)(UCHAR)n) return FALSE;
+        wide++;
+        narrow++;
+    }
+    return (*wide == L'\0') && (*narrow == '\0');
+}
+
+static UINT64 FindModuleInPeb(PEPROCESS process, const CHAR* moduleName) {
+    PVOID pebRaw = PsGetProcessPeb(process);
+    if (!pebRaw) return 0;
+
+    if (!IsProcessAlive(process))
+        return 0;
+
+    UINT64 peb = (UINT64)pebRaw;
+    KAPC_STATE apcState;
+    KeStackAttachProcess(process, &apcState);
+
+    UINT64 result = 0;
+
+    __try {
+        UINT64 ldr = 0;
+        if (!NT_SUCCESS(ReadAttached(peb + 0x18, &ldr, sizeof(ldr))) || !ldr)
+            __leave;
+
+        UINT64 listHead = ldr + 0x20;
+        UINT64 flink    = 0;
+        if (!NT_SUCCESS(ReadAttached(listHead, &flink, sizeof(flink))) || !flink)
+            __leave;
+
+        for (int guard = 0; guard < 512 && flink && flink != listHead; guard++) {
+            if (flink < 0x10000 || flink > MAX_USER_ADDRESS) break;
+
+            UINT64 entry = flink - 0x10;
+
+            UINT64 dllBase  = 0;
+            USHORT nameLen  = 0;
+            UINT64 nameBuf  = 0;
+
+            ReadAttached(entry + 0x30, &dllBase,  sizeof(dllBase));
+            ReadAttached(entry + 0x58, &nameLen,  sizeof(nameLen));
+            ReadAttached(entry + 0x60, &nameBuf,  sizeof(nameBuf));
+
+            if (nameBuf && nameBuf > 0x10000 && nameBuf <= MAX_USER_ADDRESS &&
+                nameLen >= 2 && nameLen <= 512) {
+                WCHAR wideName[256] = {0};
+                USHORT maxNameLen = (USHORT)(sizeof(wideName) - sizeof(WCHAR));
+                ULONG readLen = (nameLen < maxNameLen) ? (ULONG)nameLen : (ULONG)maxNameLen;
+                if (NT_SUCCESS(ReadAttached(nameBuf, wideName, readLen))) {
+                    wideName[readLen / sizeof(WCHAR)] = L'\0';
+                    if (WcsiEqual(wideName, moduleName)) {
+                        result = dllBase;
+                        __leave;
+                    }
+                }
+            }
+
+            UINT64 next = 0;
+            if (!NT_SUCCESS(ReadAttached(flink, &next, sizeof(next))))
+                break;
+            flink = next;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        result = 0;
+    }
+
+    KeUnstackDetachProcess(&apcState);
+    return result;
+}
+
+static PDEVICE_OBJECT g_DeviceObject = NULL;
+static BOOLEAN        g_KdMapped     = FALSE;
+static PKD_LDR_ENTRY  g_LdrEntry     = NULL;
+
+static NTSTATUS DispatchCreate(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchClose(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    Irp->IoStatus.Status      = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+static NTSTATUS DispatchIoctl(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+
+    PIO_STACK_LOCATION stack = IoGetCurrentIrpStackLocation(Irp);
+    ULONG  ioctl  = stack->Parameters.DeviceIoControl.IoControlCode;
+    ULONG  inLen  = stack->Parameters.DeviceIoControl.InputBufferLength;
+    ULONG  outLen = stack->Parameters.DeviceIoControl.OutputBufferLength;
+    NTSTATUS  status = STATUS_INVALID_DEVICE_REQUEST;
+    ULONG_PTR info   = 0;
+    PEPROCESS process = NULL;
+
+    switch (ioctl) {
+
+    case IOCTL_GET_BASE: {
+        if (inLen < sizeof(BASE_REQUEST) || outLen < sizeof(BASE_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PBASE_REQUEST breq = (PBASE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        if (breq->ProcessId == 0) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)breq->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+
+        __try {
+            breq->BaseAddress = (UINT64)PsGetProcessSectionBaseAddress(process);
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+            breq->BaseAddress = 0;
+            status = GetExceptionCode();
+        }
+
+        ObDereferenceObject(process);
+        if (NT_SUCCESS(status)) {
+            info   = sizeof(BASE_REQUEST);
+            status = STATUS_SUCCESS;
+        }
+        break;
+    }
+
+    case IOCTL_GET_PROCESS: {
+        if (inLen < sizeof(PROCESS_REQUEST) || outLen < sizeof(PROCESS_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PPROCESS_REQUEST preq = (PPROCESS_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        preq->Name[sizeof(preq->Name) - 1] = '\0';
+
+        if (preq->Name[0] == '\0') {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+
+        preq->ProcessId = 0;
+
+        for (ULONG id = 4; id < 0x40000; id += 4) {
+            PEPROCESS p = NULL;
+            if (!NT_SUCCESS(PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)id, &p)))
+                continue;
+            if (IsProcessAlive(p)) {
+                PCHAR imgName = PsGetProcessImageFileName(p);
+                if (imgName && StrEqualI(imgName, preq->Name))
+                    preq->ProcessId = id;
+            }
+            ObDereferenceObject(p);
+            if (preq->ProcessId) break;
+        }
+
+        status = preq->ProcessId ? STATUS_SUCCESS : STATUS_NOT_FOUND;
+        if (NT_SUCCESS(status)) info = sizeof(PROCESS_REQUEST);
+        break;
+    }
+
+    case IOCTL_GET_MODULE: {
+        if (inLen < sizeof(MODULE_REQUEST) || outLen < sizeof(MODULE_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PMODULE_REQUEST mreq = (PMODULE_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+        mreq->Name[sizeof(mreq->Name) - 1] = '\0';
+
+        if (mreq->ProcessId == 0 || mreq->Name[0] == '\0') {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+
+        mreq->BaseAddress = 0;
+
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)mreq->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+
+        mreq->BaseAddress = FindModuleInPeb(process, mreq->Name);
+        ObDereferenceObject(process);
+
+        status = mreq->BaseAddress ? STATUS_SUCCESS : STATUS_NOT_FOUND;
+        if (NT_SUCCESS(status)) info = sizeof(MODULE_REQUEST);
+        break;
+    }
+
+    case IOCTL_READ_MEMORY:
+    case IOCTL_WRITE_MEMORY: {
+        if (inLen < sizeof(MEMORY_REQUEST) || outLen < sizeof(MEMORY_REQUEST)) {
+            status = STATUS_BUFFER_TOO_SMALL; break;
+        }
+        PMEMORY_REQUEST req = (PMEMORY_REQUEST)Irp->AssociatedIrp.SystemBuffer;
+
+        if (req->Size == 0 || req->Size > sizeof(req->Buffer)) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+        if (req->ProcessId == 0) {
+            status = STATUS_INVALID_PARAMETER; break;
+        }
+        if (req->Address == 0 || req->Address > MAX_USER_ADDRESS) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+        if (req->Address + req->Size < req->Address) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+        if (req->Address + req->Size - 1 > MAX_USER_ADDRESS) {
+            status = STATUS_ACCESS_VIOLATION; break;
+        }
+
+        status = PsLookupProcessByProcessId((HANDLE)(ULONG_PTR)req->ProcessId, &process);
+        if (!NT_SUCCESS(status)) break;
+
+        if (!IsProcessAlive(process)) {
+            ObDereferenceObject(process);
+            status = STATUS_PROCESS_IS_TERMINATING;
+            break;
+        }
+
+        {
+            KAPC_STATE apcState;
+            KeStackAttachProcess(process, &apcState);
+
+            __try {
+                if (ioctl == IOCTL_READ_MEMORY) {
+                    ProbeForRead((PVOID)req->Address, req->Size, 1);
+                    RtlCopyMemory(req->Buffer, (PVOID)req->Address, req->Size);
+                } else {
+                    ProbeForWrite((PVOID)req->Address, req->Size, 1);
+                    RtlCopyMemory((PVOID)req->Address, req->Buffer, req->Size);
+                }
+                status = STATUS_SUCCESS;
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                status = GetExceptionCode();
+            }
+
+            KeUnstackDetachProcess(&apcState);
+        }
+
+        ObDereferenceObject(process);
+        if (NT_SUCCESS(status)) info = sizeof(MEMORY_REQUEST);
+        break;
+    }
+
+    default:
+        status = STATUS_INVALID_DEVICE_REQUEST;
+        break;
+    }
+
+    Irp->IoStatus.Status      = status;
+    Irp->IoStatus.Information = info;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return status;
+}
+
+static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNICODE_STRING symlink;
+    RtlInitUnicodeString(&symlink, SYMLINK_NAME);
+    IoDeleteSymbolicLink(&symlink);
+    if (g_DeviceObject) IoDeleteDevice(g_DeviceObject);
+}
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath);
+
+// Scan backward from DriverEntry to find the MZ/PE header of our own image.
+// Safe without __try: kdmapper places us in non-paged pool so all pages are
+// always present. We stop as soon as we hit a valid MZ+PE header.
+static UINT64 FindImageBase(void) {
+    UINT64 addr = ((UINT64)(ULONG_PTR)DriverEntry) & ~(UINT64)0xFFF;
+    for (int i = 0; i < 1024; i++, addr -= 0x1000) {
+        // Stop if this page isn't mapped — we've scanned below the allocation.
+        if (!MmIsAddressValid((PVOID)addr))
+            break;
+        PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)addr;
+        if (dos->e_magic != IMAGE_DOS_SIGNATURE) continue;
+        LONG e_lfanew = dos->e_lfanew;
+        if (e_lfanew <= 0 || e_lfanew >= 0x10000) continue;
+        if (!MmIsAddressValid((PVOID)(addr + (ULONG)e_lfanew))) continue;
+        PIMAGE_NT_HEADERS nt = (PIMAGE_NT_HEADERS)(addr + (ULONG)e_lfanew);
+        if (nt->Signature == IMAGE_NT_SIGNATURE)
+            return addr;
+    }
+    return 0;
+}
+
+static VOID RegisterExceptionTable(void) {
+    UINT64 base = FindImageBase();
+    if (!base) return;
+
+    PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)base;
+    PIMAGE_NT_HEADERS nt  = (PIMAGE_NT_HEADERS)(base + (ULONG)dos->e_lfanew);
+    ULONG imageSize = nt->OptionalHeader.SizeOfImage;
+
+    PKD_LDR_ENTRY entry = (PKD_LDR_ENTRY)ExAllocatePool2(
+        POOL_FLAG_NON_PAGED, sizeof(KD_LDR_ENTRY), POOL_TAG);
+    if (!entry) return;
+
+    RtlZeroMemory(entry, sizeof(KD_LDR_ENTRY));
+    entry->DllBase     = (PVOID)base;
+    entry->SizeOfImage = imageSize;
+    RtlInitUnicodeString(&entry->BaseDllName, L"driver-kd.sys");
+    RtlInitUnicodeString(&entry->FullDllName, L"driver-kd.sys");
+
+    KeEnterCriticalRegion();
+    ExAcquireResourceExclusiveLite(&PsLoadedModuleResource, TRUE);
+    InsertTailList(&PsLoadedModuleList, &entry->InLoadOrderLinks);
+    ExReleaseResourceLite(&PsLoadedModuleResource);
+    KeLeaveCriticalRegion();
+
+    g_LdrEntry = entry;
+}
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+{
+    UNREFERENCED_PARAMETER(RegistryPath);
+
+    if (!DriverObject) {
+        // x64 SEH is table-based: the kernel exception dispatcher calls
+        // RtlLookupFunctionEntry to find handlers. kdmapper doesn't register
+        // our .pdata, so every __try/__except in the driver is silently inert
+        // until we do this. Must happen before any code that can fault.
+        RegisterExceptionTable();
+
+        // Loaded via kdmapper — borrow \Driver\Null as a real kernel object
+        // so IoCreateDevice's internal ObReferenceObject call works correctly.
+        // ExAllocatePool2 raw memory has no OBJECT_HEADER and causes a
+        // REFERENCE_BY_POINTER bugcheck when the object manager touches it.
+        UNICODE_STRING nullDrv;
+        RtlInitUnicodeString(&nullDrv, L"\\Driver\\Null");
+        NTSTATUS st = ObReferenceObjectByName(
+            &nullDrv, OBJ_CASE_INSENSITIVE, NULL, 0,
+            *IoDriverObjectType, KernelMode, NULL, (PVOID*)&DriverObject);
+        if (!NT_SUCCESS(st)) return st;
+        g_KdMapped = TRUE;
+    }
+
+    UNICODE_STRING devName, symName;
+    RtlInitUnicodeString(&devName, DEVICE_NAME);
+    RtlInitUnicodeString(&symName, SYMLINK_NAME);
+
+    NTSTATUS status = IoCreateDevice(DriverObject, 0, &devName,
+        FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &g_DeviceObject);
+    if (!NT_SUCCESS(status)) {
+        if (g_KdMapped) ObDereferenceObject(DriverObject);
+        return status;
+    }
+
+    status = IoCreateSymbolicLink(&symName, &devName);
+    if (!NT_SUCCESS(status)) {
+        IoDeleteDevice(g_DeviceObject);
+        if (g_KdMapped) ObDereferenceObject(DriverObject);
+        return status;
+    }
+
+    // Release our borrow — IoCreateDevice holds its own internal reference
+    // to the driver object, so it stays alive for the device's lifetime.
+    if (g_KdMapped) ObDereferenceObject(DriverObject);
+
+    if (!g_KdMapped)
+        DriverObject->DriverUnload = DriverUnload;
+
+    DriverObject->MajorFunction[IRP_MJ_CREATE]         = DispatchCreate;
+    DriverObject->MajorFunction[IRP_MJ_CLOSE]          = DispatchClose;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DispatchIoctl;
+
+    g_DeviceObject->Flags |= DO_BUFFERED_IO;
+    g_DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+
+    return STATUS_SUCCESS;
+}
+
+```
