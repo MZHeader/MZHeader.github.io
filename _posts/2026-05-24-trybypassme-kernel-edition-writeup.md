@@ -1360,20 +1360,6 @@ typedef VOID (NTAPI *pfnRtlDeleteGrowableFunctionTable)(PVOID DynamicTable);
 static pfnRtlAddGrowableFunctionTable    g_RtlAddGrowableFunctionTable    = NULL;
 static pfnRtlDeleteGrowableFunctionTable g_RtlDeleteGrowableFunctionTable = NULL;
 
-// Manual /GS cookie init — kdmapper skips CRT so __security_init_cookie never runs.
-extern ULONG_PTR __security_cookie;
-extern ULONG_PTR __security_cookie_complement;
-
-static VOID InitSecurityCookie(void) {
-    LARGE_INTEGER perf = KeQueryPerformanceCounter(NULL);
-    ULONG_PTR cookie = (ULONG_PTR)__rdtsc() ^ (ULONG_PTR)perf.QuadPart ^ (ULONG_PTR)&perf;
-    cookie &= 0x0000FFFFFFFFFFFFULL;
-    if (cookie == 0x2B992DDFA232) cookie++;
-    if (cookie == 0) cookie = 0x2B992DDFA233;
-    __security_cookie = cookie;
-    __security_cookie_complement = ~cookie;
-}
-
 #define DEVICE_NAME     L"\\Device\\WinDiagSvc"
 #define SYMLINK_NAME    L"\\DosDevices\\WinDiagSvc"
 #define POOL_TAG        'gDwS'
@@ -1772,9 +1758,6 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
     UNREFERENCED_PARAMETER(RegistryPath);
 
     if (!DriverObject) {
-        // kdmapper path: CRT never ran, so init /GS cookie first.
-        InitSecurityCookie();
-
         // Register .pdata via RtlAddGrowableFunctionTable so the kernel
         // exception dispatcher finds our unwind info. This is what
         // KeInvertedFunctionTable uses on 25H2 — the PsLoadedModuleList
