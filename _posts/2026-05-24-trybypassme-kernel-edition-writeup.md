@@ -1345,7 +1345,9 @@ NTKERNELAPI NTSTATUS ObReferenceObjectByName(
     PVOID*          Object
 );
 
-NTKERNELAPI NTSTATUS RtlAddGrowableFunctionTable(
+typedef IMAGE_RUNTIME_FUNCTION_ENTRY RUNTIME_FUNCTION, *PRUNTIME_FUNCTION;
+
+typedef NTSTATUS (NTAPI *pfnRtlAddGrowableFunctionTable)(
     PVOID*            DynamicTable,
     PRUNTIME_FUNCTION FunctionTable,
     ULONG             EntryCount,
@@ -1353,7 +1355,10 @@ NTKERNELAPI NTSTATUS RtlAddGrowableFunctionTable(
     ULONG_PTR         RangeBase,
     ULONG_PTR         RangeEnd
 );
-NTKERNELAPI VOID RtlDeleteGrowableFunctionTable(PVOID DynamicTable);
+typedef VOID (NTAPI *pfnRtlDeleteGrowableFunctionTable)(PVOID DynamicTable);
+
+static pfnRtlAddGrowableFunctionTable    g_RtlAddGrowableFunctionTable    = NULL;
+static pfnRtlDeleteGrowableFunctionTable g_RtlDeleteGrowableFunctionTable = NULL;
 
 // Manual /GS cookie init — kdmapper skips CRT so __security_init_cookie never runs.
 extern ULONG_PTR __security_cookie;
@@ -1707,7 +1712,8 @@ static VOID DriverUnload(PDRIVER_OBJECT DriverObject)
     RtlInitUnicodeString(&symlink, SYMLINK_NAME);
     IoDeleteSymbolicLink(&symlink);
     if (g_DeviceObject) IoDeleteDevice(g_DeviceObject);
-    if (g_DynamicTable) RtlDeleteGrowableFunctionTable(g_DynamicTable);
+    if (g_DynamicTable && g_RtlDeleteGrowableFunctionTable)
+        g_RtlDeleteGrowableFunctionTable(g_DynamicTable);
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath);
@@ -1730,6 +1736,13 @@ static UINT64 FindImageBase(void) {
 }
 
 static VOID RegisterExceptionTable(void) {
+    UNICODE_STRING addName, delName;
+    RtlInitUnicodeString(&addName, L"RtlAddGrowableFunctionTable");
+    RtlInitUnicodeString(&delName, L"RtlDeleteGrowableFunctionTable");
+    g_RtlAddGrowableFunctionTable    = (pfnRtlAddGrowableFunctionTable)MmGetSystemRoutineAddress(&addName);
+    g_RtlDeleteGrowableFunctionTable = (pfnRtlDeleteGrowableFunctionTable)MmGetSystemRoutineAddress(&delName);
+    if (!g_RtlAddGrowableFunctionTable) return;
+
     UINT64 base = FindImageBase();
     if (!base) return;
 
@@ -1744,7 +1757,7 @@ static VOID RegisterExceptionTable(void) {
     PRUNTIME_FUNCTION funcTable = (PRUNTIME_FUNCTION)(base + excDir.VirtualAddress);
     ULONG entryCount = excDir.Size / sizeof(RUNTIME_FUNCTION);
 
-    RtlAddGrowableFunctionTable(
+    g_RtlAddGrowableFunctionTable(
         &g_DynamicTable,
         funcTable,
         entryCount,
@@ -1813,4 +1826,3 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
     return STATUS_SUCCESS;
 }
-```
