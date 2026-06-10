@@ -253,3 +253,120 @@ h1, h2, h3, h4 { color: #7880d8; }
 .detail-panel { background: rgba(10,10,18,0.97); border-color: #2e3050; }
 .detail-panel-title { color: #8be9fd; }
 .detail-panel-desc  { color: #8b90a8; }
+
+/* ═══ Vibrancy pass ═══════════════════════════════════════════════
+ * Richer color within the indigo→cyan palette: static gradients and
+ * hover states only — no glows, no ambient animation.
+ */
+
+/* Text selection */
+::selection { background: rgba(104,112,196,0.55); color: #ffffff; }
+
+/* Page scrollbar (sidebar keeps its own 4px rules) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2e3050; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #6870c4; }
+
+/* Reading progress: indigo → cyan sweep */
+.reading-progress { background: linear-gradient(90deg, #6870c4, #8be9fd); }
+
+/* Site title kicker: cyan → indigo gradient text
+ * (.re-char spans keep their own color when scrambling) */
+.title-re {
+  background: linear-gradient(90deg, #8be9fd 0%, #7880d8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.9;
+}
+.re-char.scrambling { color: #f8f8f2; }
+
+/* PE window: gradient hairline under the titlebar */
+.pe-window-titlebar { position: relative; }
+.pe-window-titlebar::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, #6870c4, #8be9fd 45%, transparent 85%);
+}
+/* Titlebar dots on palette (close stays red) */
+.pe-window-dot.dot-min { background: #6870c4; }
+.pe-window-dot.dot-max { background: #8be9fd; }
+.pe-dot:nth-child(2) { background: #6870c4; }
+.pe-dot:nth-child(3) { background: #8be9fd; }
+
+/* Category badges: tinted pills instead of dimmed text */
+.rsrc-badge {
+  opacity: 1;
+  padding: 0.05em 0.55em;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* Post row hover: directional indigo→cyan wash */
+.rsrc-post-row:hover,
+.rsrc-post-row:focus-visible,
+.series-header:hover {
+  background: linear-gradient(90deg, rgba(104,112,196,0.18), rgba(139,233,253,0.05));
+}
+
+/* Series rail fades out toward the last child */
+.series-children {
+  border-left: 1px solid transparent;
+  border-image: linear-gradient(180deg, #6870c4, rgba(104,112,196,0)) 1;
+}
+
+/* Filter buttons: livelier states */
+.filter-btn:hover {
+  color: #8be9fd;
+  border-color: #6870c4;
+  background: rgba(104,112,196,0.08);
+}
+.filter-btn.active {
+  background: linear-gradient(135deg, rgba(104,112,196,0.28), rgba(139,233,253,0.10));
+  border-color: #8be9fd;
+  color: #8be9fd;
+}
+
+/* Article h1: gradient underline */
+article h1 {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, #6870c4, #8be9fd 40%, rgba(46,48,80,0.6) 90%) 1;
+}
+
+/* Article h2: cyan→indigo spine */
+article h2 {
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, #8be9fd, #6870c4) 1;
+}
+
+/* Blockquote: indigo spine fading out */
+blockquote {
+  border-left: 3px solid transparent;
+  border-image: linear-gradient(180deg, #6870c4, rgba(104,112,196,0.15)) 1;
+}
+
+/* Code blocks: gradient top strip (replaces the flat indigo border;
+ * pre is position:relative + overflow:hidden in main.css) */
+pre { border-top: none; }
+pre::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #6870c4, #8be9fd);
+}
+
+/* Article links: visible tinted underline */
+article a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(139,233,253,0.4);
+}
+article a:hover { text-decoration-color: #8be9fd; }
+
+/* Scroll-to-top hover tint */
+.scroll-top-btn:hover { background: rgba(104,112,196,0.15); }
