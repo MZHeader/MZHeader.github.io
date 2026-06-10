@@ -369,7 +369,7 @@ Firstly, the value of string_9 is being passed to `GClass30.smethod_0`.
 
 We can see the contents of `string_9` among the other configuration information:
 
-```chsarp
+```csharp
 string_9 = "QzXTNaNU0qNKGByM57rH";
 ```
 

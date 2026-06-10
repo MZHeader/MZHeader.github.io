@@ -93,6 +93,9 @@ ASSET_HEAD='
 HLJS_HEAD='
   <link rel="stylesheet" href="/css/hljs-theme.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/vbscript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/applescript.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/x86asm.min.js" onload="hljs.highlightAll()"></script>
 '
 
@@ -101,7 +104,7 @@ post_data_js=""
 itemlist_json=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_series_descs p_offsets p_hex_ts p_short_dates p_ent_pcts p_ent_vals
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_series_descs p_offsets p_hex_ts p_short_dates
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -162,14 +165,6 @@ PYSTRIP
     [ "$read_time" -lt 1 ] && read_time=1
     p_read_times[$post_idx]="$read_time"
     p_word_counts[$post_idx]="$word_count"
-
-    # "Section entropy" bar: fill % and fake Shannon value derived from length
-    ent_pct=$(( word_count / 55 ))
-    [ "$ent_pct" -gt 96 ] && ent_pct=96
-    [ "$ent_pct" -lt 10 ] && ent_pct=10
-    ent_val=$(awk -v p="$ent_pct" 'BEGIN{printf "%.2f", 4.8 + p * 0.031}')
-    p_ent_pcts[$post_idx]="$ent_pct"
-    p_ent_vals[$post_idx]="$ent_val"
 
     # Extract first image URL from rendered HTML for per-post OG image
     first_img=$(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${slug}.html" | head -1 | sed 's/.*src="//;s/".*//' || true)
@@ -240,7 +235,7 @@ for i in $(seq 1 $total_posts); do
                 <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$j]}</span>
                 <span class=\"rsrc-title-block\">
                   <span class=\"rsrc-title\">${p_titles[$j]}</span>
-                  <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span> &nbsp;<span class=\"ent-bar\" title=\"entropy: ${p_ent_vals[$j]}\"><span class=\"ent-fill\" style=\"width:${p_ent_pcts[$j]}%\"></span></span></span>
+                  <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span></span>
                 </span>
               </a>"
                 fi
@@ -280,7 +275,7 @@ for i in $(seq 1 $total_posts); do
         <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$i]}</span>
         <span class=\"rsrc-title-block\">
           <span class=\"rsrc-title\">${p_titles[$i]}</span>
-          <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span> &nbsp;<span class=\"ent-bar\" title=\"entropy: ${p_ent_vals[$i]}\"><span class=\"ent-fill\" style=\"width:${p_ent_pcts[$i]}%\"></span></span></span>
+          <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span></span>
         </span>
       </a>"
     fi
@@ -1332,12 +1327,21 @@ ENDHEADER
     addr.textContent = ".text:" + ("00000000" + codeVA.toString(16).toUpperCase()).slice(-8);
     bar.appendChild(addr);
 
-    var lang = (pre.className || "").split(/\s+/)[0];
+    var lang = (pre.className || "").split(/\s+/)[0].toLowerCase();
     if (lang === "nosyntax") lang = "";
     var langEl = document.createElement("span");
     langEl.className = "pre-lang";
     langEl.textContent = lang || "data";
     bar.appendChild(langEl);
+
+    // Tell hljs the declared language (it only reads classes on <code>,
+    // so without this every block gets auto-detected — often wrongly).
+    // Unlabeled blocks are tool output / hexdumps: leave them plain.
+    var codeTag = pre.querySelector("code");
+    if (codeTag) {
+      var hlLang = lang === "vba" ? "vbscript" : lang;
+      codeTag.classList.add(hlLang ? "language-" + hlLang : "nohighlight");
+    }
 
     var btn = document.createElement("button");
     btn.className = "copy-btn";
@@ -2103,25 +2107,6 @@ cat > "_site/index.html" << ENDINDEX
     .about-sep {
       color: #2a2a3a !important;
     }
-
-    /* ── Entropy bar on post rows ── */
-    .ent-bar {
-      display: inline-block;
-      width: 56px;
-      height: 5px;
-      border-radius: 3px;
-      background: #181924;
-      border: 1px solid #2a2a3a;
-      vertical-align: middle;
-      overflow: hidden;
-    }
-    .ent-fill {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, #6870c4, #8be9fd);
-      opacity: 0.75;
-    }
-    @media (max-width: 600px) { .ent-bar { display: none; } }
 
     /* ── Detail panel hex dump ── */
     .pe-detail-hexdump {
