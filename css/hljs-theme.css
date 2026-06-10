@@ -1,0 +1,81 @@
+/*
+ * MZHeader highlight.js theme
+ * ===========================
+ * Replaces the stock base16/dracula CDN stylesheet with the site's own
+ * indigo/cyan palette so code blocks match the rest of the chrome.
+ * Block background and border come from main.css (pre code).
+ */
+
+.hljs {
+  color: #e8e8f4;
+  background: transparent;
+}
+
+/* Comments */
+.hljs-comment,
+.hljs-quote {
+  color: #7c81ac;
+  font-style: italic;
+}
+
+/* Keywords / instructions */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-name,
+.hljs-tag {
+  color: #9da3f0;
+}
+
+/* Built-ins, registers, types */
+.hljs-built_in,
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-title.class_ {
+  color: #8be9fd;
+}
+
+/* Function names */
+.hljs-title,
+.hljs-title.function_ {
+  color: #8be9fd;
+}
+
+/* Strings */
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #50fa7b;
+}
+
+/* Numbers, literals, addresses */
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: #bd93f9;
+}
+
+/* Variables, params, attributes */
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-params {
+  color: #cdd1e8;
+}
+
+/* Meta, preprocessor, deletions */
+.hljs-meta,
+.hljs-doctag,
+.hljs-deletion {
+  color: #7c81ac;
+}
+
+.hljs-subst { color: #e8e8f4; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 600; }

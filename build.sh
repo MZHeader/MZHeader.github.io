@@ -91,7 +91,7 @@ ASSET_HEAD='
 '
 
 HLJS_HEAD='
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/dracula.min.css">
+  <link rel="stylesheet" href="/css/hljs-theme.css">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/x86asm.min.js" onload="hljs.highlightAll()"></script>
 '
@@ -101,7 +101,7 @@ post_data_js=""
 itemlist_json=""
 post_idx=0
 
-declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_series_descs p_offsets p_hex_ts p_short_dates
+declare -a p_slugs p_titles p_dates p_date_strs p_descs p_tags p_badge_classes p_read_times p_word_counts p_og_images p_date_modifieds p_series p_series_descs p_offsets p_hex_ts p_short_dates p_ent_pcts p_ent_vals
 
 # ── Pass 1: collect metadata, run pandoc, build list HTML ──────────────────
 for post in $(ls _posts/*.md | sort -r); do
@@ -162,6 +162,14 @@ PYSTRIP
     [ "$read_time" -lt 1 ] && read_time=1
     p_read_times[$post_idx]="$read_time"
     p_word_counts[$post_idx]="$word_count"
+
+    # "Section entropy" bar: fill % and fake Shannon value derived from length
+    ent_pct=$(( word_count / 55 ))
+    [ "$ent_pct" -gt 96 ] && ent_pct=96
+    [ "$ent_pct" -lt 10 ] && ent_pct=10
+    ent_val=$(awk -v p="$ent_pct" 'BEGIN{printf "%.2f", 4.8 + p * 0.031}')
+    p_ent_pcts[$post_idx]="$ent_pct"
+    p_ent_vals[$post_idx]="$ent_val"
 
     # Extract first image URL from rendered HTML for per-post OG image
     first_img=$(grep -oE '<img[^>]+src="[^"]+"' "/tmp/mzbuild_${slug}.html" | head -1 | sed 's/.*src="//;s/".*//' || true)
@@ -232,7 +240,7 @@ for i in $(seq 1 $total_posts); do
                 <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$j]}</span>
                 <span class=\"rsrc-title-block\">
                   <span class=\"rsrc-title\">${p_titles[$j]}</span>
-                  <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span></span>
+                  <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$j]} (${p_short_dates[$j]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$j]}\">${p_tags[$j]}</span> &nbsp;<span class=\"ent-bar\" title=\"entropy: ${p_ent_vals[$j]}\"><span class=\"ent-fill\" style=\"width:${p_ent_pcts[$j]}%\"></span></span></span>
                 </span>
               </a>"
                 fi
@@ -272,7 +280,7 @@ for i in $(seq 1 $total_posts); do
         <span class=\"rsrc-gutter\">.rsrc:${p_offsets[$i]}</span>
         <span class=\"rsrc-title-block\">
           <span class=\"rsrc-title\">${p_titles[$i]}</span>
-          <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span></span>
+          <span class=\"rsrc-meta\">; TimeDateStamp: ${p_hex_ts[$i]} (${p_short_dates[$i]}) &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${p_badge_classes[$i]}\">${p_tags[$i]}</span> &nbsp;<span class=\"ent-bar\" title=\"entropy: ${p_ent_vals[$i]}\"><span class=\"ent-fill\" style=\"width:${p_ent_pcts[$i]}%\"></span></span></span>
         </span>
       </a>"
     fi
@@ -722,14 +730,16 @@ for i in $(seq 1 $total_posts); do
       position: fixed;
       bottom: 1.5rem;
       right: 1.5rem;
-      width: 36px;
+      width: auto;
+      min-width: 36px;
       height: 36px;
+      padding: 0 0.55rem;
       background: rgba(16, 16, 22, 0.9);
       border: 1px solid #2a2a3a;
       border-radius: 4px;
       color: #6870c4;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       cursor: pointer;
       opacity: 0;
       pointer-events: none;
@@ -952,29 +962,55 @@ for i in $(seq 1 $total_posts); do
     }
     @media (max-width: 900px) { .reading-progress { top: 44px; } }
 
-    /* ── Copy button on code blocks ── */
-    .pre-wrapper { position: relative; }
+    /* ── Code block titlebar (address + language + copy) ── */
+    .pre-wrapper { margin: 1.5rem 0; }
+    .pre-wrapper pre { margin: 0; border-radius: 0 0 6px 6px; }
+    .pre-wrapper pre code { border-radius: 0 0 6px 6px; }
+    .pre-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.3rem 0.75rem;
+      background: #161620;
+      border: 1px solid #2e3050;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.7rem;
+      color: #555872;
+      user-select: none;
+    }
+    .pre-titlebar .pre-addr { letter-spacing: 0.03em; }
+    .pre-titlebar .pre-lang { color: #8be9fd; margin-left: auto; text-transform: lowercase; }
     .copy-btn {
-      position: absolute;
-      top: 0.4rem;
-      right: 0.4rem;
-      background: #2a2a3a;
-      border: 1px solid #444;
+      background: transparent;
+      border: 1px solid #2e3050;
       color: #8be9fd;
       font-family: "Fira Code", monospace;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.4rem;
+      font-size: 0.68rem;
+      padding: 0.1rem 0.45rem;
       border-radius: 3px;
       cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.15s;
+      transition: border-color 0.15s, color 0.15s;
     }
-    .pre-wrapper:hover .copy-btn,
-    .pre-wrapper:focus-within .copy-btn,
-    .copy-btn:focus-visible { opacity: 1; }
+    .copy-btn:hover { border-color: #6870c4; }
     .copy-btn:focus-visible { outline: 2px solid #6870c4; outline-offset: 1px; }
-    @media (hover: none) { .copy-btn { opacity: 1; } }
     .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
+
+    /* ── Article epilogue ── */
+    .post-epilogue {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #2a2a3a;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #777;
+      user-select: none;
+    }
+    .post-epilogue .ep-i { color: #6870c4; display: inline-block; width: 3.5em; }
+    .post-epilogue .ep-o { color: #999; }
+    .post-epilogue .ep-c { color: #555872; margin-left: 2em; }
   </style>
   <script type="application/ld+json">
   {
@@ -1028,6 +1064,7 @@ for i in $(seq 1 $total_posts); do
   <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
+<!-- .text section is clean. No overlay, no TLS callbacks. Safe to read. -->
 
 <a href="#post-main" class="skip-link">Skip to content</a>
 
@@ -1129,10 +1166,14 @@ ENDHEADER
     done
     related_section=""
     if [ -n "$related_html" ]; then
-      related_section="<div class=\"related-posts\"><span class=\"related-label\">; other ${tags} posts</span>${related_html}</div>"
+      related_section="<div class=\"related-posts\"><span class=\"related-label\">; xrefs to this sample &middot; ${tags}</span>${related_html}</div>"
     fi
 
     cat >> "_site/posts/${slug}.html" << ENDFOOTER
+    <div class="post-epilogue" aria-hidden="true">
+      <div><span class="ep-i">xor</span><span class="ep-o">eax, eax</span><span class="ep-c">; clean exit</span></div>
+      <div><span class="ep-i">ret</span></div>
+    </div>
     </article>
     ${related_section}
     <nav class="post-pagination">
@@ -1141,7 +1182,7 @@ ENDHEADER
     </nav>
   </div>
 
-<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="0x0000">^</button>
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="ret to 0x0000">^</button>
 
 <script>
 (function() {
@@ -1276,12 +1317,28 @@ ENDHEADER
     }
   }
 
-  // ── Copy buttons on code blocks ──
+  // ── Code block titlebars (address + language) + copy buttons ──
+  var codeVA = 0x401000;
   document.querySelectorAll("pre").forEach(function(pre) {
     var wrapper = document.createElement("div");
     wrapper.className = "pre-wrapper";
     pre.parentNode.insertBefore(wrapper, pre);
-    wrapper.appendChild(pre);
+
+    var bar = document.createElement("div");
+    bar.className = "pre-titlebar";
+
+    var addr = document.createElement("span");
+    addr.className = "pre-addr";
+    addr.textContent = ".text:" + ("00000000" + codeVA.toString(16).toUpperCase()).slice(-8);
+    bar.appendChild(addr);
+
+    var lang = (pre.className || "").split(/\s+/)[0];
+    if (lang === "nosyntax") lang = "";
+    var langEl = document.createElement("span");
+    langEl.className = "pre-lang";
+    langEl.textContent = lang || "data";
+    bar.appendChild(langEl);
+
     var btn = document.createElement("button");
     btn.className = "copy-btn";
     btn.textContent = "copy";
@@ -1293,7 +1350,15 @@ ENDHEADER
         setTimeout(function() { btn.textContent = "copy"; btn.classList.remove("copied"); }, 1500);
       });
     });
-    wrapper.appendChild(btn);
+    bar.appendChild(btn);
+
+    wrapper.appendChild(bar);
+    wrapper.appendChild(pre);
+
+    // Next block starts where this one ends, 16-byte aligned
+    var codeEl = pre.querySelector("code");
+    var len = codeEl ? codeEl.textContent.length : 0;
+    codeVA += Math.max(0x10, Math.ceil(len / 16) * 16);
   });
 
   // ── Reading progress bar + Scroll-to-top button ──
@@ -1310,6 +1375,11 @@ ENDHEADER
       }
       if (scrollBtn) {
         scrollBtn.classList.toggle('visible', scrollTop > window.innerHeight);
+        // Live virtual-address readout for the current scroll position
+        if (docHeight > 0) {
+          var va = Math.min(0xFFFF, Math.round((scrollTop / docHeight) * 0xFFFF));
+          scrollBtn.textContent = '0x' + ('0000' + va.toString(16).toUpperCase()).slice(-4);
+        }
       }
       scrollTimer2 = null;
     });
@@ -2034,6 +2104,62 @@ cat > "_site/index.html" << ENDINDEX
       color: #2a2a3a !important;
     }
 
+    /* ── Entropy bar on post rows ── */
+    .ent-bar {
+      display: inline-block;
+      width: 56px;
+      height: 5px;
+      border-radius: 3px;
+      background: #181924;
+      border: 1px solid #2a2a3a;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+    .ent-fill {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #6870c4, #8be9fd);
+      opacity: 0.75;
+    }
+    @media (max-width: 600px) { .ent-bar { display: none; } }
+
+    /* ── Detail panel hex dump ── */
+    .pe-detail-hexdump {
+      font-size: 0.62rem;
+      line-height: 1.7;
+      white-space: pre;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #222233;
+      overflow: hidden;
+    }
+    .pe-detail-hexdump .hd-off { color: #3f4260; margin-right: 0.8em; }
+    .pe-detail-hexdump .hd-hex { color: #9da3f0; }
+    .pe-detail-hexdump .hd-ascii { color: #8be9fd; opacity: 0.8; margin-left: 0.8em; }
+
+    /* ── DOS stub footer ── */
+    .dos-stub {
+      max-width: 900px;
+      margin: 2.5rem auto 1rem;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      line-height: 1.8;
+      color: #555872;
+      text-align: center;
+      user-select: none;
+    }
+    .dos-stub .stub-row { white-space: nowrap; overflow: hidden; }
+    .dos-stub .stub-off { color: #3f4260; margin-right: 1.2em; }
+    .dos-stub .stub-hex { letter-spacing: 0.04em; }
+    .dos-stub .stub-hex .mz { color: #6870c4; }
+    .dos-stub .stub-ascii { color: #6f7494; margin-left: 1.2em; }
+    .dos-stub .stub-ascii .mz { color: #8be9fd; }
+    .dos-stub .stub-msg { margin-top: 0.5rem; color: #7c81ac; font-style: italic; }
+    @media (max-width: 700px) {
+      .dos-stub { font-size: 0.6rem; }
+      .dos-stub .stub-ascii { display: none; }
+    }
+
   </style>
   <script type="application/ld+json">
   [
@@ -2070,6 +2196,7 @@ cat > "_site/index.html" << ENDINDEX
   <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
+<!-- Rich header intact. Nothing packed here. -->
 
 <a href="#postsList" class="skip-link">Skip to posts</a>
 
@@ -2186,6 +2313,12 @@ ${posts_list_html}
   </div>
 </header>
 
+<footer class="dos-stub" aria-hidden="true">
+  <div class="stub-row"><span class="stub-off">0x0000</span><span class="stub-hex"><span class="mz">4D 5A</span> 90 00 03 00 00 00 04 00 00 00 FF FF 00 00</span><span class="stub-ascii"><span class="mz">MZ</span>..............</span></div>
+  <div class="stub-row"><span class="stub-off">0x0040</span><span class="stub-hex">0E 1F BA 0E 00 B4 09 CD 21 B8 01 4C CD 21 54 68</span><span class="stub-ascii">........!..L.!Th</span></div>
+  <div class="stub-msg">This program cannot be run in DOS mode.</div>
+</footer>
+
 <!-- Right detail panel -->
 <div class="pe-detail-panel" id="detailPanel">
   <div class="pe-detail-toolbar">
@@ -2226,11 +2359,39 @@ ${posts_list_html}
     row.appendChild(val);
     return row;
   }
+  function hexDump(str) {
+    const wrap = document.createElement('div');
+    wrap.className = 'pe-detail-hexdump';
+    const bytes = [];
+    for (let i = 0; i < str.length && bytes.length < 32; i++) {
+      const c = str.charCodeAt(i);
+      bytes.push(c > 255 ? 0x3f : c);
+    }
+    for (let row = 0; row < bytes.length; row += 8) {
+      const slice = bytes.slice(row, row + 8);
+      let hex = slice.map(b => ('0' + b.toString(16).toUpperCase()).slice(-2)).join(' ');
+      while (hex.length < 23) hex += ' ';
+      const ascii = slice.map(b => (b >= 32 && b < 127) ? String.fromCharCode(b) : '.').join('');
+      const line = document.createElement('div');
+      const off = makeDiv('hd-off', ('000' + row.toString(16).toUpperCase()).slice(-4));
+      off.style.display = 'inline';
+      const hx = makeDiv('hd-hex', hex);
+      hx.style.display = 'inline';
+      const as = makeDiv('hd-ascii', ascii);
+      as.style.display = 'inline';
+      line.appendChild(off);
+      line.appendChild(hx);
+      line.appendChild(as);
+      wrap.appendChild(line);
+    }
+    return wrap;
+  }
   function showDetail(row) {
     const data = postData[row.id];
     if (data) {
       panel.classList.add('active');
       detailBody.textContent = '';
+      detailBody.appendChild(hexDump(data.title));
       detailBody.appendChild(makeDiv('pe-detail-title', data.title));
       detailBody.appendChild(makeDiv('pe-detail-desc', data.desc));
       if (data.series) {
@@ -2585,6 +2746,7 @@ cat > "_site/404.html" << 'END404'
   <link rel="stylesheet" href="/css/theme.css" />
 </head>
 <body>
+<!-- you found the overlay -->
   <div class="pe-box">
     <div class="pe-titlebar">
       <div class="pe-dots">

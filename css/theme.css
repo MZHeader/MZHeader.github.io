@@ -162,7 +162,7 @@ img { border-color: #2e3050; }
 .scroll-top-btn:hover { color: #8be9fd; border-color: #6870c4; }
 
 /* ─── Copy button ─────────────────────────────────────────────────── */
-.copy-btn { background: #1a1b28; border-color: #2e3050; color: #8be9fd; }
+.copy-btn { background: transparent; border-color: #2e3050; color: #8be9fd; }
 .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
 
 /* ─── Related posts ───────────────────────────────────────────────── */
