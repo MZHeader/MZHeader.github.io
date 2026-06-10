@@ -73,13 +73,13 @@ body {
 
 /* ─── Top nav ─────────────────────────────────────────────────────── */
 .post-nav { border-bottom-color: #2e3050; }
-.back-link { color: #50fa7b; text-shadow: 0 0 6px rgba(80,250,123,0.3); }
-.back-link:hover { text-shadow: 0 0 10px rgba(80,250,123,0.6); }
+.back-link { color: #8be9fd; }
+.back-link:hover { text-decoration: underline; }
 .post-meta { color: #7880a8; }
 
 /* ─── Article headings ────────────────────────────────────────────── */
 article h1 {
-  color: #ff6e6e;
+  color: #f0f0f8;
   text-shadow: none;
   border-bottom-color: #2e3050;
 }
@@ -111,11 +111,7 @@ article tr:hover td { background: rgba(104,112,196,0.09); }
 
 /* ─── Global links ────────────────────────────────────────────────── */
 a { color: #7880d8; }
-@keyframes hex-shift {
-  0%   { color: #7880d8; }
-  50%  { color: #8be9fd; }
-  100% { color: #50fa7b; }
-}
+a:hover { color: #8be9fd; }
 
 /* ─── Code blocks ─────────────────────────────────────────────────── */
 pre { border-top-color: #6870c4; }
@@ -147,7 +143,7 @@ img { border-color: #2e3050; }
 .toc-body li:hover > a { color: #8be9fd; }
 .toc-body li a.toc-active { color: #8be9fd; }
 .toc-body li a.toc-active::before { color: #6870c4; }
-.toc-body li a::before { color: #f1fa8c; }
+.toc-body li a::before { color: #8be9fd; }
 .toc-category { color: #6870c4; }
 .toc-h3 a { color: #8088c4 !important; }
 .toc-h3:hover > a { color: #8be9fd !important; }
@@ -155,7 +151,6 @@ img { border-color: #2e3050; }
 /* ─── Reading progress bar ────────────────────────────────────────── */
 .reading-progress {
   background: #6870c4;
-  box-shadow: 0 0 8px rgba(104,112,196,0.6);
 }
 
 /* ─── Scroll-to-top ───────────────────────────────────────────────── */
@@ -179,12 +174,12 @@ img { border-color: #2e3050; }
 /* ─── Pagination ──────────────────────────────────────────────────── */
 .post-pagination { border-top-color: #2e3050; }
 .post-pagination-link { color: #8be9fd; }
-.post-pagination-link:hover { color: #50fa7b; }
+.post-pagination-link:hover { text-decoration: underline; }
 
 /* ─── Mobile nav ──────────────────────────────────────────────────── */
 #mobile-nav { background: #0f1018; border-bottom-color: #2e3050; }
-.mob-back { color: #50fa7b; }
-.mob-back:hover { color: #8be9fd; }
+.mob-back { color: #8be9fd; }
+.mob-back:hover { text-decoration: underline; }
 .mob-sep { color: #44475a; }
 .mob-title { color: #6272a4; }
 
@@ -196,7 +191,7 @@ img { border-color: #2e3050; }
 .pe-window-dot.dot-max { background: #44475a; }
 
 /* ─── Homepage: title ─────────────────────────────────────────────── */
-.title-re { color: #50fa7b; }
+.title-re { color: #8be9fd; }
 .title-malware {
   color: #ff5555;
   text-shadow: 0 0 8px rgba(255,85,85,0.6), 0 0 20px rgba(255,85,85,0.3);
@@ -232,17 +227,17 @@ img { border-color: #2e3050; }
 .rsrc-gutter { color: #7c81ac; }
 .rsrc-title { color: #a0a4c0; }
 .rsrc-post-row:hover .rsrc-title { color: #e8e8f8; }
-.rsrc-title::before { color: #f1fa8c; }
+.rsrc-title::before { color: #8be9fd; }
 .rsrc-meta { color: #7c81ac; }
 
 /* ─── Badges ──────────────────────────────────────────────────────── */
-.rsrc-badge--rats        { background: rgba(189,147,249,0.1);  border-color: rgba(189,147,249,0.35); color: #bd93f9; }
-.rsrc-badge--infostealer { background: rgba(255,85,85,0.1);    border-color: rgba(255,85,85,0.35);   color: #ff8080; }
-.rsrc-badge--ctf         { background: rgba(241,250,140,0.08); border-color: rgba(241,250,140,0.3);  color: #f1fa8c; }
-.rsrc-badge--loader      { background: rgba(80,250,123,0.08);  border-color: rgba(80,250,123,0.3);   color: #50fa7b; }
-.rsrc-badge--downloader  { background: rgba(139,233,253,0.08); border-color: rgba(139,233,253,0.3);  color: #8be9fd; }
-.rsrc-badge--trojan      { background: rgba(255,85,85,0.07);   border-color: rgba(255,85,85,0.25);   color: #cc6060; }
-.rsrc-badge--analysis    { background: rgba(98,114,164,0.15);  border-color: rgba(98,114,164,0.35);  color: #6272a4; }
+.rsrc-badge--rats        { color: #bd93f9; }
+.rsrc-badge--infostealer { color: #ff8080; }
+.rsrc-badge--ctf         { color: #8be9fd; }
+.rsrc-badge--loader      { color: #50fa7b; }
+.rsrc-badge--downloader  { color: #8be9fd; }
+.rsrc-badge--trojan      { color: #cc6060; }
+.rsrc-badge--analysis    { color: #8b90a8; }
 
 /* ─── Series groups ───────────────────────────────────────────────── */
 .series-header:hover { background: rgba(104,112,196,0.1); }

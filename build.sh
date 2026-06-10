@@ -16,16 +16,15 @@ SHARED_CSS='
     body {
       background: #1e1e1e;
       color: #dcdcdc;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       padding: 2rem;
       line-height: 1.6;
       max-width: 900px;
       margin: 0 auto;
     }
     h1, h2, h3, h4 { color: #7880d8; }
-    @keyframes hex-shift { 0% { color: #5625be; } 50% { color: #8be9fd; } 100% { color: #50fa7b; } }
-    a { color: #5625be; text-decoration: none; transition: letter-spacing 0.15s ease; }
-    a:hover { text-decoration: underline; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
+    a { color: #6870c4; text-decoration: none; transition: color 0.15s ease; }
+    a:hover { text-decoration: underline; color: #8be9fd; }
     pre code {
       display: block;
       padding: 1em;
@@ -44,11 +43,11 @@ SHARED_CSS='
       padding: 0.1em 0.3em;
       border-radius: 3px;
       font-size: 0.9em;
-      border: 1px solid rgba(86, 37, 190, 0.4);
+      border: 1px solid rgba(104, 112, 196, 0.4);
     }
     img { max-width: 100%; height: auto; border-radius: 6px; border: 1px solid #2a2a3a; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4); }
-    pre { position: relative; border-top: 2px solid #5625be; border-radius: 6px; overflow: hidden; }
-    blockquote { border-left: 3px solid #5625be; padding-left: 1rem; color: #aaa; margin: 1.5rem 0; }
+    pre { position: relative; border-top: 2px solid #6870c4; border-radius: 6px; overflow: hidden; }
+    blockquote { border-left: 3px solid #6870c4; padding-left: 1rem; color: #aaa; margin: 1.5rem 0; }
     hr { border: none; border-top: 1px solid #2a2a3a; margin: 2rem 0; }
     .back-link {
       display: inline-block;
@@ -76,7 +75,7 @@ ASSET_HEAD='
   <link rel="stylesheet" href="/css/main.css" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#5625be" />
+  <meta name="theme-color" content="#6870c4" />
   <link rel="alternate" type="application/atom+xml" title="MZHeader RSS Feed" href="/atom.xml" />
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
   <link rel="preload" as="font" type="font/woff2" href="/fonts/FiraCode-latin.woff2" crossorigin />
@@ -239,6 +238,8 @@ for i in $(seq 1 $total_posts); do
                 fi
             done
             # Emit collapsible series group — header looks like a normal row
+            series_noun="posts"
+            [ "$series_count" -eq 1 ] && series_noun="post"
             series_id=$(printf '%s' "$series" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
             header_offset=$(printf '%04X' $(( visible_row * 32 )) )
             visible_row=$((visible_row + 1))
@@ -254,7 +255,7 @@ for i in $(seq 1 $total_posts); do
               <span class=\"rsrc-gutter\">.rsrc:${header_offset}</span>
               <span class=\"rsrc-title-block\">
                 <span class=\"rsrc-title\"><span class=\"series-label\">Series:</span> ${series}</span>
-                <span class=\"rsrc-meta\">; ${series_count} posts &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span> &nbsp;<span class=\"series-toggle\" id=\"toggle-${series_id}\">[+]</span></span>
+                <span class=\"rsrc-meta\">; ${series_count} ${series_noun} &nbsp;&middot;&nbsp; <span class=\"rsrc-badge ${series_badge}\">${series_tag}</span> &nbsp;<span class=\"series-toggle\" id=\"toggle-${series_id}\">[+]</span></span>
               </span>
             </div>
             <div class=\"series-children\" id=\"children-${series_id}\" style=\"display:none;\">
@@ -373,7 +374,7 @@ for i in $(seq 1 $total_posts); do
       top: -100%;
       left: 1rem;
       padding: 0.5rem 1rem;
-      background: #5625be;
+      background: #6870c4;
       color: #fff;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.8rem;
@@ -419,8 +420,8 @@ for i in $(seq 1 $total_posts); do
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #5625be;
-      box-shadow: 0 0 4px #5625be88;
+      background: #6870c4;
+      box-shadow: 0 0 4px rgba(104, 112, 196, 0.5);
       flex-shrink: 0;
     }
     .rsrc-toolbar-label {
@@ -430,12 +431,12 @@ for i in $(seq 1 $total_posts); do
       flex: 1;
     }
     .rsrc-toolbar-count {
-      font-size: 0.65rem;
-      color: #3a3a55;
+      font-size: 0.72rem;
+      color: #5a5f85;
     }
     .rsrc-section-header {
-      font-size: 0.62rem;
-      color: #3a3a55;
+      font-size: 0.7rem;
+      color: #5a5f85;
       letter-spacing: 0.1em;
       padding: 0.5rem 0.75rem 0.3rem;
       border-bottom: 1px solid #1e1e28;
@@ -453,8 +454,8 @@ for i in $(seq 1 $total_posts); do
     }
     #rsrc-sidebar a.rsrc-post-row:hover,
     #rsrc-sidebar a.rsrc-post-row:focus-visible {
-      background: rgba(86, 37, 190, 0.1);
-      border-left-color: #5625be;
+      background: rgba(104, 112, 196, 0.1);
+      border-left-color: #6870c4;
     }
     #rsrc-sidebar a.rsrc-post-row:focus-visible .rsrc-title { color: #c0c0c0; }
     #rsrc-sidebar a.rsrc-post-row:focus-visible .rsrc-title::before { opacity: 1; }
@@ -464,15 +465,15 @@ for i in $(seq 1 $total_posts); do
     }
     #rsrc-sidebar .rsrc-gutter {
       display: block;
-      font-size: 0.6rem;
-      color: #3a3a55;
+      font-size: 0.68rem;
+      color: #5a5f85;
       margin-bottom: 0.1rem;
       width: auto;
     }
-    #rsrc-sidebar a.rsrc-post-row.active .rsrc-gutter { color: #5625be; }
+    #rsrc-sidebar a.rsrc-post-row.active .rsrc-gutter { color: #6870c4; }
     #rsrc-sidebar .rsrc-title {
       display: block;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.75rem;
       font-weight: 500;
       color: #999;
@@ -484,9 +485,9 @@ for i in $(seq 1 $total_posts); do
     #rsrc-sidebar a.rsrc-post-row:hover .rsrc-title { color: #c0c0c0; }
     #rsrc-sidebar .rsrc-title::before {
       content: "call  ";
-      color: #e6db74;
+      color: #8be9fd;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       font-weight: normal;
       opacity: 0;
       transition: opacity 0.15s ease;
@@ -516,9 +517,9 @@ for i in $(seq 1 $total_posts); do
     #rsrc-sidebar .series-header .rsrc-title::before {
       content: "je   ";
       opacity: 1;
-      color: #e6db74;
+      color: #8be9fd;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       font-weight: normal;
     }
     #rsrc-sidebar .series-group.open > .series-header .rsrc-title::before {
@@ -550,13 +551,12 @@ for i in $(seq 1 $total_posts); do
       border-bottom: 1px solid #2a2a3a;
     }
     .back-link {
-      color: #50fa7b;
+      color: #8be9fd;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.85rem;
-      text-shadow: 0 0 6px rgba(80, 250, 123, 0.3);
       text-decoration: none;
     }
-    .back-link:hover { text-shadow: 0 0 10px rgba(80, 250, 123, 0.6); }
+    .back-link:hover { text-decoration: underline; }
     .post-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.78rem;
@@ -583,14 +583,14 @@ for i in $(seq 1 $total_posts); do
       background: #161620;
       transition: background 0.1s;
     }
-    .toc-trigger:hover { background: rgba(86, 37, 190, 0.1); }
+    .toc-trigger:hover { background: rgba(104, 112, 196, 0.1); }
     .toc-label {
       font-size: 0.82rem;
       color: #8be9fd;
       font-weight: 600;
     }
     .toc-toggle {
-      color: #5625be;
+      color: #6870c4;
       font-size: 0.75rem;
       transition: color 0.15s;
     }
@@ -623,7 +623,7 @@ for i in $(seq 1 $total_posts); do
     }
     .toc-body li a::before {
       content: "jmp  ";
-      color: #e6db74;
+      color: #8be9fd;
       font-size: 0.75rem;
       opacity: 0;
       transition: opacity 0.15s ease;
@@ -636,7 +636,7 @@ for i in $(seq 1 $total_posts); do
       opacity: 1;
     }
     .toc-category {
-      color: #5625be;
+      color: #6870c4;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.04em;
@@ -656,16 +656,15 @@ for i in $(seq 1 $total_posts); do
     }
     .toc-body li a.toc-active::before {
       content: "► ";
-      color: #5625be;
-      font-size: 0.65rem;
+      color: #6870c4;
+      font-size: 0.72rem;
     }
     .toc-h3 a.toc-active { color: #8be9fd !important; }
 
     /* ── Article ── */
     article h1 {
       font-size: 1.9rem;
-      color: #7c4dff;
-      text-shadow: 0 0 16px rgba(124, 77, 255, 0.5), 0 0 32px rgba(124, 77, 255, 0.2);
+      color: #f0f0f8;
       border-bottom: 1px solid #2a2a3a;
       padding-bottom: 0.5rem;
       margin-bottom: 1.5rem;
@@ -673,7 +672,7 @@ for i in $(seq 1 $total_posts); do
     article h2 {
       font-size: 1.2rem;
       color: #8be9fd;
-      border-left: 3px solid #5625be;
+      border-left: 3px solid #6870c4;
       padding-left: 0.75rem;
       margin-top: 2rem;
     }
@@ -703,7 +702,7 @@ for i in $(seq 1 $total_posts); do
       color: #8be9fd;
       text-align: left;
       padding: 0.5rem 0.75rem;
-      border-bottom: 2px solid #5625be;
+      border-bottom: 2px solid #6870c4;
       font-weight: 600;
       letter-spacing: 0.03em;
       white-space: nowrap;
@@ -716,7 +715,7 @@ for i in $(seq 1 $total_posts); do
     }
     article tr:last-child td { border-bottom: none; }
     article tr:nth-child(even) td { background: rgba(30, 30, 42, 0.5); }
-    article tr:hover td { background: rgba(86, 37, 190, 0.07); }
+    article tr:hover td { background: rgba(104, 112, 196, 0.07); }
 
     /* ── Scroll-to-top ── */
     .scroll-top-btn {
@@ -728,7 +727,7 @@ for i in $(seq 1 $total_posts); do
       background: rgba(16, 16, 22, 0.9);
       border: 1px solid #2a2a3a;
       border-radius: 4px;
-      color: #5625be;
+      color: #6870c4;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.75rem;
       cursor: pointer;
@@ -741,8 +740,8 @@ for i in $(seq 1 $total_posts); do
       justify-content: center;
     }
     .scroll-top-btn.visible { opacity: 1; pointer-events: auto; }
-    .scroll-top-btn:hover { color: #8be9fd; border-color: #5625be; }
-    .scroll-top-btn:focus-visible { outline: 2px solid #5625be; outline-offset: 2px; }
+    .scroll-top-btn:hover { color: #8be9fd; border-color: #6870c4; }
+    .scroll-top-btn:focus-visible { outline: 2px solid #6870c4; outline-offset: 2px; }
     @media (max-width: 900px) { .scroll-top-btn { bottom: 1rem; right: 1rem; } }
 
     /* ── Sidebar toggle ── */
@@ -775,7 +774,7 @@ for i in $(seq 1 $total_posts); do
       background: none;
       border: none;
       cursor: pointer;
-      color: #3a3a55;
+      color: #5a5f85;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.75rem;
       line-height: 1;
@@ -788,7 +787,7 @@ for i in $(seq 1 $total_posts); do
     .rsrc-toggle-btn:hover { color: #8be9fd; }
     #rsrc-sidebar.collapsed .rsrc-toggle-btn {
       margin-left: 0;
-      color: #5625be;
+      color: #6870c4;
       padding: 0.55rem 0;
       width: 32px;
       text-align: center;
@@ -827,7 +826,7 @@ for i in $(seq 1 $total_posts); do
         font-family: "Fira Code", "Consolas", monospace;
       }
       #mobile-nav .mob-back {
-        color: #50fa7b;
+        color: #8be9fd;
         text-decoration: none;
         font-size: 0.82rem;
         white-space: nowrap;
@@ -907,7 +906,7 @@ for i in $(seq 1 $total_posts); do
       display: block;
       color: #999;
       text-decoration: none;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.85rem;
       padding: 0.35rem 0.5rem;
       border-left: 2px solid transparent;
@@ -915,8 +914,8 @@ for i in $(seq 1 $total_posts); do
     }
     .related-post-link:hover {
       color: #8be9fd;
-      border-left-color: #5625be;
-      background: rgba(86, 37, 190, 0.08);
+      border-left-color: #6870c4;
+      background: rgba(104, 112, 196, 0.08);
     }
 
     /* ── Post pagination ── */
@@ -937,8 +936,8 @@ for i in $(seq 1 $total_posts); do
     }
     .post-pagination-link--right { margin-left: auto; text-align: right; }
     .post-pagination-link:hover,
-    .post-pagination-link:focus-visible { color: #50fa7b; }
-    .post-pagination-link:focus-visible { outline: 2px solid #5625be; outline-offset: 3px; }
+    .post-pagination-link:focus-visible { text-decoration: underline; }
+    .post-pagination-link:focus-visible { outline: 2px solid #6870c4; outline-offset: 3px; }
 
     /* ── Reading progress bar ── */
     .reading-progress {
@@ -947,8 +946,7 @@ for i in $(seq 1 $total_posts); do
       left: 0;
       width: 0%;
       height: 2px;
-      background: #5625be;
-      box-shadow: 0 0 6px rgba(86, 37, 190, 0.4);
+      background: #6870c4;
       z-index: 999;
       transition: width 0.1s linear;
     }
@@ -974,7 +972,7 @@ for i in $(seq 1 $total_posts); do
     .pre-wrapper:hover .copy-btn,
     .pre-wrapper:focus-within .copy-btn,
     .copy-btn:focus-visible { opacity: 1; }
-    .copy-btn:focus-visible { outline: 2px solid #5625be; outline-offset: 1px; }
+    .copy-btn:focus-visible { outline: 2px solid #6870c4; outline-offset: 1px; }
     @media (hover: none) { .copy-btn { opacity: 1; } }
     .copy-btn.copied { color: #50fa7b; border-color: #50fa7b; }
   </style>
@@ -1455,14 +1453,14 @@ cat > "_site/index.html" << ENDINDEX
       display: block;
       font-size: 0.95rem;
       font-family: "Fira Code", "Consolas", monospace;
-      color: #50fa7b;
+      color: #8be9fd;
       opacity: 0.75;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       margin-bottom: 0.2em;
     }
     .re-char { display: inline-block; }
-    .re-char.scrambling { color: #50fa7b; opacity: 1; }
+    .re-char.scrambling { color: #f8f8f2; opacity: 1; }
     @keyframes glitch-malware {
       0%,88%,100% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
       90% { text-shadow: -2px 0 #8be9fd,2px 0 #8be9fd,0 0 12px rgba(198,40,40,0.5); transform: translate(-2px,0); }
@@ -1473,40 +1471,6 @@ cat > "_site/index.html" << ENDINDEX
       96% { text-shadow: 1px 0 #8be9fd; transform: translate(1px,0); }
       98% { text-shadow: 0 0 8px rgba(198,40,40,0.6),0 0 20px rgba(198,40,40,0.3); transform: translate(0); }
     }
-    .magnifier {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 2px solid rgba(138,138,170,0.35);
-      box-shadow: 0 0 12px rgba(86,37,190,0.15), inset 0 0 30px rgba(86,37,190,0.05);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      z-index: 10;
-      overflow: hidden;
-      background: rgba(30,30,30,0.4);
-    }
-    .magnifier.active { opacity: 1; }
-    .magnifier::after {
-      content: "";
-      position: absolute;
-      bottom: -18px;
-      right: -6px;
-      width: 3px;
-      height: 28px;
-      background: rgba(138,138,170,0.3);
-      transform: rotate(-45deg);
-      border-radius: 2px;
-    }
-    .magnifier-content {
-      position: absolute;
-      white-space: nowrap;
-      font-family: "Fira Code","Consolas",monospace;
-      transform-origin: 0 0;
-    }
-    .magnifier-content .title-malware { animation: none; }
-
     /* PE window wrapper — unified container for titlebar + viewer */
     .pe-window {
       max-width: 900px;
@@ -1550,7 +1514,7 @@ cat > "_site/index.html" << ENDINDEX
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .pe-window-titlebar .window-title .wt-app { color: #5625be; }
+    .pe-window-titlebar .window-title .wt-app { color: #6870c4; }
     .pe-window-titlebar .window-title .wt-sep { color: #333; margin: 0 0.3em; }
     .pe-window-titlebar .window-title .wt-file { color: #c62828; }
     .pe-window-titlebar .window-title .wt-path { color: #666; }
@@ -1558,7 +1522,7 @@ cat > "_site/index.html" << ENDINDEX
     .pe-window-titlebar .window-tag {
       color: #50fa7b;
       opacity: 0.55;
-      font-size: 0.65rem;
+      font-size: 0.72rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       white-space: nowrap;
@@ -1591,10 +1555,10 @@ cat > "_site/index.html" << ENDINDEX
       padding: 0.4rem 1rem;
       background: rgba(10, 10, 16, 0.7);
       font-size: 0.72rem;
-      color: #3a3a55;
+      color: #5a5f85;
     }
     .pe-section-meta span { white-space: nowrap; }
-    .pe-section-meta .meta-label { color: #3a3a55; }
+    .pe-section-meta .meta-label { color: #5a5f85; }
     .pe-section-meta .meta-value { color: #50fa7b; }
 
     /* Shared body */
@@ -1613,7 +1577,7 @@ cat > "_site/index.html" << ENDINDEX
       white-space: nowrap;
       overflow: hidden;
     }
-    .pe-section-divider--text { border-left-color: #5625be; }
+    .pe-section-divider--text { border-left-color: #6870c4; }
     .pe-section-divider--rsrc { border-left-color: #8be9fd; }
     .pe-section-divider--idata { border-left-color: #50fa7b; }
     .pe-section-divider-label {
@@ -1631,8 +1595,6 @@ cat > "_site/index.html" << ENDINDEX
       }
     }
 
-    @keyframes hex-shift { 0% { color: #5625be; } 50% { color: #8be9fd; } 100% { color: #50fa7b; } }
-
     /* .text disasm rows */
     .pe-disasm-row {
       display: flex;
@@ -1640,7 +1602,7 @@ cat > "_site/index.html" << ENDINDEX
       line-height: 1.7;
       transition: background 0.1s ease;
     }
-    .pe-disasm-row:hover { background: rgba(86, 37, 190, 0.06); }
+    .pe-disasm-row:hover { background: rgba(104, 112, 196, 0.06); }
     .pe-gutter {
       width: 7em;
       flex-shrink: 0;
@@ -1650,7 +1612,7 @@ cat > "_site/index.html" << ENDINDEX
       padding-top: 0.15em;
     }
     .pe-instr {
-      color: #5625be;
+      color: #6870c4;
       width: 3.5em;
       flex-shrink: 0;
       font-size: 0.86rem;
@@ -1665,13 +1627,13 @@ cat > "_site/index.html" << ENDINDEX
     .pe-operand {
       flex: 1;
       color: #e4e4e4;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.95rem;
       line-height: 1.65;
     }
     .pe-operand strong { color: #8be9fd; }
-    .pe-operand a { color: #8be9fd !important; transition: letter-spacing 0.15s ease; }
-    .pe-operand a:hover { color: #50fa7b !important; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
+    .pe-operand a { color: #8be9fd !important; transition: color 0.15s ease; }
+    .pe-operand a:hover { text-decoration: underline; }
     .pe-comment {
       flex: 1;
       font-family: "Fira Code", "Consolas", monospace;
@@ -1680,8 +1642,8 @@ cat > "_site/index.html" << ENDINDEX
       line-height: 1.65;
     }
     .pe-comment strong { color: #c62828; font-weight: 600; }
-    .pe-comment a { color: #8be9fd !important; transition: letter-spacing 0.15s ease; }
-    .pe-comment a:hover { color: #50fa7b !important; letter-spacing: 0.02em; animation: hex-shift 0.25s ease forwards; }
+    .pe-comment a { color: #8be9fd !important; transition: color 0.15s ease; }
+    .pe-comment a:hover { text-decoration: underline; }
 
     /* .rsrc post rows */
     .rsrc-post-row {
@@ -1696,15 +1658,12 @@ cat > "_site/index.html" << ENDINDEX
     }
     .rsrc-post-row:hover,
     .rsrc-post-row:focus-visible {
-      background: rgba(86, 37, 190, 0.10);
-      border-left-color: #5625be;
+      background: rgba(104, 112, 196, 0.10);
+      border-left-color: #6870c4;
       text-decoration: none;
     }
-    .rsrc-post-row:focus-visible .rsrc-gutter { color: #5625be; }
-    .rsrc-post-row:focus-visible .rsrc-title {
-      color: #8be9fd;
-      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
-    }
+    .rsrc-post-row:focus-visible .rsrc-gutter { color: #6870c4; }
+    .rsrc-post-row:focus-visible .rsrc-title { color: #8be9fd; }
     .rsrc-post-row:focus-visible .rsrc-meta { color: #6e6e90; }
     /* Staggered entrance animation for post rows */
     @keyframes row-enter {
@@ -1726,16 +1685,16 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.82rem;
       user-select: none;
       padding-top: 0.15rem;
-      transition: color 0.2s ease, text-shadow 0.2s ease;
+      transition: color 0.2s ease;
     }
-    .rsrc-post-row:hover .rsrc-gutter { color: #5625be; }
+    .rsrc-post-row:hover .rsrc-gutter { color: #6870c4; }
     .rsrc-title-block {
       display: flex;
       flex-direction: column;
       min-width: 0;
     }
     .rsrc-post-row .rsrc-title {
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.95rem;
       font-weight: 600;
       white-space: nowrap;
@@ -1745,7 +1704,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .rsrc-post-row .rsrc-title::before {
       content: "call  ";
-      color: #e6db74;
+      color: #8be9fd;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.82rem;
       font-weight: normal;
@@ -1756,10 +1715,7 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-post-row:focus-visible .rsrc-title::before {
       opacity: 1;
     }
-    .rsrc-post-row:hover .rsrc-title {
-      color: #8be9fd;
-      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
-    }
+    .rsrc-post-row:hover .rsrc-title { color: #8be9fd; }
     .rsrc-meta {
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.74rem;
@@ -1770,7 +1726,7 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-post-row:hover .rsrc-meta { color: #6e6e90; }
     .rsrc-badge {
       display: inline-block;
-      font-size: 0.62rem;
+      font-size: 0.7rem;
       font-weight: 400;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -1797,13 +1753,10 @@ cat > "_site/index.html" << ENDINDEX
     .rsrc-badge--analysis    { color: #8a8aaa; }
     .rsrc-badge--analysis::before    { color: #8a8aaa; }
 
-    /* Social link hover glow */
-    .rsrc-post-row[target="_blank"]:hover .rsrc-title {
-      color: #8be9fd;
-      text-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
-    }
+    /* Social link hover */
+    .rsrc-post-row[target="_blank"]:hover .rsrc-title { color: #8be9fd; }
     .rsrc-post-row[target="_blank"]:hover .rsrc-gutter {
-      color: #5625be;
+      color: #6870c4;
     }
 
     /* Right detail panel */
@@ -1825,7 +1778,7 @@ cat > "_site/index.html" << ENDINDEX
     }
     .pe-detail-panel.active {
       display: block;
-      border-color: #3a3a55;
+      border-color: #5a5f85;
     }
     .pe-detail-toolbar {
       display: flex;
@@ -1838,25 +1791,22 @@ cat > "_site/index.html" << ENDINDEX
       color: #666;
     }
     .pe-detail-toolbar .detail-label { color: #8be9fd; font-weight: 600; }
-    .pe-detail-toolbar .detail-type { color: #3a3a55; }
+    .pe-detail-toolbar .detail-type { color: #5a5f85; }
     .pe-detail-body {
       padding: 0.75rem;
     }
     .pe-detail-title {
       color: #c0c0c0;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.92rem;
       font-weight: 500;
       line-height: 1.5;
       margin-bottom: 0.6rem;
     }
-    .pe-detail-panel.active .pe-detail-title {
-      color: #8be9fd;
-      text-shadow: 0 0 8px rgba(139, 233, 253, 0.2);
-    }
+    .pe-detail-panel.active .pe-detail-title { color: #8be9fd; }
     .pe-detail-desc {
       color: #666;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", "Roboto", sans-serif;
       font-size: 0.82rem;
       line-height: 1.55;
     }
@@ -1866,11 +1816,11 @@ cat > "_site/index.html" << ENDINDEX
       padding-top: 0.4rem;
       border-top: 1px solid #222233;
       font-size: 0.7rem;
-      color: #3a3a55;
+      color: #5a5f85;
     }
     .pe-detail-date .meta-value { color: #50fa7b; }
     .pe-detail-placeholder {
-      color: #2a2a3a;
+      color: #5a5f85;
       font-size: 0.75rem;
       text-align: center;
       padding: 1rem 0.5rem;
@@ -1898,8 +1848,8 @@ cat > "_site/index.html" << ENDINDEX
       font-family: "Fira Code", "Consolas", monospace;
     }
     .filter-bar-label {
-      font-size: 0.65rem;
-      color: #3a3a55;
+      font-size: 0.72rem;
+      color: #5a5f85;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       margin-right: 0.3rem;
@@ -1910,56 +1860,32 @@ cat > "_site/index.html" << ENDINDEX
       border: 1px solid #2a2a3a;
       color: #555570;
       font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.62rem;
+      font-size: 0.7rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       padding: 0.2rem 0.55rem;
       border-radius: 2px;
       cursor: pointer;
-      transition: background 0.12s, color 0.12s, border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
       user-select: none;
     }
     .filter-btn:hover {
-      border-color: #5625be;
+      border-color: #6870c4;
       color: #8a8aaa;
     }
     .filter-btn.active {
-      background: rgba(86, 37, 190, 0.15);
-      border-color: #5625be;
+      background: rgba(104, 112, 196, 0.15);
+      border-color: #6870c4;
       color: #8be9fd;
-      box-shadow: 0 0 6px rgba(86, 37, 190, 0.3);
-      transform: scale(1.03);
     }
-    .filter-btn[data-cat="all"].active { color: #8be9fd; border-color: #5625be; }
-    .filter-btn[data-cat="trojan"] { border-color: rgba(198,40,40,0.3); }
-    .filter-btn[data-cat="trojan"]:hover { border-color: #c62828; color: #e07070; }
-    .filter-btn[data-cat="trojan"].active { background: rgba(198,40,40,0.12); border-color: #c62828; color: #e07070; box-shadow: 0 0 6px rgba(198,40,40,0.25); }
-    .filter-btn[data-cat="infostealer"] { border-color: rgba(139,233,253,0.2); }
-    .filter-btn[data-cat="infostealer"]:hover { border-color: #8be9fd; color: #8be9fd; }
-    .filter-btn[data-cat="infostealer"].active { background: rgba(139,233,253,0.08); border-color: #8be9fd; color: #8be9fd; box-shadow: 0 0 6px rgba(139,233,253,0.2); }
-    .filter-btn[data-cat="downloader"] { border-color: rgba(80,250,123,0.2); }
-    .filter-btn[data-cat="downloader"]:hover { border-color: #50fa7b; color: #50fa7b; }
-    .filter-btn[data-cat="downloader"].active { background: rgba(80,250,123,0.08); border-color: #50fa7b; color: #50fa7b; box-shadow: 0 0 6px rgba(80,250,123,0.2); }
-    .filter-btn[data-cat="loader"] { border-color: rgba(80,250,123,0.2); }
-    .filter-btn[data-cat="loader"]:hover { border-color: #50fa7b; color: #50fa7b; }
-    .filter-btn[data-cat="loader"].active { background: rgba(80,250,123,0.08); border-color: #50fa7b; color: #50fa7b; box-shadow: 0 0 6px rgba(80,250,123,0.2); }
-    .filter-btn[data-cat="rats"] { border-color: rgba(189,147,249,0.2); }
-    .filter-btn[data-cat="rats"]:hover { border-color: #bd93f9; color: #bd93f9; }
-    .filter-btn[data-cat="rats"].active { background: rgba(189,147,249,0.08); border-color: #bd93f9; color: #bd93f9; box-shadow: 0 0 6px rgba(189,147,249,0.2); }
-    .filter-btn[data-cat="ctf"] { border-color: rgba(255,184,108,0.2); }
-    .filter-btn[data-cat="ctf"]:hover { border-color: #ffb86c; color: #ffb86c; }
-    .filter-btn[data-cat="ctf"].active { background: rgba(255,184,108,0.08); border-color: #ffb86c; color: #ffb86c; box-shadow: 0 0 6px rgba(255,184,108,0.2); }
-    .filter-btn[data-cat="analysis"] { border-color: rgba(138,138,170,0.2); }
-    .filter-btn[data-cat="analysis"]:hover { border-color: #8a8aaa; color: #8a8aaa; }
-    .filter-btn[data-cat="analysis"].active { background: rgba(138,138,170,0.08); border-color: #8a8aaa; color: #8a8aaa; box-shadow: 0 0 6px rgba(138,138,170,0.2); }
     .filter-count {
-      font-size: 0.55rem;
-      color: #3a3a55;
+      font-size: 0.65rem;
+      color: #5a5f85;
       margin-left: 0.15rem;
     }
     .filter-btn.active .filter-count { color: inherit; opacity: 0.7; }
     .filter-btn:focus-visible {
-      outline: 2px solid #5625be;
+      outline: 2px solid #6870c4;
       outline-offset: 1px;
     }
 
@@ -1969,7 +1895,7 @@ cat > "_site/index.html" << ENDINDEX
       top: -100%;
       left: 1rem;
       padding: 0.5rem 1rem;
-      background: #5625be;
+      background: #6870c4;
       color: #fff;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.8rem;
@@ -1983,7 +1909,7 @@ cat > "_site/index.html" << ENDINDEX
 
     /* General focus-visible for interactive elements */
     .about-trigger:focus-visible {
-      outline: 2px solid #5625be;
+      outline: 2px solid #6870c4;
       outline-offset: -2px;
     }
 
@@ -2000,14 +1926,11 @@ cat > "_site/index.html" << ENDINDEX
       transition: background 0.12s ease, border-left-color 0.12s ease;
     }
     .series-header:hover {
-      background: rgba(80, 250, 123, 0.06);
-      border-left-color: #50fa7b;
+      background: rgba(104, 112, 196, 0.10);
+      border-left-color: #6870c4;
     }
-    .series-header:hover .rsrc-gutter { color: #50fa7b; }
-    .series-header:hover .rsrc-title {
-      color: #50fa7b;
-      text-shadow: 0 0 8px rgba(80, 250, 123, 0.3);
-    }
+    .series-header:hover .rsrc-gutter { color: #6870c4; }
+    .series-header:hover .rsrc-title { color: #8be9fd; }
     .series-header .rsrc-gutter {
       width: 7em;
       flex-shrink: 0;
@@ -2016,11 +1939,11 @@ cat > "_site/index.html" << ENDINDEX
       user-select: none;
     }
     .series-header .rsrc-title-block { flex: 1; min-width: 0; }
-    .series-toggle { color: #5625be; }
+    .series-toggle { color: #6870c4; }
     .series-label { color: #3a8a4a; }
     .series-header .rsrc-title::before {
       content: "je    ";
-      color: #e6db74;
+      color: #8be9fd;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.82rem;
       font-weight: normal;
@@ -2028,17 +1951,19 @@ cat > "_site/index.html" << ENDINDEX
       transition: opacity 0.15s ease;
     }
     .series-header:hover .rsrc-title::before { opacity: 1; }
-    .series-header:hover .rsrc-gutter { color: #5625be; }
+    .series-header:hover .rsrc-gutter { color: #6870c4; }
     .series-group.open .series-header .rsrc-title::before {
       content: "jne   ";
     }
     .series-children {
       margin-left: 2rem;
-      border-left: 1px solid rgba(86, 37, 190, 0.35);
+      border-left: 1px solid rgba(104, 112, 196, 0.35);
     }
 
     @media (max-width: 600px) {
+      html, body { overflow-x: hidden; }
       body { padding: 1rem; }
+      .pe-comment { min-width: 0; overflow-wrap: anywhere; }
       .title-malware { font-size: 1.8rem; }
       .title-re { font-size: 0.8rem; letter-spacing: 0.12em; }
       .pe-section-flags { display: none; }
@@ -2057,7 +1982,6 @@ cat > "_site/index.html" << ENDINDEX
     /* Reduced motion preference */
     @media (prefers-reduced-motion: reduce) {
       .title-malware { animation: none !important; }
-      .magnifier { display: none !important; }
       .re-char.scrambling { color: inherit; opacity: inherit; }
     }
 
@@ -2069,12 +1993,12 @@ cat > "_site/index.html" << ENDINDEX
       transition: background 0.1s ease;
       cursor: pointer;
       user-select: none;
-      border-left: 2px solid #5625be;
+      border-left: 2px solid #6870c4;
     }
-    .about-trigger:hover { background: rgba(86, 37, 190, 0.10); }
+    .about-trigger:hover { background: rgba(104, 112, 196, 0.10); }
     .about-trigger:hover .pe-comment::before {
       content: "je    ";
-      color: #e6db74;
+      color: #8be9fd;
       font-size: 0.82rem;
     }
     .about-trigger.open:hover .pe-comment::before {
@@ -2083,7 +2007,7 @@ cat > "_site/index.html" << ENDINDEX
     .about-trigger .pe-comment { flex: 1; color: #c0c0e0; cursor: pointer; }
     .about-trigger.open .pe-comment { color: #8be9fd; }
     .about-toggle {
-      color: #5625be;
+      color: #6870c4;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.75rem;
       transition: color 0.15s ease, transform 0.25s ease;
@@ -2097,7 +2021,7 @@ cat > "_site/index.html" << ENDINDEX
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.35s ease;
-      border-left: 2px solid #5625be;
+      border-left: 2px solid #6870c4;
       background: rgba(0, 0, 0, 0.2);
     }
     .about-expanded.open {
@@ -2151,7 +2075,6 @@ cat > "_site/index.html" << ENDINDEX
 
 <header>
   <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
-  <div class="magnifier" id="magnifier"></div>
 
   <div class="pe-window">
     <div class="pe-window-titlebar">
@@ -2162,7 +2085,6 @@ cat > "_site/index.html" << ENDINDEX
       </div>
       <span class="window-title"><span class="wt-app">pe-viewer</span><span class="wt-sep">&#8212;</span><span class="wt-path">C:\Samples\</span><span class="wt-file">mzheader</span></span>
       <span class="window-spacer"></span>
-      <span class="window-tag">reverse engineering / malware</span>
     </div>
   <div class="pe-viewer">
     <!-- .text section -->
@@ -2339,8 +2261,11 @@ ${posts_list_html}
     ).join('');
 
     if (!prefersReducedMotion) {
+      const title = document.getElementById('siteTitle');
       const reSpans = Array.from(reEl.querySelectorAll('.re-char'));
+      let scrambleActive = false;
       function scrambleRE() {
+        if (!scrambleActive) return;
         const pick = reSpans[Math.floor(Math.random() * reSpans.length)];
         pick.classList.add('scrambling');
         pick.textContent = hexChars[Math.floor(Math.random() * 16)];
@@ -2353,31 +2278,12 @@ ${posts_list_html}
         }, 60);
         setTimeout(scrambleRE, 100 + Math.random() * 250);
       }
-      scrambleRE();
-    }
-
-    if (!prefersReducedMotion) {
-      const title = document.getElementById('siteTitle');
-      const mag = document.getElementById('magnifier');
-      const magSize = 120;
-      const zoom = 1.8;
-      const clone = document.createElement('div');
-      clone.className = 'magnifier-content';
-      clone.innerHTML = title.innerHTML;
-      mag.appendChild(clone);
-      title.addEventListener('mouseenter', () => mag.classList.add('active'));
-      title.addEventListener('mouseleave', () => mag.classList.remove('active'));
-      title.addEventListener('mousemove', (e) => {
-        const rect = title.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        mag.style.left = (e.clientX - magSize/2) + 'px';
-        mag.style.top = (e.clientY - magSize/2) + 'px';
-        mag.style.position = 'fixed';
-        clone.style.transform = 'scale(' + zoom + ')';
-        clone.style.left = (-x * zoom + magSize/2) + 'px';
-        clone.style.top = (-y * zoom + magSize/2) + 'px';
+      title.addEventListener('mouseenter', () => {
+        if (scrambleActive) return;
+        scrambleActive = true;
+        scrambleRE();
       });
+      title.addEventListener('mouseleave', () => { scrambleActive = false; });
     }
   })();
 
@@ -2602,7 +2508,7 @@ cat > "_site/manifest.json" << 'ENDMANIFEST'
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1e1e1e",
-  "theme_color": "#5625be",
+  "theme_color": "#6870c4",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -2666,7 +2572,7 @@ cat > "_site/404.html" << 'END404'
     .disasm { padding:0.8rem 1rem; }
     .disasm-row { display:flex; padding:0.25rem 0; line-height:1.7; }
     .gutter { width:6em; flex-shrink:0; color:#5a5a7a; font-size:0.78rem; user-select:none; }
-    .instr { color:#5625be; width:3em; flex-shrink:0; font-size:0.82rem; }
+    .instr { color:#6870c4; width:3em; flex-shrink:0; font-size:0.82rem; }
     .operand { color:#e4e4e4; font-size:0.82rem; }
     .comment { color:#8888b0; font-size:0.82rem; }
     .comment strong { color:#c62828; font-weight:600; }
@@ -2674,7 +2580,7 @@ cat > "_site/404.html" << 'END404'
     .ret-row { padding:0.6rem 1rem 0.8rem; border-top:1px solid #1e1e28; }
     a { color:#50fa7b; text-decoration:none; font-size:0.82rem; text-shadow:0 0 6px rgba(80,250,123,0.3); transition: text-shadow 0.15s; }
     a:hover { text-shadow:0 0 10px rgba(80,250,123,0.6); }
-    a:focus-visible { outline:2px solid #5625be; outline-offset:2px; }
+    a:focus-visible { outline:2px solid #6870c4; outline-offset:2px; }
   </style>
   <link rel="stylesheet" href="/css/theme.css" />
 </head>
@@ -2697,7 +2603,7 @@ cat > "_site/404.html" << 'END404'
         <div style="text-align:center;padding:0.3rem 0;">
           <div class="code">0x00000404</div>
         </div>
-        <div class="disasm-row"><span class="gutter">:000D</span><span class="instr">call</span><span class="operand" style="color:#e6db74">RaiseException</span></div>
+        <div class="disasm-row"><span class="gutter">:000D</span><span class="instr">call</span><span class="operand" style="color:#8be9fd">RaiseException</span></div>
         <div class="disasm-row"><span class="gutter">:0012</span><span class="instr">xor</span><span class="operand">eax, eax</span></div>
         <div class="disasm-row"><span class="gutter">:0014</span><span class="instr">ret</span><span class="comment">; <a href="/">back to posts</a></span></div>
       </div>
