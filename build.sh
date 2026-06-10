@@ -1006,6 +1006,90 @@ for i in $(seq 1 $total_posts); do
     .post-epilogue .ep-i { color: #6870c4; display: inline-block; width: 3.5em; }
     .post-epilogue .ep-o { color: #999; }
     .post-epilogue .ep-c { color: #555872; margin-left: 2em; }
+
+    /* ── Image lightbox ── */
+    article img { cursor: zoom-in; }
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .lightbox.open { display: flex; }
+    body.lightbox-open { overflow: hidden; }
+    .lightbox-window {
+      max-width: 94vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #2e3050;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0c0d14;
+    }
+    .lightbox-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.75rem;
+      background: #12121a;
+      border-bottom: 1px solid #2e3050;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      color: #7c81ac;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .lightbox-dots { display: flex; gap: 5px; }
+    .lightbox-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .lightbox-dot.d1 { background: #ff5555; }
+    .lightbox-dot.d2 { background: #6870c4; }
+    .lightbox-dot.d3 { background: #8be9fd; }
+    .lightbox-title {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .lightbox-title .lb-app { color: #6870c4; }
+    .lightbox-close {
+      background: none;
+      border: 1px solid #2e3050;
+      color: #7c81ac;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.68rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .lightbox-close:hover { color: #8be9fd; border-color: #6870c4; }
+    .lightbox-img {
+      display: block;
+      max-width: 100%;
+      max-height: calc(92vh - 6rem);
+      object-fit: contain;
+      cursor: default;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+    }
+    .lightbox-caption {
+      padding: 0.45rem 0.75rem;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      color: #7c81ac;
+      border-top: 1px solid #1e1e28;
+      flex-shrink: 0;
+    }
+    .lightbox-caption:empty { display: none; }
+    @media (max-width: 900px) { .lightbox { padding: 0.75rem; } }
   </style>
   <script type="application/ld+json">
   {
@@ -1364,6 +1448,57 @@ ENDHEADER
     var len = codeEl ? codeEl.textContent.length : 0;
     codeVA += Math.max(0x10, Math.ceil(len / 16) * 16);
   });
+
+  // ── Image lightbox ──
+  var articleImgs = document.querySelectorAll("article img");
+  if (articleImgs.length > 0) {
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", "Image viewer");
+    lb.innerHTML =
+      '<div class="lightbox-window">' +
+        '<div class="lightbox-titlebar">' +
+          '<span class="lightbox-dots">' +
+            '<span class="lightbox-dot d1"></span>' +
+            '<span class="lightbox-dot d2"></span>' +
+            '<span class="lightbox-dot d3"></span>' +
+          '</span>' +
+          '<span class="lightbox-title"><span class="lb-app">image-viewer</span> &#8212; <span id="lbFile"></span></span>' +
+          '<button class="lightbox-close" id="lbClose" aria-label="Close image viewer">esc</button>' +
+        '</div>' +
+        '<img class="lightbox-img" id="lbImg" alt="" />' +
+        '<div class="lightbox-caption" id="lbCaption"></div>' +
+      '</div>';
+    document.body.appendChild(lb);
+    var lbImg = document.getElementById("lbImg");
+    var lbFile = document.getElementById("lbFile");
+    var lbCaption = document.getElementById("lbCaption");
+
+    function openLightbox(img) {
+      lbImg.src = img.src;
+      lbImg.alt = img.alt || "";
+      lbFile.textContent = (img.getAttribute("src") || "").split("/").pop();
+      lbCaption.textContent = img.alt ? "; " + img.alt : "";
+      lb.classList.add("open");
+      document.body.classList.add("lightbox-open");
+    }
+    function closeLightbox() {
+      lb.classList.remove("open");
+      document.body.classList.remove("lightbox-open");
+    }
+
+    articleImgs.forEach(function(img) {
+      img.addEventListener("click", function() { openLightbox(img); });
+    });
+    lb.addEventListener("click", function(e) {
+      if (e.target === lb || e.target.id === "lbClose") closeLightbox();
+    });
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && lb.classList.contains("open")) closeLightbox();
+    });
+  }
 
   // ── Reading progress bar + Scroll-to-top button ──
   var progressBar = document.getElementById('readingProgress');
@@ -2108,6 +2243,53 @@ cat > "_site/index.html" << ENDINDEX
       color: #2a2a3a !important;
     }
 
+    /* ── Command-line search ── */
+    .filter-btn.search-toggle { margin-left: auto; }
+    .cmd-search {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: #12121a;
+      border-bottom: 1px solid #1e1e28;
+      font-family: "Fira Code", "Consolas", monospace;
+    }
+    .cmd-prompt { color: #6870c4; font-size: 0.8rem; user-select: none; }
+    .cmd-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #8be9fd;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.8rem;
+      caret-color: #8be9fd;
+    }
+    .cmd-input::placeholder { color: #555870; }
+    .cmd-count { color: #5a5f85; font-size: 0.7rem; white-space: nowrap; }
+    .cmd-close {
+      background: transparent;
+      border: 1px solid #2a2a3a;
+      color: #5a5f85;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .cmd-close:hover { color: #8be9fd; border-color: #6870c4; }
+
+    /* Keyboard-nav highlight (mirrors hover) */
+    .rsrc-post-row.kb-active,
+    .series-header.kb-active {
+      background: linear-gradient(90deg, rgba(104,112,196,0.18), rgba(139,233,253,0.05));
+      border-left-color: #8be9fd;
+    }
+    .rsrc-post-row.kb-active .rsrc-title,
+    .series-header.kb-active .rsrc-title { color: #8be9fd; }
+
     /* ── Detail panel hex dump ── */
     .pe-detail-hexdump {
       font-size: 0.62rem;
@@ -2260,6 +2442,13 @@ cat > "_site/index.html" << ENDINDEX
         <button class="filter-btn" data-cat="rats" aria-pressed="false">RAT</button>
         <button class="filter-btn" data-cat="loader" aria-pressed="false">Loader</button>
         <button class="filter-btn" data-cat="ctf" aria-pressed="false">CTF</button>
+        <button class="filter-btn search-toggle" id="searchToggle" aria-expanded="false" aria-controls="cmdSearch" title="Search posts ( / )">/ search</button>
+      </div>
+      <div class="cmd-search" id="cmdSearch" style="display:none">
+        <span class="cmd-prompt">&gt;</span>
+        <input class="cmd-input" id="searchInput" type="text" placeholder="search .rsrc entries&hellip;" autocomplete="off" spellcheck="false" aria-label="Search posts" />
+        <span class="cmd-count" id="searchCount"></span>
+        <button class="cmd-close" id="searchClose" aria-label="Close search">esc</button>
       </div>
       <div id="postsList">
 ${posts_list_html}
@@ -2433,19 +2622,27 @@ ${posts_list_html}
     }
   })();
 
-  // ── Category filter ──
+  // ── Category filter + search + keyboard nav ──
   (function() {
     var filterBar = document.getElementById('filterBar');
-    var buttons = filterBar.querySelectorAll('.filter-btn');
+    var buttons = filterBar.querySelectorAll('.filter-btn[data-cat]');
     var rows = document.querySelectorAll('#postsList > .rsrc-post-row, #postsList > .series-group');
+    var cmdSearch = document.getElementById('cmdSearch');
+    var searchInput = document.getElementById('searchInput');
+    var searchToggle = document.getElementById('searchToggle');
+    var searchClose = document.getElementById('searchClose');
+    var searchCount = document.getElementById('searchCount');
     var activeCat = 'all';
+    var query = '';
+    var lastQuery = '';
+    var navRows = [];
+    var navIdx = -1;
 
     // Map badge class suffix to filter category
     function getRowCat(el) {
       var badge = el.querySelector('.rsrc-badge');
       if (!badge) return 'analysis';
-      var cls = badge.className;
-      var m = cls.match(/rsrc-badge--(\w+)/);
+      var m = badge.className.match(/rsrc-badge--(\w+)/);
       return m ? m[1] : 'analysis';
     }
 
@@ -2459,28 +2656,103 @@ ${posts_list_html}
       children.style.display = isOpen ? 'none' : '';
       toggle.textContent = isOpen ? '[+]' : '[-]';
       if (group) group.classList.toggle('open', !isOpen);
+      rebuildNav();
     };
 
     var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function applyFilter(cat) {
-      activeCat = cat;
+    // Rows currently visible/navigable, in document order
+    function rebuildNav() {
+      navRows = [];
+      var all = document.querySelectorAll('#postsList .series-header, #postsList .rsrc-post-row');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].offsetParent !== null) navRows.push(all[i]);
+      }
+    }
+
+    function setNavIdx(idx) {
+      if (navIdx >= 0 && navRows[navIdx]) navRows[navIdx].classList.remove('kb-active');
+      navIdx = idx;
+      if (navIdx >= 0 && navRows[navIdx]) {
+        var el = navRows[navIdx];
+        el.classList.add('kb-active');
+        el.scrollIntoView({ block: 'nearest' });
+        if (typeof showDetail === 'function') showDetail(el);
+      } else if (typeof hideDetail === 'function') {
+        hideDetail();
+      }
+    }
+
+    function navMove(d) {
+      rebuildNav();
+      if (navRows.length === 0) return;
+      var idx = navIdx + d;
+      if (idx < 0) idx = navRows.length - 1;
+      if (idx >= navRows.length) idx = 0;
+      setNavIdx(idx);
+    }
+
+    function navOpen() {
+      if (navIdx < 0 || !navRows[navIdx]) return;
+      var el = navRows[navIdx];
+      if (el.classList.contains('series-header')) {
+        el.click();
+        rebuildNav();
+        navIdx = navRows.indexOf(el);
+      } else if (el.getAttribute('href')) {
+        window.location.href = el.getAttribute('href');
+      }
+    }
+
+    function updateCount() {
+      if (!searchCount) return;
+      if (query === '') { searchCount.textContent = ''; return; }
+      var hits = 0;
+      for (var i = 0; i < navRows.length; i++) {
+        if (navRows[i].tagName === 'A') hits++;
+      }
+      searchCount.textContent = hits + (hits === 1 ? ' hit' : ' hits');
+    }
+
+    function applyFilters(animate) {
+      setNavIdx(-1);
       var visibleIdx = 0;
       for (var i = 0; i < rows.length; i++) {
         var el = rows[i];
         var isSeries = el.classList.contains('series-group');
         var elCat = isSeries ? el.getAttribute('data-tag').toLowerCase() : getRowCat(el);
-        var show = (cat === 'all' || elCat === cat);
+        var catOk = (activeCat === 'all' || elCat === activeCat);
+        var show;
+        if (isSeries) {
+          var header = el.querySelector('.series-header');
+          var container = el.querySelector('.series-children');
+          var toggle = el.querySelector('.series-toggle');
+          var children = container.querySelectorAll('.rsrc-post-row');
+          var headerMatch = query !== '' && header.textContent.toLowerCase().indexOf(query) !== -1;
+          var anyChild = false;
+          for (var c = 0; c < children.length; c++) {
+            var childMatch = query === '' || headerMatch ||
+              children[c].textContent.toLowerCase().indexOf(query) !== -1;
+            children[c].style.display = childMatch ? '' : 'none';
+            if (childMatch) anyChild = true;
+          }
+          show = catOk && (query === '' || anyChild);
+          // Expand groups while searching; collapse again when search clears
+          if (query !== '') {
+            container.style.display = '';
+            el.classList.add('open');
+            if (toggle) toggle.textContent = '[-]';
+          } else if (lastQuery !== '') {
+            container.style.display = 'none';
+            el.classList.remove('open');
+            if (toggle) toggle.textContent = '[+]';
+          }
+        } else {
+          show = catOk && (query === '' || el.textContent.toLowerCase().indexOf(query) !== -1);
+        }
         el.style.display = show ? '' : 'none';
         if (show) {
-          if (isSeries) {
-            // Update gutter on series header
-            var hdrGutter = el.querySelector('.series-header .rsrc-gutter .series-toggle');
-            if (!hdrGutter) {
-              var g = el.querySelector('.series-header .rsrc-gutter');
-              // Series header gutter is the toggle icon, skip offset renumbering
-            }
-          } else {
+          if (!isSeries) {
             var gutter = el.querySelector('.rsrc-gutter');
             if (gutter) {
               var offset = (visibleIdx * 32).toString(16).toUpperCase();
@@ -2488,7 +2760,7 @@ ${posts_list_html}
               gutter.textContent = '.rsrc:' + offset;
             }
           }
-          if (!prefersRM) {
+          if (animate && !prefersRM) {
             el.style.animation = 'none';
             el.offsetHeight;
             el.style.animation = '';
@@ -2497,13 +2769,13 @@ ${posts_list_html}
           visibleIdx++;
         }
       }
+      lastQuery = query;
       for (var j = 0; j < buttons.length; j++) {
-        var isActive = buttons[j].getAttribute('data-cat') === cat;
+        var isActive = buttons[j].getAttribute('data-cat') === activeCat;
         buttons[j].classList.toggle('active', isActive);
         buttons[j].setAttribute('aria-pressed', isActive ? 'true' : 'false');
       }
-      // Clear animation after stagger completes
-      if (!prefersRM) {
+      if (animate && !prefersRM) {
         var filterDelay = visibleIdx * 35 + 200;
         setTimeout(function() {
           for (var i = 0; i < rows.length; i++) {
@@ -2511,18 +2783,77 @@ ${posts_list_html}
           }
         }, filterDelay);
       }
+      rebuildNav();
+      updateCount();
     }
 
     filterBar.addEventListener('click', function(e) {
-      var btn = e.target.closest('.filter-btn');
+      var btn = e.target.closest('.filter-btn[data-cat]');
       if (!btn) return;
       var cat = btn.getAttribute('data-cat');
-      if (cat === activeCat || cat === 'all') {
-        applyFilter('all');
-      } else {
-        applyFilter(cat);
+      activeCat = (cat === activeCat || cat === 'all') ? 'all' : cat;
+      applyFilters(true);
+    });
+
+    // ── Search open/close ──
+    function openSearch() {
+      cmdSearch.style.display = 'flex';
+      searchToggle.setAttribute('aria-expanded', 'true');
+      searchInput.focus();
+    }
+    function closeSearch() {
+      searchInput.value = '';
+      if (query !== '') {
+        query = '';
+        applyFilters(false);
+      }
+      cmdSearch.style.display = 'none';
+      searchToggle.setAttribute('aria-expanded', 'false');
+    }
+    searchToggle.addEventListener('click', function() {
+      if (cmdSearch.style.display === 'none') openSearch();
+      else closeSearch();
+    });
+    searchClose.addEventListener('click', closeSearch);
+    searchInput.addEventListener('input', function() {
+      query = searchInput.value.trim().toLowerCase();
+      applyFilters(false);
+    });
+
+    // ── Keyboard shortcuts: / search, j/k move, Enter open, Esc clear ──
+    document.addEventListener('keydown', function(e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        if (e.target !== searchInput) return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeSearch();
+        } else if (e.key === 'Enter' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          searchInput.blur();
+          navMove(1);
+        }
+        return;
+      }
+      if (e.key === '/') {
+        e.preventDefault();
+        openSearch();
+      } else if (e.key === 'j' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        navMove(1);
+      } else if (e.key === 'k' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        navMove(-1);
+      } else if (e.key === 'Enter') {
+        navOpen();
+      } else if (e.key === 'Escape') {
+        if (cmdSearch.style.display !== 'none') closeSearch();
+        else setNavIdx(-1);
       }
     });
+
+    rebuildNav();
 
     // Initial stagger on page load
     if (!prefersRM) {
