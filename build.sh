@@ -2327,6 +2327,70 @@ cat > "_site/index.html" << ENDINDEX
       .dos-stub .stub-ascii { display: none; }
     }
 
+    /* ── Desktop set dressing: unfocused windows (decorative, wide screens) ──
+     * Deliberately dim — like blurred-out windows behind the focused one.
+     * Static, non-interactive, hidden below 1380px. */
+    .bg-window {
+      display: none;
+      position: fixed;
+      z-index: -1;
+      pointer-events: none;
+      user-select: none;
+      font-family: "Fira Code", "Consolas", monospace;
+      border: 1px solid #1c1d2b;
+      border-radius: 6px;
+      background: rgba(13, 13, 19, 0.6);
+      overflow: hidden;
+    }
+    .bgw-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.7rem;
+      background: #10101a;
+      border-bottom: 1px solid #1c1d2b;
+      font-size: 0.68rem;
+      color: #34374f;
+      white-space: nowrap;
+    }
+    .bgw-dots { display: flex; gap: 5px; flex-shrink: 0; }
+    .bgw-dots span { width: 7px; height: 7px; border-radius: 50%; background: #23242f; }
+    .bgw-body {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.65rem;
+      line-height: 1.8;
+      color: #2c2f4a;
+      white-space: pre;
+    }
+    .bgw-p { color: #3a3e63; }
+    .bg-hex { left: -120px; top: 14vh; width: 350px; }
+    .bg-term { right: -40px; bottom: 9vh; width: 380px; }
+    @media (min-width: 1380px) {
+      .bg-window { display: block; }
+    }
+
+    /* ── WM status bar ── */
+    .wm-bar {
+      max-width: 900px;
+      margin: 1.5rem auto 0;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid #1e1e28;
+      border-radius: 4px;
+      background: #11111a;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 0.7rem;
+      user-select: none;
+    }
+    .wm-ws { color: #3f4260; }
+    .wm-ws.active { color: #8be9fd; }
+    .wm-spacer { flex: 1; }
+    .wm-stat { color: #555872; }
+    .wm-sep { color: #2a2a3a; }
+    @media (max-width: 700px) { .wm-bar { display: none; } }
+
   </style>
   <script type="application/ld+json">
   [
@@ -2366,6 +2430,33 @@ cat > "_site/index.html" << ENDINDEX
 <!-- Rich header intact. Nothing packed here. -->
 
 <a href="#postsList" class="skip-link">Skip to posts</a>
+
+<div class="bg-window bg-hex" aria-hidden="true">
+  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>hex-viewer &#8212; sample.bin</div>
+  <div class="bgw-body">00000040  0E 1F BA 0E 00 B4 09 CD  ........
+00000048  21 B8 01 4C CD 21 54 68  !..L.!Th
+00000050  69 73 20 70 72 6F 67 72  is progr
+00000058  61 6D 20 63 61 6E 6E 6F  am canno
+00000060  74 20 62 65 20 72 75 6E  t be run
+00000068  20 69 6E 20 44 4F 53 20   in DOS
+00000070  6D 6F 64 65 2E 0D 0D 0A  mode....
+00000078  24 00 00 00 00 00 00 00  &#36;.......
+00000080  50 45 00 00 4C 01 03 00  PE..L...
+00000088  00 00 00 00 00 00 00 00  ........
+00000090  E0 00 02 01 0B 01 0E 00  ........
+00000098  00 16 00 00 00 0A 00 00  ........</div>
+</div>
+
+<div class="bg-window bg-term" aria-hidden="true">
+  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>zsh &#8212; ~/samples</div>
+  <div class="bgw-body"><span class="bgw-p">&#36;</span> file sample.bin
+sample.bin: PE32 executable (GUI) Intel 80386
+<span class="bgw-p">&#36;</span> strings -n 8 sample.bin | head -3
+!This program cannot be run in DOS mode.
+.rdata&#36;zzzdbg
+budha.exe
+<span class="bgw-p">&#36;</span> &#9601;</div>
+</div>
 
 <header>
   <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
@@ -2486,6 +2577,16 @@ ${posts_list_html}
   </div>
   </div>
 </header>
+
+<div class="wm-bar" aria-hidden="true">
+  <span class="wm-ws active">[1:pe-viewer]</span>
+  <span class="wm-ws">[2:x64dbg]</span>
+  <span class="wm-ws">[3:notes]</span>
+  <span class="wm-spacer"></span>
+  <span class="wm-stat">${total_posts} samples</span>
+  <span class="wm-sep">&middot;</span>
+  <span class="wm-stat">$(date -u +%Y-%m-%d)</span>
+</div>
 
 <footer class="dos-stub" aria-hidden="true">
   <div class="stub-row"><span class="stub-off">0x0000</span><span class="stub-hex"><span class="mz">4D 5A</span> 90 00 03 00 00 00 04 00 00 00 FF FF 00 00</span><span class="stub-ascii"><span class="mz">MZ</span>..............</span></div>
