@@ -2329,7 +2329,8 @@ cat > "_site/index.html" << ENDINDEX
 
     /* ── Desktop set dressing: unfocused windows (decorative, wide screens) ──
      * Deliberately dim — like blurred-out windows behind the focused one.
-     * Static, non-interactive, hidden below 1380px. */
+     * Static, non-interactive; fully on-screen in the side margins, and only
+     * rendered when the viewport leaves comfortable clearance (>=1640px). */
     .bg-window {
       display: none;
       position: fixed;
@@ -2352,6 +2353,8 @@ cat > "_site/index.html" << ENDINDEX
       font-size: 0.68rem;
       color: #34374f;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .bgw-dots { display: flex; gap: 5px; flex-shrink: 0; }
     .bgw-dots span { width: 7px; height: 7px; border-radius: 50%; background: #23242f; }
@@ -2364,9 +2367,9 @@ cat > "_site/index.html" << ENDINDEX
     }
     .bgw-p { color: #3a3e63; }
     .bgw-sep { border-top: 1px solid #1c1d2b; margin: 0.45rem -0.8rem; }
-    .bg-dbg { left: -120px; top: 14vh; width: 350px; }
-    .bg-term { right: -40px; bottom: 9vh; width: 380px; }
-    @media (min-width: 1380px) {
+    .bg-dbg { left: 28px; top: 15vh; width: 300px; }
+    .bg-term { right: 28px; bottom: 10vh; width: 300px; }
+    @media (min-width: 1640px) {
       .bg-window { display: block; }
     }
 
