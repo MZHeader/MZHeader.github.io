@@ -2307,7 +2307,7 @@ cat > "_site/index.html" << ENDINDEX
     /* ── DOS stub footer ── */
     .dos-stub {
       max-width: 900px;
-      margin: 2.5rem auto 1rem;
+      margin: 2.5rem auto 0;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.72rem;
       line-height: 1.8;
@@ -2363,7 +2363,8 @@ cat > "_site/index.html" << ENDINDEX
       white-space: pre;
     }
     .bgw-p { color: #3a3e63; }
-    .bg-hex { left: -120px; top: 14vh; width: 350px; }
+    .bgw-sep { border-top: 1px solid #1c1d2b; margin: 0.45rem -0.8rem; }
+    .bg-dbg { left: -120px; top: 14vh; width: 350px; }
     .bg-term { right: -40px; bottom: 9vh; width: 380px; }
     @media (min-width: 1380px) {
       .bg-window { display: block; }
@@ -2372,7 +2373,7 @@ cat > "_site/index.html" << ENDINDEX
     /* ── WM status bar ── */
     .wm-bar {
       max-width: 900px;
-      margin: 1.5rem auto 0;
+      margin: 1.5rem auto 1.5rem;
       display: flex;
       align-items: center;
       gap: 0.7rem;
@@ -2431,30 +2432,25 @@ cat > "_site/index.html" << ENDINDEX
 
 <a href="#postsList" class="skip-link">Skip to posts</a>
 
-<div class="bg-window bg-hex" aria-hidden="true">
-  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>hex-viewer &#8212; sample.bin</div>
-  <div class="bgw-body">00000040  0E 1F BA 0E 00 B4 09 CD  ........
-00000048  21 B8 01 4C CD 21 54 68  !..L.!Th
-00000050  69 73 20 70 72 6F 67 72  is progr
-00000058  61 6D 20 63 61 6E 6E 6F  am canno
-00000060  74 20 62 65 20 72 75 6E  t be run
-00000068  20 69 6E 20 44 4F 53 20   in DOS
-00000070  6D 6F 64 65 2E 0D 0D 0A  mode....
-00000078  24 00 00 00 00 00 00 00  &#36;.......
-00000080  50 45 00 00 4C 01 03 00  PE..L...
-00000088  00 00 00 00 00 00 00 00  ........
-00000090  E0 00 02 01 0B 01 0E 00  ........
-00000098  00 16 00 00 00 0A 00 00  ........</div>
+<div class="bg-window bg-dbg" aria-hidden="true">
+  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>x64dbg &#8212; stage2.bin (paused)</div>
+  <div class="bgw-body"><span class="bgw-p">EIP</span> 00401D2E   <span class="bgw-p">bp VirtualProtect</span>
+<span class="bgw-p">EAX</span> 00000000   <span class="bgw-p">EBX</span> 7FFDE000
+<span class="bgw-p">ECX</span> 0012FF8C   <span class="bgw-p">EDX</span> 00401000<div class="bgw-sep"></div>00401D2B  push 40h   ; RWX
+00401D2D  lea eax, [ebp-10h]
+00401D30  push eax
+00401D31  call VirtualProtect</div>
 </div>
 
 <div class="bg-window bg-term" aria-hidden="true">
-  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>zsh &#8212; ~/samples</div>
-  <div class="bgw-body"><span class="bgw-p">&#36;</span> file sample.bin
-sample.bin: PE32 executable (GUI) Intel 80386
-<span class="bgw-p">&#36;</span> strings -n 8 sample.bin | head -3
-!This program cannot be run in DOS mode.
-.rdata&#36;zzzdbg
-budha.exe
+  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>zsh &#8212; ~/cases/triage</div>
+  <div class="bgw-body"><span class="bgw-p">&#36;</span> capa stage2.bin | tail -3
+T1055 process injection
+T1140 deobfuscate/decode
+<span class="bgw-p">&#36;</span> python3 xor_dec.py -k 0x5A
+[+] 4096 bytes -> c2_config.json
+<span class="bgw-p">&#36;</span> jq .host c2_config.json
+"hxxp://45.93.xx.xx:8080"
 <span class="bgw-p">&#36;</span> &#9601;</div>
 </div>
 
@@ -2578,21 +2574,21 @@ ${posts_list_html}
   </div>
 </header>
 
-<div class="wm-bar" aria-hidden="true">
-  <span class="wm-ws active">[1:pe-viewer]</span>
-  <span class="wm-ws">[2:x64dbg]</span>
-  <span class="wm-ws">[3:notes]</span>
-  <span class="wm-spacer"></span>
-  <span class="wm-stat">${total_posts} samples</span>
-  <span class="wm-sep">&middot;</span>
-  <span class="wm-stat">$(date -u +%Y-%m-%d)</span>
-</div>
-
 <footer class="dos-stub" aria-hidden="true">
   <div class="stub-row"><span class="stub-off">0x0000</span><span class="stub-hex"><span class="mz">4D 5A</span> 90 00 03 00 00 00 04 00 00 00 FF FF 00 00</span><span class="stub-ascii"><span class="mz">MZ</span>..............</span></div>
   <div class="stub-row"><span class="stub-off">0x0040</span><span class="stub-hex">0E 1F BA 0E 00 B4 09 CD 21 B8 01 4C CD 21 54 68</span><span class="stub-ascii">........!..L.!Th</span></div>
   <div class="stub-msg">This program cannot be run in DOS mode.</div>
 </footer>
+
+<div class="wm-bar" aria-hidden="true">
+  <span class="wm-ws active">[1:pe-viewer]</span>
+  <span class="wm-ws">[2:x64dbg]</span>
+  <span class="wm-ws">[3:zsh]</span>
+  <span class="wm-spacer"></span>
+  <span class="wm-stat">${total_posts} samples</span>
+  <span class="wm-sep">&middot;</span>
+  <span class="wm-stat">$(date -u +%Y-%m-%d)</span>
+</div>
 
 <!-- Right detail panel -->
 <div class="pe-detail-panel" id="detailPanel">
