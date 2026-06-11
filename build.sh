@@ -2307,7 +2307,7 @@ cat > "_site/index.html" << ENDINDEX
     /* ── DOS stub footer ── */
     .dos-stub {
       max-width: 900px;
-      margin: 2.5rem auto 0;
+      margin: 2.5rem auto 1rem;
       font-family: "Fira Code", "Consolas", monospace;
       font-size: 0.72rem;
       line-height: 1.8;
@@ -2326,74 +2326,6 @@ cat > "_site/index.html" << ENDINDEX
       .dos-stub { font-size: 0.6rem; }
       .dos-stub .stub-ascii { display: none; }
     }
-
-    /* ── Desktop set dressing: unfocused windows (decorative, wide screens) ──
-     * Deliberately dim — like blurred-out windows behind the focused one.
-     * Static, non-interactive; fully on-screen in the side margins, and only
-     * rendered when the viewport leaves comfortable clearance (>=1640px). */
-    .bg-window {
-      display: none;
-      position: fixed;
-      z-index: -1;
-      pointer-events: none;
-      user-select: none;
-      font-family: "Fira Code", "Consolas", monospace;
-      border: 1px solid #1c1d2b;
-      border-radius: 6px;
-      background: rgba(13, 13, 19, 0.6);
-      overflow: hidden;
-    }
-    .bgw-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.7rem;
-      background: #10101a;
-      border-bottom: 1px solid #1c1d2b;
-      font-size: 0.68rem;
-      color: #34374f;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .bgw-dots { display: flex; gap: 5px; flex-shrink: 0; }
-    .bgw-dots span { width: 7px; height: 7px; border-radius: 50%; background: #23242f; }
-    .bgw-body {
-      padding: 0.6rem 0.8rem;
-      font-size: 0.65rem;
-      line-height: 1.8;
-      color: #2c2f4a;
-      white-space: pre;
-    }
-    .bgw-p { color: #3a3e63; }
-    .bgw-sep { border-top: 1px solid #1c1d2b; margin: 0.45rem -0.8rem; }
-    .bg-dbg { left: 28px; top: 15vh; width: 300px; }
-    .bg-term { right: 28px; bottom: 10vh; width: 300px; }
-    @media (min-width: 1640px) {
-      .bg-window { display: block; }
-    }
-
-    /* ── WM status bar ── */
-    .wm-bar {
-      max-width: 900px;
-      margin: 1.5rem auto 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.3rem 0.9rem;
-      border: 1px solid #1e1e28;
-      border-radius: 4px;
-      background: #11111a;
-      font-family: "Fira Code", "Consolas", monospace;
-      font-size: 0.7rem;
-      user-select: none;
-    }
-    .wm-ws { color: #3f4260; }
-    .wm-ws.active { color: #8be9fd; }
-    .wm-spacer { flex: 1; }
-    .wm-stat { color: #555872; }
-    .wm-sep { color: #2a2a3a; }
-    @media (max-width: 700px) { .wm-bar { display: none; } }
 
   </style>
   <script type="application/ld+json">
@@ -2434,28 +2366,6 @@ cat > "_site/index.html" << ENDINDEX
 <!-- Rich header intact. Nothing packed here. -->
 
 <a href="#postsList" class="skip-link">Skip to posts</a>
-
-<div class="bg-window bg-dbg" aria-hidden="true">
-  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>x64dbg &#8212; stage2.bin (paused)</div>
-  <div class="bgw-body"><span class="bgw-p">EIP</span> 00401D2E   <span class="bgw-p">bp VirtualProtect</span>
-<span class="bgw-p">EAX</span> 00000000   <span class="bgw-p">EBX</span> 7FFDE000
-<span class="bgw-p">ECX</span> 0012FF8C   <span class="bgw-p">EDX</span> 00401000<div class="bgw-sep"></div>00401D2B  push 40h   ; RWX
-00401D2D  lea eax, [ebp-10h]
-00401D30  push eax
-00401D31  call VirtualProtect</div>
-</div>
-
-<div class="bg-window bg-term" aria-hidden="true">
-  <div class="bgw-titlebar"><span class="bgw-dots"><span></span><span></span><span></span></span>zsh &#8212; ~/cases/triage</div>
-  <div class="bgw-body"><span class="bgw-p">&#36;</span> capa stage2.bin | tail -3
-T1055 process injection
-T1140 deobfuscate/decode
-<span class="bgw-p">&#36;</span> python3 xor_dec.py -k 0x5A
-[+] 4096 bytes -> c2_config.json
-<span class="bgw-p">&#36;</span> jq .host c2_config.json
-"hxxp://45.93.xx.xx:8080"
-<span class="bgw-p">&#36;</span> &#9601;</div>
-</div>
 
 <header>
   <h1 class="site-title" id="siteTitle"><span class="title-re" id="titleRE">Reverse Engineering</span><span class="title-malware">Malware</span></h1>
@@ -2582,16 +2492,6 @@ ${posts_list_html}
   <div class="stub-row"><span class="stub-off">0x0040</span><span class="stub-hex">0E 1F BA 0E 00 B4 09 CD 21 B8 01 4C CD 21 54 68</span><span class="stub-ascii">........!..L.!Th</span></div>
   <div class="stub-msg">This program cannot be run in DOS mode.</div>
 </footer>
-
-<div class="wm-bar" aria-hidden="true">
-  <span class="wm-ws active">[1:pe-viewer]</span>
-  <span class="wm-ws">[2:x64dbg]</span>
-  <span class="wm-ws">[3:zsh]</span>
-  <span class="wm-spacer"></span>
-  <span class="wm-stat">${total_posts} samples</span>
-  <span class="wm-sep">&middot;</span>
-  <span class="wm-stat">$(date -u +%Y-%m-%d)</span>
-</div>
 
 <!-- Right detail panel -->
 <div class="pe-detail-panel" id="detailPanel">
